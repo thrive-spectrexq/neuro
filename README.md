@@ -456,7 +456,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide.
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for full text.
+MIT License. See [LICENSE](LICENSE).
 
 
 </div>
