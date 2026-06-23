@@ -458,10 +458,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide.
 
 MIT License. See [LICENSE](LICENSE) for full text.
 
----
-
-<div align="center">
-
-Built with care for people who think in connections.
 
 </div>
