@@ -7,6 +7,8 @@ export default function GraphView() {
   const fgRef = useRef<any>();
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [hoverNode, setHoverNode] = useState<any>(null);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -62,9 +64,18 @@ export default function GraphView() {
         nodeLabel="name"
         nodeColor={(node: any) => node.type === 'note' ? '#a855f7' : '#3b82f6'} // Electric purple for notes, bright blue for tags
         nodeRelSize={6}
-        linkColor={() => 'rgba(168, 85, 247, 0.2)'} // Subtle purple for edges
-        linkWidth={1.5}
+        linkColor={(link: any) => {
+          if (!hoverNode) return 'rgba(168, 85, 247, 0.2)';
+          return (link.source.id === hoverNode.id || link.target.id === hoverNode.id)
+            ? 'rgba(168, 85, 247, 0.8)'
+            : 'rgba(168, 85, 247, 0.05)';
+        }}
+        linkWidth={(link: any) => {
+          if (!hoverNode) return 1.5;
+          return (link.source.id === hoverNode.id || link.target.id === hoverNode.id) ? 3 : 1;
+        }}
         backgroundColor="#0a0a0a" // dark theme
+        onNodeHover={setHoverNode}
         onNodeClick={handleNodeClick}
         nodeCanvasObject={(node: any, ctx, globalScale) => {
           const label = node.name;
@@ -74,18 +85,25 @@ export default function GraphView() {
           const isNote = node.type === 'note';
           const nodeColor = isNote ? '#a855f7' : '#3b82f6';
           const nodeRadius = isNote ? 6 : 4;
+          const isHovered = hoverNode && hoverNode.id === node.id;
 
           // Draw node circle
           ctx.beginPath();
-          ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI, false);
+          ctx.arc(node.x, node.y, isHovered ? nodeRadius * 1.5 : nodeRadius, 0, 2 * Math.PI, false);
           ctx.fillStyle = nodeColor;
           ctx.fill();
+          
+          if (isHovered) {
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1 / globalScale;
+            ctx.stroke();
+          }
 
           // Draw label
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillText(label, node.x, node.y + nodeRadius + 2);
+          ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.8)';
+          ctx.fillText(label, node.x, node.y + (isHovered ? nodeRadius * 1.5 : nodeRadius) + 2);
         }}
       />
     </div>

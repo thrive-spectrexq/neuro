@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.core.database import get_session
 from app.core.security import get_current_user
+from app.models.note import Note, NoteLink
+from app.models.tag import Tag, NoteTag
 
 router = APIRouter()
 
@@ -11,20 +14,61 @@ async def get_graph(
     session: AsyncSession = Depends(get_session),
     current_user: str = Depends(get_current_user)
 ):
-    # Return some initial dummy data so the UI isn't empty and doesn't crash
+    # Fetch notes for the current user
+    notes_result = await session.execute(select(Note).where(Note.user_id == current_user.id))
+    notes = notes_result.scalars().all()
+    
+    # We will build nodes out of notes and tags
+    nodes = []
+    links = []
+    
+    note_ids = []
+    for note in notes:
+        nodes.append({
+            "id": str(note.id),
+            "name": note.title,
+            "type": "note"
+        })
+        note_ids.append(note.id)
+    
+    # If the user has notes, find links between them
+    if note_ids:
+        # Note-to-note links
+        links_result = await session.execute(
+            select(NoteLink).where(NoteLink.source_id.in_(note_ids) | NoteLink.target_id.in_(note_ids))
+        )
+        note_links = links_result.scalars().all()
+        for link in note_links:
+            links.append({
+                "source": str(link.source_id),
+                "target": str(link.target_id)
+            })
+            
+        # Tags associated with these notes
+        tags_result = await session.execute(
+            select(NoteTag).where(NoteTag.note_id.in_(note_ids))
+        )
+        note_tags = tags_result.scalars().all()
+        
+        # We need to fetch the actual tags to get their names
+        tag_ids = [nt.tag_id for nt in note_tags]
+        if tag_ids:
+            actual_tags = await session.execute(select(Tag).where(Tag.id.in_(tag_ids)))
+            for tag in actual_tags.scalars().all():
+                nodes.append({
+                    "id": str(tag.id),
+                    "name": tag.name,
+                    "type": "tag"
+                })
+            
+            # Create links from notes to tags
+            for nt in note_tags:
+                links.append({
+                    "source": str(nt.note_id),
+                    "target": str(nt.tag_id)
+                })
+
     return {
-        "nodes": [
-            {"id": "1", "name": "Artificial Intelligence", "type": "note"},
-            {"id": "2", "name": "Machine Learning", "type": "note"},
-            {"id": "3", "name": "Neural Networks", "type": "note"},
-            {"id": "4", "name": "Deep Learning", "type": "note"},
-            {"id": "t1", "name": "#Tech", "type": "tag"}
-        ],
-        "links": [
-            {"source": "1", "target": "2"},
-            {"source": "2", "target": "3"},
-            {"source": "3", "target": "4"},
-            {"source": "1", "target": "t1"},
-            {"source": "4", "target": "t1"}
-        ]
+        "nodes": nodes,
+        "links": links
     }
