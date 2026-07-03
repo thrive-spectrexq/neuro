@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Neuro Clipper",
+  "version": "1.0.0",
+  "description": "Save pages and text to your Neuro second brain.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.js"]
+    }
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
+}
