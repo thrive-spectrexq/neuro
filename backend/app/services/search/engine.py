@@ -27,11 +27,7 @@ class SearchEngine:
 
     async def index_note(self, session: AsyncSession, note: Note):
         # 1. Update SQLite FTS5 table
-        # Ensure FTS table exists
-        await session.execute(text("""
-            CREATE VIRTUAL TABLE IF NOT EXISTS note_fts USING fts5(id UNINDEXED, title, content);
-        """))
-        
+
         # Remove old entry if exists, then insert
         await session.execute(text("DELETE FROM note_fts WHERE id = :id"), {"id": str(note.id)})
         await session.execute(text(

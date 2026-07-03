@@ -17,6 +17,8 @@ engine = create_async_engine(
 async def create_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+        from sqlalchemy import text
+        await conn.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS note_fts USING fts5(id UNINDEXED, title, content);"))
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSession(engine) as session:

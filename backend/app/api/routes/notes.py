@@ -45,7 +45,7 @@ async def _update_note_tags(session: AsyncSession, note_id: uuid.UUID, tags: lis
         if not tag:
             tag = Tag(name=tag_name)
             session.add(tag)
-            await session.commit()
+            await session.flush()
             await session.refresh(tag)
             
         note_tag = NoteTag(note_id=note_id, tag_id=tag.id)
@@ -62,26 +62,32 @@ async def create_note(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    note_data = note_in.model_dump(exclude={"tags"})
-    user_id = current_user.id if hasattr(current_user, 'id') else current_user.get("id")
-    note = Note(**note_data, user_id=user_id)
-    session.add(note)
-    await session.commit()
-    await session.refresh(note)
-    
-    if note_in.tags is not None:
-        await _update_note_tags(session, note.id, note_in.tags)
-    
-    await _update_note_links(session, note.id, note.content)
-    
-    await search_engine.index_note(session, note)
-    
-    await session.commit()
-    
-    tags = await _get_note_tags(session, note.id)
-    response_data = note.model_dump()
-    response_data["tags"] = tags
-    return NoteResponse(**response_data)
+    try:
+        note_data = note_in.model_dump(exclude={"tags"})
+        user_id = current_user.id if hasattr(current_user, 'id') else current_user.get("id")
+        note = Note(**note_data, user_id=user_id)
+        session.add(note)
+        await session.flush()
+        await session.refresh(note)
+        
+        if note_in.tags is not None:
+            await _update_note_tags(session, note.id, note_in.tags)
+        
+        await _update_note_links(session, note.id, note.content)
+        
+        await search_engine.index_note(session, note)
+        
+        await session.commit()
+        
+        tags = await _get_note_tags(session, note.id)
+        response_data = note.model_dump()
+        response_data["tags"] = tags
+        return NoteResponse(**response_data)
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=500, content={"detail": tb})
 
 @router.get("", response_model=NoteListResponse)
 async def list_notes(
@@ -140,7 +146,7 @@ async def update_note(
         note.updated_at = datetime.now(UTC)
         
     session.add(note)
-    await session.commit()
+    await session.flush()
     await session.refresh(note)
     
     if note_in.tags is not None:
