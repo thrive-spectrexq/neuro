@@ -186,7 +186,7 @@ importers:
   packages/sdk:
     devDependencies:
       typescript:
-        specifier: ^5.0.0
+        specifier: ^5.4.0
         version: 5.9.3
 
   packages/shared:

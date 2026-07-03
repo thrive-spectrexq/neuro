@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 from typing import Optional
 
-from app.api.deps import get_db, get_current_user
+from app.core.database import get_session
+from app.core.security import get_current_user
 from app.models.sync import SyncBlob, SyncBlobCreate, SyncBlobRead
 from app.models.user import User
 
@@ -12,7 +13,7 @@ router = APIRouter()
 @router.post("/", response_model=SyncBlobRead)
 def upload_sync_blob(
     *,
-    session: Session = Depends(get_db),
+    session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
     blob_in: SyncBlobCreate,
 ) -> SyncBlobRead:
@@ -32,7 +33,7 @@ def upload_sync_blob(
 @router.get("/latest", response_model=Optional[SyncBlobRead])
 def get_latest_sync_blob(
     *,
-    session: Session = Depends(get_db),
+    session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> Optional[SyncBlobRead]:
     statement = (

@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
-from app.api.deps import get_session
+from app.core.database import get_session
 from app.models.task import Task, TaskCreate, TaskUpdate, TaskStatusUpdate
 
 router = APIRouter()

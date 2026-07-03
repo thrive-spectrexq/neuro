@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '../stores/authStore';
 
 export interface GraphNode {
   id: string;
@@ -18,8 +19,20 @@ export interface GraphData {
 }
 
 const fetchGraphData = async (): Promise<GraphData> => {
-  const response = await fetch('/api/v1/graph');
+  const token = useAuthStore.getState().token;
+  const headers: HeadersInit = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch('/api/v1/graph', {
+    headers,
+  });
+
   if (!response.ok) {
+    if (response.status === 401) {
+      useAuthStore.getState().logout();
+    }
     throw new Error('Failed to fetch graph data');
   }
   return response.json();
