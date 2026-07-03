@@ -13,12 +13,12 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'notes': return <NotesPage />;
+      case 'notes': return <NotesPage onNavigate={setCurrentPage as any} />;
       case 'editor': return <EditorPage />;
       case 'graph': return <GraphPage />;
       case 'search': return <SearchPage />;
       case 'settings': return <SettingsPage />;
-      default: return <NotesPage />;
+      default: return <NotesPage onNavigate={setCurrentPage as any} />;
     }
   };
 
