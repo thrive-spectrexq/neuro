@@ -1,12 +1,13 @@
-from pydantic import BaseModel
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.database import get_session
 from app.core.security import get_current_user
-from app.services.search.engine import search_engine
-from app.services.ai.provider import get_ai_provider
 from app.models.user import User
+from app.services.ai.provider import get_ai_provider
+from app.services.search.engine import search_engine
 
 router = APIRouter()
 ai_provider = get_ai_provider()

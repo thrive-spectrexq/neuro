@@ -1,4 +1,3 @@
-import uuid
 
 class IngestionPipeline:
     async def process_markdown(self, content: str) -> dict:

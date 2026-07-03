@@ -1,8 +1,10 @@
 import uuid
+
 import chromadb
 from sentence_transformers import SentenceTransformer
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import get_settings
 from app.models.note import Note
 

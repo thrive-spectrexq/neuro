@@ -1,8 +1,10 @@
-from datetime import datetime
-from typing import Optional
 import uuid
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
+
 from app.models.note import ContentType
+
 
 class NoteCreate(BaseModel):
     title: str
@@ -10,19 +12,19 @@ class NoteCreate(BaseModel):
     content_type: ContentType = ContentType.markdown
     is_archived: bool = False
     is_pinned: bool = False
-    parent_id: Optional[uuid.UUID] = None
-    project_id: Optional[uuid.UUID] = None
-    tags: Optional[list[str]] = None
+    parent_id: uuid.UUID | None = None
+    project_id: uuid.UUID | None = None
+    tags: list[str] | None = None
 
 class NoteUpdate(BaseModel):
-    title: Optional[str] = None
-    content: Optional[str] = None
-    content_type: Optional[ContentType] = None
-    is_archived: Optional[bool] = None
-    is_pinned: Optional[bool] = None
-    parent_id: Optional[uuid.UUID] = None
-    project_id: Optional[uuid.UUID] = None
-    tags: Optional[list[str]] = None
+    title: str | None = None
+    content: str | None = None
+    content_type: ContentType | None = None
+    is_archived: bool | None = None
+    is_pinned: bool | None = None
+    parent_id: uuid.UUID | None = None
+    project_id: uuid.UUID | None = None
+    tags: list[str] | None = None
 
 class NoteResponse(BaseModel):
     id: uuid.UUID
@@ -33,8 +35,8 @@ class NoteResponse(BaseModel):
     updated_at: datetime
     is_archived: bool
     is_pinned: bool
-    parent_id: Optional[uuid.UUID]
-    project_id: Optional[uuid.UUID]
+    parent_id: uuid.UUID | None
+    project_id: uuid.UUID | None
     user_id: uuid.UUID
     tags: list[str] = []
     

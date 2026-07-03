@@ -1,20 +1,21 @@
-from datetime import datetime
-from typing import Optional
 import uuid
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
+
 
 class ProjectCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 class ProjectUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
 
 class ProjectResponse(BaseModel):
     id: uuid.UUID
     name: str
-    description: Optional[str]
+    description: str | None
     created_at: datetime
     updated_at: datetime
     user_id: uuid.UUID

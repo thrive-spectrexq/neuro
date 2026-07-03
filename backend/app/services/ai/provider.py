@@ -1,6 +1,7 @@
 import json
 from abc import ABC, abstractmethod
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+
 import httpx
 
 from app.core.config import get_settings

@@ -1,6 +1,7 @@
-from typing import Optional
 import uuid
+
 from sqlmodel import Field, SQLModel
+
 
 class NoteTag(SQLModel, table=True):
     note_id: uuid.UUID = Field(foreign_key="note.id", primary_key=True)

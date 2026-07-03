@@ -1,17 +1,17 @@
-import uuid
 import re
-from datetime import datetime, timezone
-from typing import Optional, List
+import uuid
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select, func, delete
+from sqlmodel import delete, func, select
 
 from app.core.database import get_session
 from app.core.security import get_current_user
 from app.models.note import Note, NoteLink
-from app.models.tag import Tag, NoteTag
+from app.models.tag import NoteTag, Tag
 from app.models.user import User
-from app.schemas.note import NoteCreate, NoteUpdate, NoteResponse, NoteListResponse
+from app.schemas.note import NoteCreate, NoteListResponse, NoteResponse, NoteUpdate
 from app.services.search.engine import search_engine
 
 router = APIRouter()
@@ -137,7 +137,7 @@ async def update_note(
     if update_data:
         for key, value in update_data.items():
             setattr(note, key, value)
-        note.updated_at = datetime.now(timezone.utc)
+        note.updated_at = datetime.now(UTC)
         
     session.add(note)
     await session.commit()
