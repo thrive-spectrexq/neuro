@@ -1,0 +1,13 @@
+{
+  "name": "neuro-word-count",
+  "version": "1.0.0",
+  "description": "Word count plugin for Neuro",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

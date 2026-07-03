@@ -1,0 +1,13 @@
+{
+  "name": "neuro-plugin-basic",
+  "version": "1.0.0",
+  "description": "Basic plugin template for Neuro",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

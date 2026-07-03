@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "neuro-word-count",
+      "version": "1.0.0",
+      "description": "A basic word count plugin",
+      "path": "./examples/word-count"
+    }
+  ]
+}
