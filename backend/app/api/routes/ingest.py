@@ -1,20 +1,34 @@
+from typing import List
 from fastapi import APIRouter, Depends, File, UploadFile
 from pydantic import BaseModel
 
 from app.core.security import get_current_user
+from app.workers.tasks import process_pdf_task, process_markdown_task
 
 router = APIRouter()
 
 class URLImport(BaseModel):
     url: str
 
-@router.post("/file")
-async def upload_file(
+@router.post("/pdf")
+async def ingest_pdf(
     file: UploadFile = File(...),
     current_user: str = Depends(get_current_user)
 ):
-    # Stub for file ingestion
-    return {"filename": file.filename, "status": "ingested"}
+    file_bytes = await file.read()
+    # Dispatch to celery
+    process_pdf_task.delay(file_bytes, file.filename, str(current_user.id))
+    return {"message": "PDF ingestion started", "filename": file.filename}
+
+@router.post("/markdown")
+async def ingest_markdown(
+    files: List[UploadFile] = File(...),
+    current_user: str = Depends(get_current_user)
+):
+    for file in files:
+        content = (await file.read()).decode("utf-8")
+        process_markdown_task.delay(content, file.filename, str(current_user.id))
+    return {"message": f"Started ingestion for {len(files)} markdown files"}
 
 @router.post("/url")
 async def import_url(

@@ -2,7 +2,8 @@ import asyncio
 from celery import Celery
 
 from app.core.config import get_settings
-from app.core.database import async_session_maker
+from app.core.database import engine
+from sqlalchemy.ext.asyncio.session import AsyncSession
 from app.services.ingestion.pipeline import ingestion_pipeline
 from app.models.note import Note
 from app.services.search.engine import search_engine
@@ -27,7 +28,7 @@ def run_async(coro):
 def process_pdf_task(file_bytes: bytes, filename: str, user_id: str):
     async def _process():
         result = await ingestion_pipeline.process_pdf(file_bytes)
-        async with async_session_maker() as session:
+        async with AsyncSession(engine) as session:
             note = Note(
                 title=filename,
                 content=result["content"],
@@ -45,7 +46,7 @@ def process_pdf_task(file_bytes: bytes, filename: str, user_id: str):
 def process_markdown_task(content: str, filename: str, user_id: str):
     async def _process():
         result = await ingestion_pipeline.process_markdown(content)
-        async with async_session_maker() as session:
+        async with AsyncSession(engine) as session:
             note = Note(
                 title=result["metadata"].get("title", filename),
                 content=result["content"],
