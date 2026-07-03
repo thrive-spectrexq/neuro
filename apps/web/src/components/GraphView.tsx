@@ -3,7 +3,7 @@ import ForceGraph2D from 'react-force-graph-2d';
 import { useGraph } from '../hooks/useGraph';
 
 export default function GraphView() {
-  const { data, isLoading, error } = useGraph();
+  const { data, isPending, error } = useGraph();
   const fgRef = useRef<any>();
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,9 +39,15 @@ export default function GraphView() {
     }
   }, []);
 
-  if (isLoading) return <div className="flex h-full w-full items-center justify-center bg-[#0a0a0a] text-purple-400">Loading graph data...</div>;
-  if (error) return <div className="flex h-full w-full items-center justify-center bg-[#0a0a0a] text-red-500">Error loading graph data</div>;
+  if (isPending) return <div className="flex h-full w-full items-center justify-center bg-[#0a0a0a] text-purple-400">Loading graph data...</div>;
+  if (error) return <div className="flex h-full w-full items-center justify-center bg-[#0a0a0a] text-red-500">Error loading graph data: {(error as Error).message}</div>;
   if (!data) return <div className="flex h-full w-full items-center justify-center bg-[#0a0a0a] text-gray-400">No graph data available</div>;
+
+  // Safely fallback if the backend returns edges instead of links
+  const safeData = {
+    nodes: data.nodes || [],
+    links: data.links || (data as any).edges || []
+  };
 
   return (
     <div ref={containerRef} className="w-full h-full bg-[#0a0a0a] overflow-hidden flex-grow relative">
@@ -52,7 +58,7 @@ export default function GraphView() {
         ref={fgRef}
         width={dimensions.width}
         height={dimensions.height}
-        graphData={data}
+        graphData={safeData}
         nodeLabel="name"
         nodeColor={(node: any) => node.type === 'note' ? '#a855f7' : '#3b82f6'} // Electric purple for notes, bright blue for tags
         nodeRelSize={6}
