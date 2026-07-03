@@ -2,7 +2,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 import uuid
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+
+class NoteLink(SQLModel, table=True):
+    source_id: uuid.UUID = Field(foreign_key="note.id", primary_key=True)
+    target_id: uuid.UUID = Field(foreign_key="note.id", primary_key=True)
 
 class ContentType(str, Enum):
     markdown = "markdown"
@@ -18,4 +22,9 @@ class Note(SQLModel, table=True):
     is_archived: bool = Field(default=False)
     is_pinned: bool = Field(default=False)
     parent_id: Optional[uuid.UUID] = Field(default=None, foreign_key="note.id")
+    project_id: Optional[uuid.UUID] = Field(default=None, foreign_key="project.id")
     user_id: uuid.UUID = Field(foreign_key="user.id")
+    
+    # relationships won't be exported in schema by default unless we use them
+    # NoteTag is defined in tag.py but we can't easily import it here due to circular deps,
+    # so we'll just handle it manually in the routes for now.

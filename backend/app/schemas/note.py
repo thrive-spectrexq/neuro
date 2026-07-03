@@ -11,6 +11,8 @@ class NoteCreate(BaseModel):
     is_archived: bool = False
     is_pinned: bool = False
     parent_id: Optional[uuid.UUID] = None
+    project_id: Optional[uuid.UUID] = None
+    tags: Optional[list[str]] = None
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
@@ -19,6 +21,8 @@ class NoteUpdate(BaseModel):
     is_archived: Optional[bool] = None
     is_pinned: Optional[bool] = None
     parent_id: Optional[uuid.UUID] = None
+    project_id: Optional[uuid.UUID] = None
+    tags: Optional[list[str]] = None
 
 class NoteResponse(BaseModel):
     id: uuid.UUID
@@ -30,7 +34,9 @@ class NoteResponse(BaseModel):
     is_archived: bool
     is_pinned: bool
     parent_id: Optional[uuid.UUID]
+    project_id: Optional[uuid.UUID]
     user_id: uuid.UUID
+    tags: list[str] = []
     
     model_config = ConfigDict(from_attributes=True)
 
