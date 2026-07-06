@@ -6,6 +6,10 @@ from pydantic import BaseModel, ConfigDict
 from app.models.note import ContentType
 
 
+class NoteLinkInfo(BaseModel):
+    id: uuid.UUID
+    title: str
+
 class NoteCreate(BaseModel):
     title: str
     content: str
@@ -39,6 +43,8 @@ class NoteResponse(BaseModel):
     project_id: uuid.UUID | None
     user_id: uuid.UUID
     tags: list[str] = []
+    forward_links: list[NoteLinkInfo] = []
+    backlinks: list[NoteLinkInfo] = []
     
     model_config = ConfigDict(from_attributes=True)
 

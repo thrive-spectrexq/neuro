@@ -39,6 +39,8 @@ class AutomationEngine:
                 await self._execute_auto_summarize(action, context)
             elif action_type == "categorize":
                 await self._execute_categorize(action, context)
+            elif action_type == "extract_entities":
+                await self._execute_extract_entities(action, context)
                 
     async def _execute_webhook(self, action: dict, context: dict):
         url = action.get("url")
@@ -57,5 +59,11 @@ class AutomationEngine:
     async def _execute_categorize(self, action: dict, context: dict):
         # Stub for categorization
         pass
+
+    async def _execute_extract_entities(self, action: dict, context: dict):
+        note_id = context.get("note_id")
+        if note_id:
+            from app.workers.tasks import extract_entities_task
+            extract_entities_task.delay(note_id)
 
 automation_engine = AutomationEngine()

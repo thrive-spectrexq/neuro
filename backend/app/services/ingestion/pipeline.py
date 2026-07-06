@@ -19,6 +19,29 @@ class IngestionPipeline:
             return "Summary generation failed."
         return summary
 
+    async def extract_entities(self, text: str) -> list[str]:
+        prompt = f"Extract the most important entities (people, places, concepts, organizations) from the following text. Return ONLY a JSON list of strings, for example: [\"Entity 1\", \"Entity 2\"]. Text: \n\n{text[:5000]}"
+        response = ""
+        try:
+            async for chunk in self.ai_provider.generate_response_stream(prompt, context=[]):
+                response += chunk
+                
+            response = response.strip()
+            if response.startswith("```json"):
+                response = response[7:]
+            if response.startswith("```"):
+                response = response[3:]
+            if response.endswith("```"):
+                response = response[:-3]
+                
+            import json
+            entities = json.loads(response.strip())
+            if isinstance(entities, list):
+                return [str(e) for e in entities]
+        except Exception:
+            pass
+        return []
+
     async def process_markdown(self, content: str) -> dict:
         """Parses Obsidian/Markdown file, extracts YAML frontmatter, and converts wikilinks."""
         metadata = {}
@@ -63,5 +86,21 @@ class IngestionPipeline:
             "content": text,
             "metadata": {"summary": summary, "type": "pdf"}
         }
+
+    async def process_vault_import(self, source_path: str, format: str) -> list[dict]:
+        """Routes a vault import request to the appropriate importer."""
+        if format == "obsidian":
+            from app.services.ingestion.obsidian import ObsidianImporter
+            importer = ObsidianImporter()
+        elif format == "notion":
+            from app.services.ingestion.notion import NotionImporter
+            importer = NotionImporter()
+        elif format == "roam":
+            from app.services.ingestion.roam import RoamImporter
+            importer = RoamImporter()
+        else:
+            raise ValueError(f"Unsupported import format: {format}")
+        
+        return await importer.process(source_path)
 
 ingestion_pipeline = IngestionPipeline()

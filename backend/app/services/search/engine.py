@@ -41,7 +41,7 @@ class SearchEngine:
         self.collection.upsert(
             documents=[text_content],
             embeddings=[embedding],
-            metadatas=[{"title": note.title, "user_id": str(note.user_id)}],
+            metadatas=[{"title": note.title, "user_id": str(note.user_id), "project_id": str(note.project_id) if note.project_id else ""}],
             ids=[str(note.id)]
         )
 
@@ -52,13 +52,19 @@ class SearchEngine:
         except Exception:
             pass
 
-    async def hybrid_search(self, session: AsyncSession, query: str, user_id: uuid.UUID, limit: int = 10) -> list[dict]:
+    async def hybrid_search(self, session: AsyncSession, query: str, user_id: uuid.UUID, project_id: uuid.UUID | None = None, limit: int = 10) -> list[dict]:
         # Semantic Search
         embedding = self._get_embedding(query)
+        where_clause = {"user_id": str(user_id)}
+        if project_id:
+            where_clause["project_id"] = str(project_id)
+        else:
+            where_clause["project_id"] = ""
+            
         vector_results = self.collection.query(
             query_embeddings=[embedding],
             n_results=limit,
-            where={"user_id": str(user_id)}
+            where=where_clause
         )
         
         vector_scores = {}
@@ -105,8 +111,11 @@ class SearchEngine:
             return []
             
         placeholders = ",".join([f"'{i}'" for i in sorted_ids])
-        notes_query = text(f"SELECT id, title, content FROM note WHERE id IN ({placeholders}) AND user_id = :user_id AND is_archived = 0")
-        notes_res = await session.execute(notes_query, {"user_id": str(user_id)})
+        
+        project_param = str(project_id) if project_id else ""
+        
+        notes_query = text(f"SELECT id, title, content FROM note WHERE id IN ({placeholders}) AND user_id = :user_id AND is_archived = 0 AND (project_id = :project_id OR (:project_id = '' AND project_id IS NULL))")
+        notes_res = await session.execute(notes_query, {"user_id": str(user_id), "project_id": project_param})
         
         notes_map = {str(row.id): {"id": str(row.id), "title": row.title, "content": row.content} for row in notes_res.fetchall()}
         

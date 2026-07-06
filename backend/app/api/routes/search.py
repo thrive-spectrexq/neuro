@@ -11,6 +11,7 @@ router = APIRouter()
 @router.get("")
 async def search_notes(
     q: str = Query(..., description="Search query"),
+    project_id: uuid.UUID | None = Query(None, description="Workspace project ID to search within"),
     limit: int = Query(10, description="Max results"),
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user)
@@ -20,6 +21,7 @@ async def search_notes(
         session=session,
         query=q,
         user_id=user_id,
+        project_id=project_id,
         limit=limit
     )
     return {"query": q, "results": results}

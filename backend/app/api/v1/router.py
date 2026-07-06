@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 
-from app.api.routes import ai, auth, graph, ingest, notes, projects, search, tasks, sync
+from app.api.routes import ai, auth, graph, ingest, notes, projects, search, tasks, sync, comments
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(notes.router, prefix="/notes", tags=["notes"])
 api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
+api_router.include_router(comments.router, prefix="/comments", tags=["comments"])
 api_router.include_router(search.router, prefix="/search", tags=["search"])
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(ingest.router, prefix="/ingest", tags=["ingest"])
