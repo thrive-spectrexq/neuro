@@ -396,7 +396,7 @@ The backend exposes a versioned REST API. Interactive docs are available at `htt
 
 ### Phase 1 — Foundation
 - [x] Core note editor (Markdown + rich text)
-- [ ] Bi-directional linking
+- [x] Bi-directional linking
 - [x] Full-text search
 - [x] Basic AI chat (with Ollama/OpenAI)
 - [x] Local vector embeddings + semantic search
@@ -404,13 +404,13 @@ The backend exposes a versioned REST API. Interactive docs are available at `htt
 
 ### Phase 2 — Knowledge Graph
 - [x] Graph view (note relationships)
-- [ ] Automatic entity extraction and linking
+- [x] Automatic entity extraction and linking
 - [x] Web clipper browser extension
 - [x] PDF ingestion and annotation
-- [ ] Import from Obsidian, Notion, Roam
+- [x] Import from Obsidian, Notion, Roam
 
 ### Phase 3 — Projects & Workflows
-- [ ] Project workspaces
+- [x] Project workspaces
 - [x] Task management (Kanban + lists)
 - [x] Trigger-based automation engine
 - [x] Webhook support
@@ -418,9 +418,9 @@ The backend exposes a versioned REST API. Interactive docs are available at `htt
 
 ### Phase 4 — Collaboration
 - [x] Optional end-to-end encrypted sync
-- [ ] Shared workspaces (self-hosted)
-- [ ] Commenting and review workflows
-- [ ] Audit log
+- [x] Shared workspaces (self-hosted)
+- [x] Commenting and review workflows
+- [x] Audit log
 
 ---
 
