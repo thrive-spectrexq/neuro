@@ -55,11 +55,10 @@ class SearchEngine:
     async def hybrid_search(self, session: AsyncSession, query: str, user_id: uuid.UUID, project_id: uuid.UUID | None = None, limit: int = 10) -> list[dict]:
         # Semantic Search
         embedding = self._get_embedding(query)
-        where_clause = {"user_id": str(user_id)}
         if project_id:
-            where_clause["project_id"] = str(project_id)
+            where_clause = {"$and": [{"user_id": str(user_id)}, {"project_id": str(project_id)}]}
         else:
-            where_clause["project_id"] = ""
+            where_clause = {"user_id": str(user_id)}
             
         vector_results = self.collection.query(
             query_embeddings=[embedding],

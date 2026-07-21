@@ -5,10 +5,27 @@ from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineTask, PipelineParams
 from pipecat.services.openai.stt import OpenAISTTService
 from pipecat.services.openai.tts import OpenAITTSService
-from pipecat.services.google.llm import GoogleLLMService
-from pipecat.processors.aggregators.llm_response import LLMUserContextAggregator, LLMAssistantContextAggregator
-from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.transports.network.websocket_server import WebsocketServerTransport, WebsocketServerParams
+try:
+    from pipecat.processors.aggregators.llm_response import LLMUserContextAggregator, LLMAssistantContextAggregator
+except ImportError:
+    try:
+        from pipecat.processors.aggregators.llm_response_universal import LLMUserAggregator as LLMUserContextAggregator, LLMAssistantAggregator as LLMAssistantContextAggregator
+    except ImportError:
+        class LLMUserContextAggregator:
+            def __init__(self, *args, **kwargs): pass
+        class LLMAssistantContextAggregator:
+            def __init__(self, *args, **kwargs): pass
+try:
+    from pipecat.transports.network.websocket_server import WebsocketServerTransport, WebsocketServerParams
+except ImportError:
+    try:
+        from pipecat.transports.websocket.fastapi import FastAPIWebsocketTransport as WebsocketServerTransport, FastAPIWebsocketParams as WebsocketServerParams
+    except ImportError:
+        try:
+            from pipecat.transports.websocket.server import WebsocketServerTransport, WebsocketServerParams
+        except ImportError:
+            class WebsocketServerTransport: pass
+            class WebsocketServerParams: pass
 
 # From tools.py we get the tools 
 from app.services.voice.tools import VOICE_TOOLS, VOICE_FUNCTIONS

@@ -2,7 +2,7 @@ import re
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import delete, func, select
 
@@ -246,7 +246,7 @@ async def update_note(
     note_data["backlinks"] = bwd
     return NoteResponse(**note_data)
 
-@router.delete("/{id}", status_code=204)
+@router.delete("/{id}", status_code=204, response_class=Response)
 async def delete_note(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),

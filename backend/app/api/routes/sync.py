@@ -62,7 +62,7 @@ async def get_sync_history(
     result = await session.execute(statement)
     return result.scalars().all()
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def clear_sync_data(
     *,
     session: AsyncSession = Depends(get_session),

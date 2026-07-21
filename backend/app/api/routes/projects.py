@@ -1,8 +1,8 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, or_
 
 from app.core.database import get_session
 from app.core.security import get_current_user
@@ -81,7 +81,7 @@ async def update_project(
     await session.refresh(project)
     return project
 
-@router.delete("/{id}", status_code=204)
+@router.delete("/{id}", status_code=204, response_class=Response)
 async def delete_project(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
@@ -152,7 +152,7 @@ async def add_member(
     
     return member
 
-@router.delete("/{id}/members/{user_id}", status_code=204)
+@router.delete("/{id}/members/{user_id}", status_code=204, response_class=Response)
 async def remove_member(
     id: uuid.UUID,
     user_id: uuid.UUID,

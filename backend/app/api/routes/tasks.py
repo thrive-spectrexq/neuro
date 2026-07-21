@@ -12,7 +12,7 @@ from app.models.user import User
 
 router = APIRouter()
 
-@router.get("/", response_model=list[Task])
+@router.get("", response_model=list[Task])
 async def read_tasks(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -26,7 +26,7 @@ async def read_tasks(
     tasks = result.scalars().all()
     return tasks
 
-@router.post("/", response_model=Task)
+@router.post("", response_model=Task)
 async def create_task(
     *, session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -99,12 +99,12 @@ async def update_task_status(
     await session.refresh(task)
     return task
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def delete_task(
     *, session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
     id: UUID
-) -> Any:
+) -> None:
     """
     Delete a task.
     """

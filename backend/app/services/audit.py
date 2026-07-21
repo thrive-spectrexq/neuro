@@ -11,8 +11,8 @@ class AuditService:
         action: str,
         target_type: str,
         target_id: str,
-        details: dict | None = None,
-        project_id: uuid.UUID | None = None
+        project_id: uuid.UUID | None = None,
+        details: dict | None = None
     ):
         log = AuditLog(
             user_id=user_id,
@@ -35,13 +35,35 @@ class AuditService:
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
-    async def export_audit_log(self, session: AsyncSession, user_id: uuid.UUID, start_date, end_date) -> list[AuditLog]:
-        stmt = select(AuditLog).where(
-            AuditLog.user_id == user_id,
-            AuditLog.created_at >= start_date,
-            AuditLog.created_at <= end_date
-        ).order_by(AuditLog.created_at.desc())
+    async def export_audit_log(
+        self,
+        session: AsyncSession,
+        user_id: uuid.UUID,
+        start_date=None,
+        end_date=None,
+        project_id: uuid.UUID | None = None
+    ) -> list[AuditLog]:
+        stmt = select(AuditLog).where(AuditLog.user_id == user_id)
+        if project_id:
+            stmt = stmt.where(AuditLog.project_id == project_id)
+        if start_date:
+            stmt = stmt.where(AuditLog.timestamp >= start_date)
+        if end_date:
+            stmt = stmt.where(AuditLog.timestamp <= end_date)
+        stmt = stmt.order_by(AuditLog.timestamp.desc())
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
 audit_service = AuditService()
+
+async def log_action(
+    session: AsyncSession,
+    user_id: uuid.UUID,
+    action: str,
+    target_type: str,
+    target_id: str,
+    project_id: uuid.UUID | None = None,
+    details: dict | None = None
+):
+    return await audit_service.log_action(session, user_id, action, target_type, target_id, project_id, details)
+

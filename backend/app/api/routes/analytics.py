@@ -1,4 +1,9 @@
-from fastapi import APIRouter, Depends
+import csv
+import io
+import json
+import uuid
+from datetime import datetime
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, func
 
@@ -13,6 +18,7 @@ from app.models.tag import Tag
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.analytics import SystemStatsResponse, ActivityItemResponse
+from app.services.audit import audit_service
 
 router = APIRouter()
 
@@ -75,3 +81,61 @@ async def get_recent_activity(
             )
         )
     return activity
+
+
+@router.get("/audit/export")
+async def export_audit_logs(
+    format: str = Query("json", regex="^(json|csv)$"),
+    project_id: uuid.UUID | None = Query(None),
+    start_date: datetime | None = Query(None),
+    end_date: datetime | None = Query(None),
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    user_id = current_user.id if hasattr(current_user, 'id') else uuid.UUID(current_user.get("id"))
+    logs = await audit_service.export_audit_log(
+        session, user_id=user_id, start_date=start_date, end_date=end_date, project_id=project_id
+    )
+
+    if format == "csv":
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["id", "user_id", "project_id", "action", "target_type", "target_id", "timestamp", "details"])
+        for log in logs:
+            writer.writerow([
+                str(log.id),
+                str(log.user_id),
+                str(log.project_id) if log.project_id else "",
+                log.action,
+                log.target_type,
+                log.target_id,
+                log.timestamp.isoformat(),
+                json.dumps(log.details or {})
+            ])
+        csv_data = output.getvalue()
+        return Response(
+            content=csv_data,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=neuro_audit_export_{user_id}.csv"}
+        )
+
+    # JSON export
+    json_data = [
+        {
+            "id": str(log.id),
+            "user_id": str(log.user_id),
+            "project_id": str(log.project_id) if log.project_id else None,
+            "action": log.action,
+            "target_type": log.target_type,
+            "target_id": log.target_id,
+            "details": log.details or {},
+            "timestamp": log.timestamp.isoformat()
+        }
+        for log in logs
+    ]
+    return Response(
+        content=json.dumps(json_data, indent=2),
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=neuro_audit_export_{user_id}.json"}
+    )
+

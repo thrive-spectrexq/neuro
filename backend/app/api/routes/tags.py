@@ -1,7 +1,7 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, func
 
@@ -54,7 +54,7 @@ async def create_tag(
     return TagResponse(id=tag.id, name=tag.name, note_count=0)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def delete_tag(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),

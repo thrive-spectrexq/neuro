@@ -12,7 +12,7 @@ from app.models.audit import AuditLog
 class NoteService:
     @staticmethod
     async def create_note(session: AsyncSession, user_id: UUID, data: NoteCreate) -> Note:
-        \"\"\"Create a new note, handling tags and emitting audit log.\"\"\"
+        """Create a new note, handling tags and emitting audit log."""
         note_dict = data.model_dump(exclude={"tags"})
         note = Note(**note_dict, user_id=user_id)
         session.add(note)
@@ -42,7 +42,7 @@ class NoteService:
 
     @staticmethod
     async def get_note(session: AsyncSession, note_id: UUID, user_id: UUID) -> Note:
-        \"\"\"Get a note with ownership check.\"\"\"
+        """Get a note with ownership check."""
         statement = select(Note).where(Note.id == note_id)
         result = await session.execute(statement)
         note = result.scalar_one_or_none()
@@ -64,7 +64,7 @@ class NoteService:
         page: int = 1, 
         size: int = 20
     ) -> Tuple[List[Note], int]:
-        \"\"\"Get a paginated list of notes.\"\"\"
+        """Get a paginated list of notes."""
         statement = select(Note).where(Note.user_id == user_id, Note.is_archived == is_archived)
         
         if project_id:
@@ -85,7 +85,7 @@ class NoteService:
 
     @staticmethod
     async def update_note(session: AsyncSession, note_id: UUID, user_id: UUID, data: NoteUpdate) -> Note:
-        \"\"\"Partially update a note.\"\"\"
+        """Partially update a note."""
         note = await NoteService.get_note(session, note_id, user_id)
         
         update_data = data.model_dump(exclude_unset=True, exclude={"tags"})
@@ -122,7 +122,7 @@ class NoteService:
 
     @staticmethod
     async def delete_note(session: AsyncSession, note_id: UUID, user_id: UUID) -> None:
-        \"\"\"Delete a note (soft delete by setting is_archived or hard delete).\"\"\"
+        """Delete a note (soft delete by setting is_archived or hard delete)."""
         note = await NoteService.get_note(session, note_id, user_id)
         
         # Emit audit log
@@ -141,7 +141,7 @@ class NoteService:
 
     @staticmethod
     async def get_note_links(session: AsyncSession, note_id: UUID) -> Dict[str, List[NoteLink]]:
-        \"\"\"Get forward links and backlinks for a note.\"\"\"
+        """Get forward links and backlinks for a note."""
         forward_stmt = select(NoteLink).where(NoteLink.source_id == note_id)
         backward_stmt = select(NoteLink).where(NoteLink.target_id == note_id)
         
@@ -155,7 +155,7 @@ class NoteService:
 
     @staticmethod
     async def link_notes(session: AsyncSession, source_id: UUID, target_id: UUID) -> NoteLink:
-        \"\"\"Link two notes together.\"\"\"
+        """Link two notes together."""
         stmt = select(NoteLink).where(NoteLink.source_id == source_id, NoteLink.target_id == target_id)
         res = await session.execute(stmt)
         existing_link = res.scalar_one_or_none()
@@ -171,7 +171,7 @@ class NoteService:
 
     @staticmethod
     async def unlink_notes(session: AsyncSession, source_id: UUID, target_id: UUID) -> None:
-        \"\"\"Unlink two notes.\"\"\"
+        """Unlink two notes."""
         stmt = select(NoteLink).where(NoteLink.source_id == source_id, NoteLink.target_id == target_id)
         res = await session.execute(stmt)
         link = res.scalar_one_or_none()

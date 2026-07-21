@@ -10,6 +10,7 @@ class TaskBase(SQLModel):
     priority: Optional[str] = Field(default="medium") # "low", "medium", "high"
     due_date: Optional[datetime] = Field(default=None)
     project_id: Optional[UUID] = Field(default=None, foreign_key="project.id")
+    user_id: Optional[UUID] = Field(default=None, foreign_key="user.id", index=True)
 
 class Task(TaskBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)

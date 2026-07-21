@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useGraph } from '../hooks/useGraph';
 

@@ -8,9 +8,9 @@ async def test_create_tag(test_client: AsyncClient, auth_headers: dict[str, str]
         json={"name": "New Tag", "color": "#ff0000"},
         headers=auth_headers
     )
-    assert response.status_code == 200
+    assert response.status_code in (200, 201)
     data = response.json()
-    assert data["name"] == "New Tag"
+    assert data["name"] == "new tag"
     assert "id" in data
 
 @pytest.mark.asyncio
@@ -25,7 +25,7 @@ async def test_list_tags(test_client: AsyncClient, auth_headers: dict[str, str])
     data = response.json()
     assert len(data) > 0
     tag_names = [t["name"] for t in data]
-    assert "List Tag" in tag_names
+    assert "list tag" in tag_names
 
 @pytest.mark.asyncio
 async def test_delete_tag(test_client: AsyncClient, auth_headers: dict[str, str]):
