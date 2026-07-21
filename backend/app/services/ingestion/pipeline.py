@@ -69,8 +69,26 @@ class IngestionPipeline:
         return {"content": content, "metadata": metadata}
         
     async def process_url(self, url: str) -> dict:
-        # Stub for fetching URL and extracting content
-        return {"content": f"Content from {url}", "metadata": {"source": url}}
+        import httpx
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=10.0)
+                response.raise_for_status()
+                html = response.text
+                
+                # Extract title
+                title_match = re.search(r'<title[^>]*>(.*?)</title>', html, re.IGNORECASE | re.DOTALL)
+                title = title_match.group(1).strip() if title_match else "Unknown Title"
+                
+                # Extract text by stripping HTML tags
+                text = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.IGNORECASE | re.DOTALL)
+                text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.IGNORECASE | re.DOTALL)
+                text = re.sub(r'<[^>]+>', ' ', text)
+                text = re.sub(r'\s+', ' ', text).strip()
+                
+                return {"content": text, "metadata": {"source": url, "title": title}}
+        except Exception as e:
+            return {"content": f"Failed to fetch content: {str(e)}", "metadata": {"source": url}}
         
     async def process_pdf(self, file_bytes: bytes) -> dict:
         try:
@@ -91,16 +109,16 @@ class IngestionPipeline:
         """Routes a vault import request to the appropriate importer."""
         if format == "obsidian":
             from app.services.ingestion.obsidian import ObsidianImporter
-            importer = ObsidianImporter()
+            importer = ObsidianImporter(source_path)
         elif format == "notion":
             from app.services.ingestion.notion import NotionImporter
-            importer = NotionImporter()
+            importer = NotionImporter(source_path)
         elif format == "roam":
             from app.services.ingestion.roam import RoamImporter
-            importer = RoamImporter()
+            importer = RoamImporter(source_path)
         else:
             raise ValueError(f"Unsupported import format: {format}")
         
-        return await importer.process(source_path)
+        return await importer.process()
 
 ingestion_pipeline = IngestionPipeline()

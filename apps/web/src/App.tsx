@@ -3,6 +3,7 @@ import AuthForm from './components/AuthForm';
 import CreateNoteForm from './components/CreateNoteForm';
 import { useAuthStore } from './stores/authStore';
 import { Brain, LogOut } from 'lucide-react';
+import { VoiceAssistant } from './components/VoiceAssistant';
 
 export default function App() {
   const token = useAuthStore((state) => state.token);
@@ -49,6 +50,8 @@ export default function App() {
           <GraphView />
         </div>
       </div>
+      
+      <VoiceAssistant />
     </div>
   );
 }

@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     # JWT Settings
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
 
+    # App Settings
+    LOG_LEVEL: str = 'INFO'
+    LOG_FORMAT: str = 'json'  # 'json' or 'text'
+    CORS_ORIGINS: str = '*'
+    MAX_PAGE_SIZE: int = 100
+    DEFAULT_PAGE_SIZE: int = 20
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 @lru_cache

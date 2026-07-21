@@ -8,6 +8,9 @@ class RoamImporter:
         self.json_path = Path(json_path)
         self.block_map: Dict[str, str] = {}
         
+    async def process(self) -> List[Dict[str, Any]]:
+        return self.import_export()
+
     def import_export(self) -> List[Dict[str, Any]]:
         """
         Reads a Roam JSON export file, extracts content, and converts block/page references.

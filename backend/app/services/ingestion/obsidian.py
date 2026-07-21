@@ -8,6 +8,9 @@ class ObsidianImporter:
     def __init__(self, vault_path: str):
         self.vault_path = Path(vault_path)
 
+    async def process(self) -> List[Dict[str, Any]]:
+        return self.import_vault()
+
     def import_vault(self) -> List[Dict[str, Any]]:
         """
         Reads all markdown files in the vault, extracting content and metadata.

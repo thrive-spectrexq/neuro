@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from sqlmodel import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 
 from app.core.database import get_session
@@ -11,9 +12,9 @@ router = APIRouter()
 
 
 @router.post("/", response_model=SyncBlobRead)
-def upload_sync_blob(
+async def upload_sync_blob(
     *,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
     blob_in: SyncBlobCreate,
 ) -> SyncBlobRead:
@@ -25,15 +26,15 @@ def upload_sync_blob(
     
     blob = SyncBlob.model_validate(blob_in)
     session.add(blob)
-    session.commit()
-    session.refresh(blob)
+    await session.commit()
+    await session.refresh(blob)
     return blob
 
 
 @router.get("/latest", response_model=Optional[SyncBlobRead])
-def get_latest_sync_blob(
+async def get_latest_sync_blob(
     *,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> Optional[SyncBlobRead]:
     statement = (
@@ -42,5 +43,35 @@ def get_latest_sync_blob(
         .order_by(SyncBlob.created_at.desc())
         .limit(1)
     )
-    blob = session.exec(statement).first()
-    return blob
+    result = await session.execute(statement)
+    return result.scalars().first()
+
+@router.get("/history", response_model=list[SyncBlobRead])
+async def get_sync_history(
+    *,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    limit: int = 10
+):
+    statement = (
+        select(SyncBlob)
+        .where(SyncBlob.user_id == current_user.id)
+        .order_by(SyncBlob.created_at.desc())
+        .limit(limit)
+    )
+    result = await session.execute(statement)
+    return result.scalars().all()
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_sync_data(
+    *,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    statement = select(SyncBlob).where(SyncBlob.user_id == current_user.id)
+    result = await session.execute(statement)
+    blobs = result.scalars().all()
+    for blob in blobs:
+        await session.delete(blob)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

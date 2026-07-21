@@ -72,7 +72,7 @@ class NotionImporter:
         cleaned_content = self.link_pattern.sub(link_replacer, content)
         return cleaned_content
 
-    def process(self) -> List[Dict[str, Any]]:
+    async def process(self) -> List[Dict[str, Any]]:
         """
         Process the export.
         Returns a list of dictionaries containing title, content, and metadata for each page.

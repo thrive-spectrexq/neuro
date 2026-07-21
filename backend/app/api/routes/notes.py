@@ -9,7 +9,9 @@ from sqlmodel import delete, func, select
 from app.core.database import get_session
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.project import Project, ProjectMember, Role, Note, NoteLink, Tag, NoteTag
+from app.models.project import Project, ProjectMember, Role
+from app.models.note import Note, NoteLink
+from app.models.tag import Tag, NoteTag
 from app.models.comment import Comment
 from app.schemas.note import NoteCreate, NoteListResponse, NoteResponse, NoteUpdate
 from app.schemas.comment import CommentCreate, CommentResponse

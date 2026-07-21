@@ -7,10 +7,12 @@ from app.core.database import engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from app.services.ingestion.pipeline import ingestion_pipeline
 from app.models.note import Note, NoteLink
+from app.models.tag import Tag, NoteTag
 from app.models.audit import AuditLog
-from sqlmodel import select
+from sqlmodel import select, func
 from app.services.search.engine import search_engine
 from app.services.automation.engine import automation_engine
+from app.services.ai.provider import get_ai_provider
 
 settings = get_settings()
 
@@ -65,7 +67,13 @@ def process_markdown_task(content: str, filename: str, user_id: str):
 
 @celery_app.task
 def embed_note(note_id: str, content: str):
-    # Stub for generating embeddings in the background
+    async def _process():
+        async with AsyncSession(engine) as session:
+            note = await session.get(Note, uuid.UUID(note_id))
+            if note:
+                await search_engine.index_note(session, note)
+    
+    run_async(_process())
     return f"Embedded {note_id}"
 
 @celery_app.task
@@ -146,3 +154,110 @@ def extract_entities_task(note_id: str):
             
     run_async(_process())
     return f"Extracted entities for note {note_id}"
+
+@celery_app.task
+def auto_summarize_note(note_id: str):
+    async def _process():
+        async with AsyncSession(engine) as session:
+            note = await session.get(Note, uuid.UUID(note_id))
+            if note:
+                ai = get_ai_provider()
+                summary = await ai.summarize_text(note.content)
+                note.content += f"\n\n---\n## Auto-Generated Summary\n\n{summary}"
+                session.add(note)
+                await session.commit()
+                await search_engine.index_note(session, note)
+                
+    run_async(_process())
+    return f"Summarized {note_id}"
+
+@celery_app.task
+def auto_tag_note(note_id: str):
+    async def _process():
+        async with AsyncSession(engine) as session:
+            note = await session.get(Note, uuid.UUID(note_id))
+            if note:
+                ai = get_ai_provider()
+                tags = await ai.extract_tags(note.content)
+                for tag_name in tags:
+                    stmt = select(Tag).where(Tag.name == tag_name)
+                    tag = (await session.execute(stmt)).scalar_one_or_none()
+                    if not tag:
+                        tag = Tag(name=tag_name)
+                        session.add(tag)
+                        await session.flush()
+                        await session.refresh(tag)
+                        
+                    link_stmt = select(NoteTag).where(NoteTag.note_id == note.id, NoteTag.tag_id == tag.id)
+                    existing_link = (await session.execute(link_stmt)).scalar_one_or_none()
+                    if not existing_link:
+                        link = NoteTag(note_id=note.id, tag_id=tag.id)
+                        session.add(link)
+                await session.commit()
+                
+    run_async(_process())
+    return f"Tagged {note_id}"
+
+@celery_app.task
+def bulk_reindex(user_id: str | None = None):
+    async def _process():
+        count = 0
+        async with AsyncSession(engine) as session:
+            stmt = select(Note)
+            if user_id:
+                stmt = stmt.where(Note.user_id == uuid.UUID(user_id))
+            result = await session.execute(stmt)
+            notes = result.scalars().all()
+            for note in notes:
+                await search_engine.index_note(session, note)
+                count += 1
+        return count
+        
+    count = run_async(_process())
+    return f"Re-indexed {count} notes"
+
+@celery_app.task
+def cleanup_orphan_tags():
+    async def _process():
+        count = 0
+        async with AsyncSession(engine) as session:
+            from sqlalchemy import delete
+            stmt = select(Tag.id).outerjoin(NoteTag, Tag.id == NoteTag.tag_id).where(NoteTag.tag_id == None)
+            orphan_ids = (await session.execute(stmt)).scalars().all()
+            
+            if orphan_ids:
+                del_stmt = delete(Tag).where(Tag.id.in_(orphan_ids))
+                await session.execute(del_stmt)
+                await session.commit()
+                count = len(orphan_ids)
+        return count
+        
+    count = run_async(_process())
+    return count
+
+@celery_app.task
+def generate_note_backlinks_report(user_id: str):
+    async def _process():
+        report = {}
+        async with AsyncSession(engine) as session:
+            stmt = select(Note).where(Note.user_id == uuid.UUID(user_id))
+            notes = (await session.execute(stmt)).scalars().all()
+            
+            for note in notes:
+                count_stmt = select(func.count(NoteLink.source_id)).where(NoteLink.target_id == note.id)
+                backlink_count = (await session.execute(count_stmt)).scalar() or 0
+                report[str(note.id)] = backlink_count
+        return report
+        
+    return run_async(_process())
+
+celery_app.conf.beat_schedule = {
+    'prune-audit-logs-daily': {
+        'task': 'app.workers.tasks.prune_audit_logs_task',
+        'schedule': 86400.0,  # every 24 hours
+    },
+    'cleanup-orphan-tags-weekly': {
+        'task': 'app.workers.tasks.cleanup_orphan_tags',
+        'schedule': 604800.0,  # every 7 days
+    },
+}
