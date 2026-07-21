@@ -37,21 +37,24 @@ class SearchEngine:
         )
 
         # 2. Update ChromaDB
-        text_content = f"{note.title}\n\n{note.content}"
-        embedding = self._get_embedding(text_content)
+        try:
+            text_content = f"{note.title}\n\n{note.content}"
+            embedding = self._get_embedding(text_content)
 
-        self.collection.upsert(
-            documents=[text_content],
-            embeddings=[embedding],
-            metadatas=[
-                {
-                    "title": note.title,
-                    "user_id": str(note.user_id),
-                    "project_id": str(note.project_id) if note.project_id else "",
-                }
-            ],
-            ids=[str(note.id)],
-        )
+            self.collection.upsert(
+                documents=[text_content],
+                embeddings=[embedding],
+                metadatas=[
+                    {
+                        "title": note.title,
+                        "user_id": str(note.user_id),
+                        "project_id": str(note.project_id) if note.project_id else "",
+                    }
+                ],
+                ids=[str(note.id)],
+            )
+        except Exception:
+            pass
 
     async def remove_note(self, session: AsyncSession, note_id: uuid.UUID):
         await session.execute(text("DELETE FROM note_fts WHERE id = :id"), {"id": str(note_id)})

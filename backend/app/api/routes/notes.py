@@ -156,14 +156,14 @@ async def create_note(
             {"title": note.title},
         )
 
-        await session.commit()
-
         tags = await _get_note_tags(session, note.id)
         fwd, bwd = await _get_note_links(session, note.id)
         response_data = note.model_dump()
         response_data["tags"] = tags
         response_data["forward_links"] = fwd
         response_data["backlinks"] = bwd
+
+        await session.commit()
         return NoteResponse(**response_data)
     except Exception:
         import traceback
@@ -276,14 +276,14 @@ async def update_note(
         {"title": note.title},
     )
 
-    await session.commit()
-
     tags = await _get_note_tags(session, note.id)
     fwd, bwd = await _get_note_links(session, note.id)
     note_data = note.model_dump()
     note_data["tags"] = tags
     note_data["forward_links"] = fwd
     note_data["backlinks"] = bwd
+
+    await session.commit()
     return NoteResponse(**note_data)
 
 

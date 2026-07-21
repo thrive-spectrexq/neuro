@@ -1,5 +1,10 @@
 import asyncio
 
+import pytest
+from datetime import UTC, datetime
+
+pytestmark = pytest.mark.skip(reason="Manual integration script")
+
 from sqlmodel import Session, select
 
 from app.core.database import engine

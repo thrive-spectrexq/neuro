@@ -27,7 +27,7 @@ async def test_update_and_get_note_links(mocker):
     mock_session.execute.return_value = mock_result
 
     # Run _update_note_links
-    await _update_note_links(mock_session, source_note.id, source_note.content, user_id)
+    await _update_note_links(mock_session, source_note)
 
     # Ensure a link is added to the session
     add_calls = mock_session.add.call_args_list

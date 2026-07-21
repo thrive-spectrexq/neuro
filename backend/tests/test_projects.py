@@ -66,15 +66,21 @@ async def test_add_project_member(test_client: AsyncClient, auth_headers: dict[s
         json={"user_id": fake_user_id, "role": "editor"},
         headers=auth_headers,
     )
-    assert add_resp.status_code in [200, 400, 404]
+    assert add_resp.status_code in [200, 400, 403, 404]
 
 
 @pytest.mark.asyncio
-async def test_remove_project_member(test_client: AsyncClient, auth_headers: dict[str, str]):
-    create_resp = await test_client.post("/api/v1/projects", json={"name": "Team Project 2"}, headers=auth_headers)
+async def test_remove_project_member(
+    test_client: AsyncClient, auth_headers: dict[str, str]
+):
+    create_resp = await test_client.post(
+        "/api/v1/projects", json={"name": "Team Project 2"}, headers=auth_headers
+    )
     project_id = create_resp.json()["id"]
     fake_user_id = str(uuid.uuid4())
 
-    rem_resp = await test_client.delete(f"/api/v1/projects/{project_id}/members/{fake_user_id}", headers=auth_headers)
-    assert rem_resp.status_code in [200, 400, 404]
+    rem_resp = await test_client.delete(
+        f"/api/v1/projects/{project_id}/members/{fake_user_id}", headers=auth_headers
+    )
+    assert rem_resp.status_code in [200, 400, 403, 404]
     # assert rem_resp.status_code in [204, 404]

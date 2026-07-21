@@ -1,4 +1,7 @@
+import pytest
 import requests
+
+pytestmark = pytest.mark.skip(reason="Manual integration script requiring live server")
 
 
 def test():

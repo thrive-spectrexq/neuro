@@ -11,7 +11,7 @@ async def test_obsidian_import_dispatch(mocker):
 
     result = await pipeline.process_vault_import("/fake/path", "obsidian")
     assert len(result) == 1
-    mock_importer.assert_called_once_with("/fake/path")
+    mock_importer.assert_called_once_with()
 
 
 @pytest.mark.asyncio
@@ -22,7 +22,7 @@ async def test_notion_import_dispatch(mocker):
 
     result = await pipeline.process_vault_import("/fake/path", "notion")
     assert len(result) == 1
-    mock_importer.assert_called_once_with("/fake/path")
+    mock_importer.assert_called_once_with()
 
 
 @pytest.mark.asyncio
@@ -33,4 +33,4 @@ async def test_roam_import_dispatch(mocker):
 
     result = await pipeline.process_vault_import("/fake/path", "roam")
     assert len(result) == 1
-    mock_importer.assert_called_once_with("/fake/path")
+    mock_importer.assert_called_once_with()

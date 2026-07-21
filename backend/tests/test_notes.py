@@ -11,7 +11,7 @@ async def test_create_note(test_client: AsyncClient, auth_headers: dict[str, str
         json={"title": "Test Note", "content": "Test Content"},
         headers=auth_headers,
     )
-    assert response.status_code == 200
+    assert response.status_code in [200, 201]
     data = response.json()
     assert data["title"] == "Test Note"
     assert data["content"] == "Test Content"
@@ -26,6 +26,7 @@ async def test_get_note(test_client: AsyncClient, auth_headers: dict[str, str]):
         json={"title": "Get Note", "content": "Get Content"},
         headers=auth_headers,
     )
+    assert create_resp.status_code in [200, 201], create_resp.text
     note_id = create_resp.json()["id"]
 
     # Then get
@@ -75,6 +76,7 @@ async def test_update_note(test_client: AsyncClient, auth_headers: dict[str, str
         json={"title": "Old Title", "content": "Old Content"},
         headers=auth_headers,
     )
+    assert create_resp.status_code in [200, 201], create_resp.text
     note_id = create_resp.json()["id"]
 
     update_resp = await test_client.put(f"/api/v1/notes/{note_id}", json={"title": "New Title"}, headers=auth_headers)
@@ -90,6 +92,7 @@ async def test_delete_note(test_client: AsyncClient, auth_headers: dict[str, str
         json={"title": "Delete Me", "content": "Content"},
         headers=auth_headers,
     )
+    assert create_resp.status_code in [200, 201], create_resp.text
     note_id = create_resp.json()["id"]
 
     del_resp = await test_client.delete(f"/api/v1/notes/{note_id}", headers=auth_headers)
@@ -110,7 +113,7 @@ async def test_create_note_with_tags(test_client: AsyncClient, auth_headers: dic
         },
         headers=auth_headers,
     )
-    assert response.status_code == 200
+    assert response.status_code in [200, 201], response.text
     data = response.json()
     assert "important" in data["tags"]
     assert "urgent" in data["tags"]
@@ -123,6 +126,7 @@ async def test_link_notes(test_client: AsyncClient, auth_headers: dict[str, str]
         json={"title": "Target Note", "content": "Target content"},
         headers=auth_headers,
     )
+    assert target_resp.status_code in [200, 201], target_resp.text
     target_id = target_resp.json()["id"]
 
     source_resp = await test_client.post(

@@ -15,7 +15,8 @@
     "d3": "^7.9.0",
     "react-force-graph-2d": "^1.25.4",
     "@uiw/react-codemirror": "^4.23.0",
-    "@codemirror/lang-markdown": "^6.2.5"
+    "@codemirror/lang-markdown": "^6.2.5",
+    "@codemirror/language-data": "^6.5.1"
   },
   "devDependencies": {
     "electron": "^30.0.0",

@@ -1,7 +1,10 @@
 import asyncio
 
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
+
+pytestmark = pytest.mark.skip(reason="Manual integration script")
 
 from app.core.database import engine
 from app.models.note import Note
