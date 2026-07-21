@@ -1,28 +1,31 @@
 import logging
+
 import httpx
-from sqlmodel import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlmodel import select
+
 from app.models.automation import AutomationRule
 
-logger = logging.getLogger('neuro.automation')
+logger = logging.getLogger("neuro.automation")
+
 
 class AutomationEngine:
     async def evaluate_triggers(self, db: AsyncSession, event_type: str, payload: dict):
         statement = select(AutomationRule).where(
             AutomationRule.trigger_type == event_type,
-            AutomationRule.is_active == True
+            AutomationRule.is_active.is_(True),
         )
         result = await db.execute(statement)
         rules = result.scalars().all()
-        
+
         for rule in rules:
             if self._evaluate_conditions(rule.conditions, payload):
                 await self.execute_workflow(rule, payload, db)
-                
+
     def _evaluate_conditions(self, conditions: dict, payload: dict) -> bool:
         if not conditions:
             return True
-            
+
         for key, expected_val in conditions.items():
             if key == "tag":
                 tags = payload.get("tags", [])
@@ -46,7 +49,7 @@ class AutomationEngine:
                 await self._execute_extract_entities(action, context)
             elif action_type == "notify_webhook_with_summary":
                 await self._execute_notify_webhook_with_summary(action, context, db)
-                
+
     async def _execute_webhook(self, action: dict, context: dict):
         url = action.get("url")
         if url:
@@ -62,14 +65,14 @@ class AutomationEngine:
         note_id = context.get("note_id")
         if not note_id or not db:
             return
-            
+
         from app.models.note import Note
         from app.services.ai.provider import get_ai_provider
-        
+
         note = await db.get(Note, note_id)
         if not note:
             return
-            
+
         ai_provider = get_ai_provider()
         prompt = f"Summarize the following text concisely:\n\n{note.content[:5000]}"
         summary = ""
@@ -79,7 +82,7 @@ class AutomationEngine:
         except Exception as e:
             logger.error(f"Summarization failed: {e}")
             return
-            
+
         note.content += f"\n\n## Summary\n{summary}"
         db.add(note)
         await db.commit()
@@ -89,22 +92,22 @@ class AutomationEngine:
         note_id = context.get("note_id")
         if not note_id or not db:
             return
-            
+
         from app.models.note import Note
-        from app.models.tag import Tag, NoteTag
+        from app.models.tag import NoteTag, Tag
         from app.services.ai.provider import get_ai_provider
-        
+
         note = await db.get(Note, note_id)
         if not note:
             return
-            
+
         ai_provider = get_ai_provider()
         try:
             tags_extracted = await ai_provider.extract_tags(note.content[:5000])
         except Exception as e:
             logger.error(f"Categorization failed: {e}")
             return
-            
+
         for tag_name in tags_extracted:
             statement = select(Tag).where(Tag.name == tag_name)
             result = await db.execute(statement)
@@ -114,7 +117,7 @@ class AutomationEngine:
                 db.add(tag)
                 await db.commit()
                 await db.refresh(tag)
-                
+
             note_tag = NoteTag(note_id=note.id, tag_id=tag.id)
             db.add(note_tag)
         await db.commit()
@@ -127,7 +130,7 @@ class AutomationEngine:
 
         from app.models.note import Note
         from app.services.ai.provider import get_ai_provider
-        
+
         note = await db.get(Note, note_id)
         if not note:
             return
@@ -156,6 +159,8 @@ class AutomationEngine:
         note_id = context.get("note_id")
         if note_id:
             from app.workers.tasks import extract_entities_task
+
             extract_entities_task.delay(note_id)
+
 
 automation_engine = AutomationEngine()

@@ -1,7 +1,6 @@
 import asyncio
-from pathlib import Path
 import subprocess
-from typing import Optional
+from pathlib import Path
 
 import typer
 
@@ -34,6 +33,7 @@ def db_init():
     """Initialize database tables."""
     typer.echo("Initializing database and tables...")
     from app.core.database import create_db_and_tables
+
     asyncio.run(create_db_and_tables())
     typer.echo("Database tables created.")
 
@@ -42,33 +42,39 @@ def db_init():
 def db_seed():
     """Seeds the database with sample data (a user, some notes, tags, a project)."""
     typer.echo("Seeding database with sample data...")
-    
+
     async def seed_data():
-        from app.core.database import engine
         from sqlalchemy.ext.asyncio import AsyncSession
+
+        from app.core.database import engine
         from app.core.security import get_password_hash
-        from app.models.user import User
-        from app.models.project import Project, ProjectMember, Role
-        from app.models.tag import Tag, NoteTag
         from app.models.note import Note, NoteLink
+        from app.models.project import Project, ProjectMember, Role
+        from app.models.tag import NoteTag, Tag
         from app.models.task import Task
-        
+        from app.models.user import User
+
         async with AsyncSession(engine) as session:
             # Check if user already exists
             from sqlmodel import select
+
             user = (await session.execute(select(User).limit(1))).scalar()
             if not user:
                 user = User(
                     email="test@example.com",
                     username="testuser",
-                    hashed_password=get_password_hash("password123")
+                    hashed_password=get_password_hash("password123"),
                 )
                 session.add(user)
                 await session.flush()
 
             # Create Projects
             p1 = Project(name="Project Alpha", description="A sample project", user_id=user.id)
-            p2 = Project(name="Project Beta", description="Another sample project", user_id=user.id)
+            p2 = Project(
+                name="Project Beta",
+                description="Another sample project",
+                user_id=user.id,
+            )
             session.add_all([p1, p2])
             await session.flush()
 
@@ -84,27 +90,51 @@ def db_seed():
             await session.flush()
 
             # Create Notes
-            n1 = Note(title="Idea 1", content="Explore AI agents.", user_id=user.id, project_id=p1.id)
-            n2 = Note(title="Idea 2", content="Improve knowledge graphs.", user_id=user.id, project_id=p1.id)
-            n3 = Note(title="Meeting Notes", content="Discussed alpha release.", user_id=user.id, project_id=p2.id)
-            n4 = Note(title="Urgent Refactor", content="Fix the core module.", user_id=user.id, project_id=p2.id)
+            n1 = Note(
+                title="Idea 1",
+                content="Explore AI agents.",
+                user_id=user.id,
+                project_id=p1.id,
+            )
+            n2 = Note(
+                title="Idea 2",
+                content="Improve knowledge graphs.",
+                user_id=user.id,
+                project_id=p1.id,
+            )
+            n3 = Note(
+                title="Meeting Notes",
+                content="Discussed alpha release.",
+                user_id=user.id,
+                project_id=p2.id,
+            )
+            n4 = Note(
+                title="Urgent Refactor",
+                content="Fix the core module.",
+                user_id=user.id,
+                project_id=p2.id,
+            )
             n5 = Note(title="Personal Log", content="A random note.", user_id=user.id)
             session.add_all([n1, n2, n3, n4, n5])
             await session.flush()
 
             # Link Notes and Tags
-            session.add_all([
-                NoteTag(note_id=n1.id, tag_id=t2.id),
-                NoteTag(note_id=n2.id, tag_id=t2.id),
-                NoteTag(note_id=n4.id, tag_id=t1.id),
-                NoteTag(note_id=n3.id, tag_id=t3.id)
-            ])
-            
+            session.add_all(
+                [
+                    NoteTag(note_id=n1.id, tag_id=t2.id),
+                    NoteTag(note_id=n2.id, tag_id=t2.id),
+                    NoteTag(note_id=n4.id, tag_id=t1.id),
+                    NoteTag(note_id=n3.id, tag_id=t3.id),
+                ]
+            )
+
             # Create Note Links
-            session.add_all([
-                NoteLink(source_id=n1.id, target_id=n2.id),
-                NoteLink(source_id=n3.id, target_id=n4.id)
-            ])
+            session.add_all(
+                [
+                    NoteLink(source_id=n1.id, target_id=n2.id),
+                    NoteLink(source_id=n3.id, target_id=n4.id),
+                ]
+            )
 
             # Create Tasks
             task1 = Task(title="Design UI", status="todo", project_id=p1.id)
@@ -113,7 +143,7 @@ def db_seed():
             session.add_all([task1, task2, task3])
 
             await session.commit()
-            
+
     asyncio.run(seed_data())
     typer.echo("Database seeded successfully.")
 
@@ -122,14 +152,16 @@ def db_seed():
 def db_prune():
     """Runs the audit log pruning task."""
     typer.echo("Pruning audit logs older than 30 days...")
-    
+
     async def prune_logs():
-        from app.core.database import engine
-        from app.models.audit import AuditLog
+        from datetime import UTC, datetime, timedelta
+
         from sqlalchemy.ext.asyncio import AsyncSession
         from sqlmodel import delete
-        from datetime import UTC, datetime, timedelta
-        
+
+        from app.core.database import engine
+        from app.models.audit import AuditLog
+
         async with AsyncSession(engine) as session:
             thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
             stmt = delete(AuditLog).where(AuditLog.timestamp < thirty_days_ago)
@@ -153,9 +185,7 @@ def plugin_create(name: str):
     plugin_dir.mkdir(parents=True)
     (plugin_dir / "__init__.py").write_text("")
     (plugin_dir / "plugin.py").write_text(
-        f'"""{name} Plugin"""\n\n'
-        f'def register():\n'
-        f'    print("Registering {name} plugin")\n'
+        f'"""{name} Plugin"""\n\ndef register():\n    print("Registering {name} plugin")\n'
     )
     (plugin_dir / "manifest.json").write_text(
         f'{{\n  "id": "{name}",\n  "name": "{name.capitalize()} Plugin",\n  "version": "0.1.0"\n}}\n'
@@ -208,16 +238,17 @@ def system_stats():
     typer.echo(" - Framework: FastAPI + SQLModel")
     typer.echo(" - Storage: SQLite / ChromaDB")
     typer.echo(" - AI Engine: Multi-provider (Ollama / OpenAI / Anthropic)")
-    
+
     async def get_stats():
-        from app.core.database import engine
         from sqlalchemy.ext.asyncio import AsyncSession
-        from sqlmodel import select, func
-        from app.models.user import User
-        from app.models.project import Project
+        from sqlmodel import func, select
+
+        from app.core.database import engine
         from app.models.note import Note
-        from app.models.task import Task
+        from app.models.project import Project
         from app.models.tag import Tag
+        from app.models.task import Task
+        from app.models.user import User
 
         async with AsyncSession(engine) as session:
             u_count = (await session.execute(select(func.count(User.id)))).scalar()
@@ -226,7 +257,7 @@ def system_stats():
             t_count = (await session.execute(select(func.count(Task.id)))).scalar()
             tag_count = (await session.execute(select(func.count(Tag.id)))).scalar()
             return u_count, p_count, n_count, t_count, tag_count
-            
+
     try:
         u, p, n, t, tg = asyncio.run(get_stats())
         typer.echo(f" - Stats: Users ({u}), Projects ({p}), Notes ({n}), Tasks ({t}), Tags ({tg})")

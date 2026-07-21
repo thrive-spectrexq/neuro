@@ -1,7 +1,9 @@
 import uuid
 from datetime import datetime
 from typing import Any
+
 from pydantic import BaseModel, ConfigDict
+
 
 class AuditLogResponse(BaseModel):
     id: uuid.UUID
@@ -12,5 +14,5 @@ class AuditLogResponse(BaseModel):
     target_id: str
     details: dict[str, Any]
     timestamp: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)

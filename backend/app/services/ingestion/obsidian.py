@@ -1,17 +1,18 @@
-import os
 import re
-import yaml
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
+
+import yaml
+
 
 class ObsidianImporter:
     def __init__(self, vault_path: str):
         self.vault_path = Path(vault_path)
 
-    async def process(self) -> List[Dict[str, Any]]:
+    async def process(self) -> list[dict[str, Any]]:
         return self.import_vault()
 
-    def import_vault(self) -> List[Dict[str, Any]]:
+    def import_vault(self) -> list[dict[str, Any]]:
         """
         Reads all markdown files in the vault, extracting content and metadata.
         """
@@ -28,11 +29,11 @@ class ObsidianImporter:
 
         return documents
 
-    def _process_file(self, filepath: Path) -> Dict[str, Any]:
+    def _process_file(self, filepath: Path) -> dict[str, Any]:
         """
         Extracts YAML frontmatter, converts wikilinks, and maps folders to tags.
         """
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             content = f.read()
 
         metadata = {}
@@ -57,10 +58,10 @@ class ObsidianImporter:
                 existing_tags = [t.strip() for t in existing_tags.split(",") if t.strip()]
             elif not isinstance(existing_tags, list):
                 existing_tags = []
-                
+
             folder_tags = [f.replace(" ", "-").lower() for f in folders if f]
             existing_tags.extend(folder_tags)
-            
+
             # Remove duplicates and save back
             metadata["tags"] = list(set(existing_tags))
 
@@ -71,15 +72,12 @@ class ObsidianImporter:
                 target, alias = inner.split("|", 1)
                 return f"[{alias}]({target})"
             return f"[{inner}]({inner})"
-            
-        content = re.sub(r'\[\[(.*?)\]\]', replace_wikilink, content)
+
+        content = re.sub(r"\[\[(.*?)\]\]", replace_wikilink, content)
 
         # Include basic metadata
         metadata["source_path"] = str(rel_path)
         if "title" not in metadata:
             metadata["title"] = filepath.stem
 
-        return {
-            "content": content,
-            "metadata": metadata
-        }
+        return {"content": content, "metadata": metadata}

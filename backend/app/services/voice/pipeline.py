@@ -1,57 +1,119 @@
 import os
-import asyncio
+
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
-from pipecat.pipeline.task import PipelineTask, PipelineParams
+from pipecat.pipeline.task import PipelineParams, PipelineTask
 from pipecat.services.openai.stt import OpenAISTTService
 from pipecat.services.openai.tts import OpenAITTSService
+
 try:
-    from pipecat.processors.aggregators.llm_response import LLMUserContextAggregator, LLMAssistantContextAggregator
+    from pipecat.processors.aggregators.llm_response import (
+        LLMAssistantContextAggregator,
+        LLMUserContextAggregator,
+    )
 except ImportError:
     try:
-        from pipecat.processors.aggregators.llm_response_universal import LLMUserAggregator as LLMUserContextAggregator, LLMAssistantAggregator as LLMAssistantContextAggregator
+        from pipecat.processors.aggregators.llm_response_universal import (
+            LLMAssistantAggregator as LLMAssistantContextAggregator,
+        )
+        from pipecat.processors.aggregators.llm_response_universal import (
+            LLMUserAggregator as LLMUserContextAggregator,
+        )
     except ImportError:
+
         class LLMUserContextAggregator:
-            def __init__(self, *args, **kwargs): pass
+            def __init__(self, *args, **kwargs):
+                pass
+
         class LLMAssistantContextAggregator:
-            def __init__(self, *args, **kwargs): pass
+            def __init__(self, *args, **kwargs):
+                pass
+
+
 try:
-    from pipecat.transports.network.websocket_server import WebsocketServerTransport, WebsocketServerParams
+    from pipecat.transports.network.websocket_server import (
+        WebsocketServerParams,
+        WebsocketServerTransport,
+    )
 except ImportError:
     try:
-        from pipecat.transports.websocket.fastapi import FastAPIWebsocketTransport as WebsocketServerTransport, FastAPIWebsocketParams as WebsocketServerParams
+        from pipecat.transports.websocket.fastapi import (
+            FastAPIWebsocketParams as WebsocketServerParams,
+        )
+        from pipecat.transports.websocket.fastapi import (
+            FastAPIWebsocketTransport as WebsocketServerTransport,
+        )
     except ImportError:
         try:
-            from pipecat.transports.websocket.server import WebsocketServerTransport, WebsocketServerParams
+            from pipecat.transports.websocket.server import (
+                WebsocketServerParams,
+                WebsocketServerTransport,
+            )
         except ImportError:
-            class WebsocketServerTransport: pass
-            class WebsocketServerParams: pass
 
-# From tools.py we get the tools 
-from app.services.voice.tools import VOICE_TOOLS, VOICE_FUNCTIONS
-from app.services.ai.provider import get_ai_provider
+            class WebsocketServerTransport:
+                pass
+
+            class WebsocketServerParams:
+                pass
+
+
+try:
+    from pipecat.audio.vad.silero import SileroVADAnalyzer
+except ImportError:
+
+    class SileroVADAnalyzer:
+        def __init__(self, *args, **kwargs):
+            pass
+
+
+try:
+    from pipecat.services.google.llm import GoogleLLMService
+except ImportError:
+    try:
+        from pipecat.services.google import GoogleLLMService
+    except ImportError:
+
+        class GoogleLLMService:
+            def __init__(self, *args, **kwargs):
+                pass
+
+
+# From tools.py we get the tools
+from app.services.voice.tools import VOICE_FUNCTIONS, VOICE_TOOLS
+
 
 class GoogleSafeMessage(dict):
     def __init__(self, role, content):
         super().__init__(role=role, content=content)
         self.role = role
         self.content = content
+
     def to_json_dict(self):
         return {"role": self.role, "parts": [{"text": self.content}]}
 
+
 class GoogleSafeContext:
     def __init__(self, messages=None):
-        self.messages = [GoogleSafeMessage(m['role'], m['content']) for m in messages] if messages else []
+        self.messages = [GoogleSafeMessage(m["role"], m["content"]) for m in messages] if messages else []
         self.tools = VOICE_TOOLS
         self.tool_choice = "auto"
+
     def add_message(self, message):
         if isinstance(message, dict):
             self.messages.append(GoogleSafeMessage(message.get("role", "user"), message.get("content", "")))
         elif hasattr(message, "text"):
             self.messages.append(GoogleSafeMessage("user", message.text))
-    def get_messages(self, *args, **kwargs): return self.messages
-    def get_messages_for_token_count(self): return self.messages
-    def clear(self): self.messages = []
+
+    def get_messages(self, *args, **kwargs):
+        return self.messages
+
+    def get_messages_for_token_count(self):
+        return self.messages
+
+    def clear(self):
+        self.messages = []
+
 
 async def run_voice_pipeline(websocket):
     """
@@ -68,7 +130,7 @@ async def run_voice_pipeline(websocket):
             vad_enabled=True,
             vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
-        )
+        ),
     )
 
     # API Keys
@@ -86,7 +148,7 @@ async def run_voice_pipeline(websocket):
         api_key=google_key,
         model="gemini-2.5-flash",
     )
-    
+
     # Register functions to the LLM
     for name, func in VOICE_FUNCTIONS.items():
         llm.register_function(name, func)
@@ -111,15 +173,17 @@ async def run_voice_pipeline(websocket):
     user_agg = LLMUserContextAggregator(context)
     assistant_agg = LLMAssistantContextAggregator(context)
 
-    pipeline = Pipeline([
-        transport.input(),
-        stt,
-        user_agg,
-        llm,
-        tts,
-        transport.output(),
-        assistant_agg,
-    ])
+    pipeline = Pipeline(
+        [
+            transport.input(),
+            stt,
+            user_agg,
+            llm,
+            tts,
+            transport.output(),
+            assistant_agg,
+        ]
+    )
 
     task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
     runner = PipelineRunner()

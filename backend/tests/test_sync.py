@@ -1,4 +1,5 @@
 import base64
+
 import pytest
 from httpx import AsyncClient
 
@@ -9,9 +10,9 @@ async def test_register_device_key(test_client: AsyncClient, auth_headers: dict[
         "/api/v1/sync/devices",
         json={
             "device_name": "MacBook Pro M3",
-            "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0\n-----END PUBLIC KEY-----"
+            "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0\n-----END PUBLIC KEY-----",
         },
-        headers=auth_headers
+        headers=auth_headers,
     )
     assert response.status_code == 201
     data = response.json()
@@ -26,9 +27,9 @@ async def test_list_device_keys(test_client: AsyncClient, auth_headers: dict[str
         "/api/v1/sync/devices",
         json={
             "device_name": "iPhone 15 Pro",
-            "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1"
+            "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1",
         },
-        headers=auth_headers
+        headers=auth_headers,
     )
     response = await test_client.get("/api/v1/sync/devices", headers=auth_headers)
     assert response.status_code == 200
@@ -52,11 +53,11 @@ async def test_sync_push_and_pull(test_client: AsyncClient, auth_headers: dict[s
                     "encrypted_data": dummy_payload,
                     "iv": dummy_iv,
                     "salt": dummy_salt,
-                    "version": 1
+                    "version": 1,
                 }
             ]
         },
-        headers=auth_headers
+        headers=auth_headers,
     )
     assert push_resp.status_code == 200
     pushed = push_resp.json()

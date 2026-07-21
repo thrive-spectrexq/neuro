@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime, UTC
-from typing import Optional
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select, func
+from sqlmodel import func, select
 
 from app.core.database import get_session
 from app.core.security import get_current_user
@@ -34,10 +34,7 @@ async def register_device_key(
     fingerprint = crypto_service.compute_key_fingerprint(key_in.public_key)
 
     # Check if key already registered
-    stmt = select(DeviceKey).where(
-        DeviceKey.user_id == user_id,
-        DeviceKey.key_fingerprint == fingerprint
-    )
+    stmt = select(DeviceKey).where(DeviceKey.user_id == user_id, DeviceKey.key_fingerprint == fingerprint)
     existing = (await session.execute(stmt)).scalars().first()
     if existing:
         existing.last_seen = datetime.now(UTC)
@@ -152,22 +149,17 @@ async def pull_sync_blobs(
 
     return SyncPullResponse(
         blobs=[SyncBlobResponse.model_validate(b) for b in blobs],
-        latest_sequence=latest_seq
+        latest_sequence=latest_seq,
     )
 
 
-@router.get("/latest", response_model=Optional[SyncBlobResponse])
+@router.get("/latest", response_model=SyncBlobResponse | None)
 async def get_latest_sync_blob(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
-) -> Optional[SyncBlobResponse]:
+) -> SyncBlobResponse | None:
     user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
-    statement = (
-        select(SyncBlob)
-        .where(SyncBlob.user_id == user_id)
-        .order_by(SyncBlob.sequence_number.desc())
-        .limit(1)
-    )
+    statement = select(SyncBlob).where(SyncBlob.user_id == user_id).order_by(SyncBlob.sequence_number.desc()).limit(1)
     result = await session.execute(statement)
     return result.scalars().first()
 
@@ -203,10 +195,7 @@ async def get_sync_history(
 ):
     user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
     statement = (
-        select(SyncBlob)
-        .where(SyncBlob.user_id == user_id)
-        .order_by(SyncBlob.sequence_number.desc())
-        .limit(limit)
+        select(SyncBlob).where(SyncBlob.user_id == user_id).order_by(SyncBlob.sequence_number.desc()).limit(limit)
     )
     result = await session.execute(statement)
     return result.scalars().all()
@@ -228,7 +217,7 @@ async def verify_sync_blob(
         valid=res["valid"],
         blob_id=blob.id,
         byte_length=res.get("byte_length", 0),
-        algorithm=res.get("algorithm", "AES-256-GCM")
+        algorithm=res.get("algorithm", "AES-256-GCM"),
     )
 
 

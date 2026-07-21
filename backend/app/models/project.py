@@ -13,10 +13,12 @@ class Project(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     user_id: uuid.UUID = Field(foreign_key="user.id")
 
+
 class Role(str, Enum):
     owner = "owner"
     editor = "editor"
     viewer = "viewer"
+
 
 class ProjectMember(SQLModel, table=True):
     project_id: uuid.UUID = Field(foreign_key="project.id", primary_key=True)

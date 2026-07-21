@@ -1,9 +1,8 @@
 import uuid
-from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select, func
+from sqlmodel import func, select
 
 from app.core.database import get_session
 from app.core.security import get_current_user
@@ -15,7 +14,7 @@ from app.schemas.tag import TagCreate, TagResponse
 router = APIRouter()
 
 
-@router.get("", response_model=List[TagResponse])
+@router.get("", response_model=list[TagResponse])
 async def list_tags(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -26,9 +25,7 @@ async def list_tags(
 
     response = []
     for tag in tags:
-        count_res = await session.execute(
-            select(func.count(NoteTag.note_id)).where(NoteTag.tag_id == tag.id)
-        )
+        count_res = await session.execute(select(func.count(NoteTag.note_id)).where(NoteTag.tag_id == tag.id))
         count = count_res.scalar() or 0
         response.append(TagResponse(id=tag.id, name=tag.name, note_count=count))
 
@@ -84,11 +81,15 @@ async def get_notes_by_tag(
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
 
-    user_id = current_user.id if hasattr(current_user, 'id') else current_user.get("id")
+    user_id = current_user.id if hasattr(current_user, "id") else current_user.get("id")
     stmt = (
         select(Note)
         .join(NoteTag, NoteTag.note_id == Note.id)
-        .where(NoteTag.tag_id == id, Note.user_id == user_id, Note.is_archived == False)
+        .where(
+            NoteTag.tag_id == id,
+            Note.user_id == user_id,
+            Note.is_archived.is_(False),
+        )
     )
     result = await session.execute(stmt)
     notes = result.scalars().all()

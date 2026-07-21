@@ -19,7 +19,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({ note, onClick }) => {
       </p>
       <div className="flex items-center justify-between">
         <div className="flex gap-1 flex-wrap overflow-hidden h-6">
-          {note.tags?.slice(0, 3).map((tag) => (
+          {note.tags?.slice(0, 3).map((tag: string) => (
             <TagBadge key={tag} tag={tag} />
           ))}
           {note.tags && note.tags.length > 3 && (

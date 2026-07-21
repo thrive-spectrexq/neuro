@@ -1,4 +1,5 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
+
 
 class VoiceSessionStatus(BaseModel):
     session_id: str = Field(..., min_length=1, description="Unique identifier for the voice session")

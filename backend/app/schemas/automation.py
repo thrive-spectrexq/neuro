@@ -1,34 +1,35 @@
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
 
 
 class AutomationRuleCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     trigger_type: str
-    conditions: Dict[str, Any] = {}
-    actions: List[Dict[str, Any]] = []
+    conditions: dict[str, Any] = {}
+    actions: list[dict[str, Any]] = []
     is_active: bool = True
 
 
 class AutomationRuleUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    trigger_type: Optional[str] = None
-    conditions: Optional[Dict[str, Any]] = None
-    actions: Optional[List[Dict[str, Any]]] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    trigger_type: str | None = None
+    conditions: dict[str, Any] | None = None
+    actions: list[dict[str, Any]] | None = None
+    is_active: bool | None = None
 
 
 class AutomationRuleResponse(BaseModel):
     id: uuid.UUID
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     trigger_type: str
-    conditions: Dict[str, Any]
-    actions: List[Dict[str, Any]]
+    conditions: dict[str, Any]
+    actions: list[dict[str, Any]]
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -38,12 +39,12 @@ class AutomationRuleResponse(BaseModel):
 
 class AutomationTestRequest(BaseModel):
     trigger_type: str
-    conditions: Dict[str, Any] = {}
-    actions: List[Dict[str, Any]] = []
-    sample_payload: Dict[str, Any] = {}
+    conditions: dict[str, Any] = {}
+    actions: list[dict[str, Any]] = []
+    sample_payload: dict[str, Any] = {}
 
 
 class AutomationTestResponse(BaseModel):
     matched: bool
-    simulated_actions: List[Dict[str, Any]]
+    simulated_actions: list[dict[str, Any]]
     message: str

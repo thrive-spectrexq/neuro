@@ -1,8 +1,7 @@
 import uuid
-from datetime import datetime, timezone
-from typing import List
+from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -22,7 +21,7 @@ from app.services.automation.engine import automation_engine
 router = APIRouter()
 
 
-@router.get("", response_model=List[AutomationRuleResponse])
+@router.get("", response_model=list[AutomationRuleResponse])
 async def list_automations(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -79,7 +78,7 @@ async def update_automation(
     for field, value in update_data.items():
         setattr(rule, field, value)
 
-    rule.updated_at = datetime.now(timezone.utc)
+    rule.updated_at = datetime.now(UTC)
     session.add(rule)
     await session.commit()
     await session.refresh(rule)
@@ -112,7 +111,7 @@ async def toggle_automation(
         raise HTTPException(status_code=404, detail="Automation rule not found")
 
     rule.is_active = not rule.is_active
-    rule.updated_at = datetime.now(timezone.utc)
+    rule.updated_at = datetime.now(UTC)
     session.add(rule)
     await session.commit()
     await session.refresh(rule)
@@ -126,9 +125,9 @@ async def test_automation_rule(
 ):
     matched = automation_engine._evaluate_conditions(test_req.conditions, test_req.sample_payload)
     actions_to_sim = test_req.actions if matched else []
-    msg = f"Rule matched sample payload successfully with {len(actions_to_sim)} action(s) triggered." if matched else "Rule conditions did not match the provided sample payload."
-    return AutomationTestResponse(
-        matched=matched,
-        simulated_actions=actions_to_sim,
-        message=msg
+    msg = (
+        f"Rule matched sample payload successfully with {len(actions_to_sim)} action(s) triggered."
+        if matched
+        else "Rule conditions did not match the provided sample payload."
     )
+    return AutomationTestResponse(matched=matched, simulated_actions=actions_to_sim, message=msg)

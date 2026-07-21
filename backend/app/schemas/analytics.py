@@ -1,4 +1,5 @@
-from typing import Dict, List, Any
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -9,8 +10,8 @@ class SystemStatsResponse(BaseModel):
     total_tags: int
     total_automations: int
     total_comments: int
-    tasks_by_status: Dict[str, int]
-    notes_by_content_type: Dict[str, int]
+    tasks_by_status: dict[str, int]
+    notes_by_content_type: dict[str, int]
 
 
 class ActivityItemResponse(BaseModel):
@@ -18,5 +19,5 @@ class ActivityItemResponse(BaseModel):
     action: str
     entity_type: str
     entity_id: str
-    details: Dict[str, Any] = {}
+    details: dict[str, Any] = {}
     timestamp: str

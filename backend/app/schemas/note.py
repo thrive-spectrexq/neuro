@@ -10,6 +10,7 @@ class NoteLinkInfo(BaseModel):
     id: uuid.UUID
     title: str
 
+
 class NoteCreate(BaseModel):
     title: str
     content: str
@@ -20,6 +21,7 @@ class NoteCreate(BaseModel):
     project_id: uuid.UUID | None = None
     tags: list[str] | None = None
 
+
 class NoteUpdate(BaseModel):
     title: str | None = None
     content: str | None = None
@@ -29,6 +31,7 @@ class NoteUpdate(BaseModel):
     parent_id: uuid.UUID | None = None
     project_id: uuid.UUID | None = None
     tags: list[str] | None = None
+
 
 class NoteResponse(BaseModel):
     id: uuid.UUID
@@ -45,8 +48,9 @@ class NoteResponse(BaseModel):
     tags: list[str] = []
     forward_links: list[NoteLinkInfo] = []
     backlinks: list[NoteLinkInfo] = []
-    
+
     model_config = ConfigDict(from_attributes=True)
+
 
 class NoteListResponse(BaseModel):
     items: list[NoteResponse]

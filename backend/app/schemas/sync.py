@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -38,7 +39,7 @@ class SyncBlobResponse(BaseModel):
     sequence_number: int = Field(default=1)
     version: int = Field(..., description="Version number")
     created_at: datetime = Field(..., description="When the blob was created")
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -63,4 +64,3 @@ class SyncVerifyResponse(BaseModel):
     blob_id: uuid.UUID
     byte_length: int
     algorithm: str
-

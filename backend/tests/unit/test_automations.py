@@ -1,6 +1,7 @@
 import pytest
-from app.services.automation.engine import AutomationEngine, automation_engine
-from app.models.automation import AutomationRule
+
+from app.services.automation.engine import automation_engine
+
 
 @pytest.mark.asyncio
 async def test_evaluate_conditions_matching():
