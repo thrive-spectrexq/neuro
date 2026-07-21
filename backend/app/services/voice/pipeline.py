@@ -1,10 +1,37 @@
 import os
 
-from pipecat.pipeline.pipeline import Pipeline
-from pipecat.pipeline.runner import PipelineRunner
-from pipecat.pipeline.task import PipelineParams, PipelineTask
-from pipecat.services.openai.stt import OpenAISTTService
-from pipecat.services.openai.tts import OpenAITTSService
+try:
+    from pipecat.pipeline.pipeline import Pipeline
+    from pipecat.pipeline.runner import PipelineRunner
+    from pipecat.pipeline.task import PipelineParams, PipelineTask
+    from pipecat.services.openai.stt import OpenAISTTService
+    from pipecat.services.openai.tts import OpenAITTSService
+except ImportError:
+
+    class Pipeline:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class PipelineRunner:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class PipelineParams:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class PipelineTask:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class OpenAISTTService:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class OpenAITTSService:
+        def __init__(self, *args, **kwargs):
+            pass
+
 
 try:
     from pipecat.processors.aggregators.llm_response import (
