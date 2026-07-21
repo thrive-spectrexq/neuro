@@ -47,9 +47,9 @@ This document outlines the detailed development phases, feature milestones, arch
 - [x] Text summarization and automatic tag extraction endpoints
 - [x] Real-time WebSocket audio streaming pipeline (`/api/v1/voice/stream`)
 
-### Phase 5 — Collaboration & E2E Encryption (Upcoming)
+### Phase 5 — Collaboration & E2E Encryption (Active)
 - [x] Client-side blob storage for encrypted synchronization (`SyncBlob`)
+- [x] End-to-end zero-knowledge key exchange (`DeviceKey`, SHA-256 fingerprinting, Web Crypto API)
+- [x] Workspace access audit trails & compliance exports (`/api/v1/analytics/audit/export`)
 - [ ] Multi-device CRDT-based offline conflict resolution
-- [ ] End-to-end zero-knowledge key exchange
-- [ ] Workspace access audit trails & compliance exports
 - [ ] Self-hosted enterprise team server packaging
