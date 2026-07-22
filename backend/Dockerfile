@@ -8,13 +8,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml and install Python dependencies
-COPY pyproject.toml .
+# Copy backend application source code and install package
+COPY . .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir .
-
-# Copy backend application source code
-COPY . .
 
 # Expose FastAPI port
 EXPOSE 8000

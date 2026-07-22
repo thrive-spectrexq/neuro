@@ -42,7 +42,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
-ignore = ["E501", "F403", "UP042"]
+ignore = ["E501", "F403", "UP042", "E402"]
 
 [tool.setuptools]
 packages = ["app"]
