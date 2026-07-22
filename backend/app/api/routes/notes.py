@@ -315,7 +315,7 @@ async def delete_note(
     )
 
     await session.delete(note)
-    await search_engine.delete_note(note.id)
+    await search_engine.remove_note(session, note.id)
     await session.commit()
 
 

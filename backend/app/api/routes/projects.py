@@ -30,7 +30,8 @@ async def create_project(
     session: AsyncSession = Depends(get_session),
     current_user: str = Depends(get_current_user),
 ):
-    project = Project(**project_in.model_dump(), user_id=uuid.uuid4())
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    project = Project(**project_in.model_dump(), user_id=user_uuid)
     session.add(project)
     await session.commit()
     await session.refresh(project)

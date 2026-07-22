@@ -20,7 +20,8 @@ async def test_create_project(test_client: AsyncClient, auth_headers: dict[str, 
 
 @pytest.mark.asyncio
 async def test_list_projects(test_client: AsyncClient, auth_headers: dict[str, str]):
-    await test_client.post("/api/v1/projects", json={"name": "List Project"}, headers=auth_headers)
+    create_resp = await test_client.post("/api/v1/projects", json={"name": "List Project"}, headers=auth_headers)
+    assert create_resp.status_code in [200, 201]
     response = await test_client.get("/api/v1/projects", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
