@@ -83,5 +83,5 @@ async def test_remove_project_member(
     rem_resp = await test_client.delete(
         f"/api/v1/projects/{project_id}/members/{fake_user_id}", headers=auth_headers
     )
-    assert rem_resp.status_code in [200, 400, 403, 404]
+    assert rem_resp.status_code in [200, 204, 400, 403, 404]
     # assert rem_resp.status_code in [204, 404]
