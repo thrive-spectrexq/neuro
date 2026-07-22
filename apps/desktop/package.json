@@ -4,7 +4,7 @@
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && electron-builder"
+    "build": "tsc -p tsconfig.main.json && vite build && electron-builder"
   },
   "dependencies": {
     "react": "^18.2.0",
