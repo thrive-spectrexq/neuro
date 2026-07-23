@@ -94,4 +94,3 @@ async def import_vault(
 
     process_import_task.delay(clean_path, data.format, str(current_user.id))
     return {"message": f"Started {data.format} import from {clean_path}"}
-

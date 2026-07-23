@@ -145,8 +145,7 @@ class SearchEngine:
         found_notes = notes_res.scalars().all()
 
         notes_map = {
-            str(note.id): {"id": str(note.id), "title": note.title, "content": note.content}
-            for note in found_notes
+            str(note.id): {"id": str(note.id), "title": note.title, "content": note.content} for note in found_notes
         }
 
         results = []

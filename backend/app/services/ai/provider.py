@@ -35,9 +35,11 @@ class AIProvider(ABC):
         raw_tags = "".join(chunks).strip()
         if raw_tags.startswith("```"):
             import re
+
             raw_tags = re.sub(r"```[a-z]*", "", raw_tags).strip()
 
         import re
+
         parts = re.split(r"[,;\n]+", raw_tags)
         tags = [t.strip().lower().replace("#", "") for t in parts if t.strip()]
         return tags[:5]
@@ -79,13 +81,15 @@ class OpenAIProvider(AIProvider):
                         break
                     if attempt < 2 and response.status_code >= 500:
                         import asyncio
-                        await asyncio.sleep(0.5 * (2 ** attempt))
+
+                        await asyncio.sleep(0.5 * (2**attempt))
                 except httpx.TransportError:
                     if attempt == 2:
                         yield json.dumps({"error": "Failed to connect to OpenAI API"})
                         return
                     import asyncio
-                    await asyncio.sleep(0.5 * (2 ** attempt))
+
+                    await asyncio.sleep(0.5 * (2**attempt))
 
             if not response or response.status_code != 200:
                 error = await response.aread() if response else b"Request failed"
@@ -143,13 +147,15 @@ class AnthropicProvider(AIProvider):
                         break
                     if attempt < 2 and response.status_code >= 500:
                         import asyncio
-                        await asyncio.sleep(0.5 * (2 ** attempt))
+
+                        await asyncio.sleep(0.5 * (2**attempt))
                 except httpx.TransportError:
                     if attempt == 2:
                         yield json.dumps({"error": "Failed to connect to Anthropic API"})
                         return
                     import asyncio
-                    await asyncio.sleep(0.5 * (2 ** attempt))
+
+                    await asyncio.sleep(0.5 * (2**attempt))
 
             if not response or response.status_code != 200:
                 error = await response.aread() if response else b"Request failed"
