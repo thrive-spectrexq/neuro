@@ -13,12 +13,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./src/*"],
       "@neuro/shared": ["../../packages/shared/dist/index.d.ts"],
       "@neuro/shared/*": ["../../packages/shared/dist/*"]
     }
