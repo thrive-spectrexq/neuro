@@ -1,14 +1,18 @@
+from functools import lru_cache
+import logging
 import uuid
 
 import chromadb
 from sentence_transformers import SentenceTransformer
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.core.config import get_settings
 from app.models.note import Note
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 class SearchEngine:
@@ -16,20 +20,22 @@ class SearchEngine:
         try:
             self.chroma_client = chromadb.HttpClient(host=settings.CHROMA_HOST, port=settings.CHROMA_PORT)
             self.collection = self.chroma_client.get_or_create_collection(name="notes")
-        except Exception:
-            # Fallback for testing/local without chroma host
+        except Exception as e:
+            logger.warning(f"Failed to connect to ChromaDB host, falling back to in-memory client: {e}")
             self.chroma_client = chromadb.Client()
             self.collection = self.chroma_client.get_or_create_collection(name="notes")
 
         self.encoder = SentenceTransformer(settings.EMBEDDING_MODEL)
 
-    def _get_embedding(self, text: str) -> list[float]:
-        return self.encoder.encode(text).tolist()
+    @lru_cache(maxsize=2048)
+    def _encode_text_cached(self, text_content: str) -> tuple[float, ...]:
+        return tuple(self.encoder.encode(text_content).tolist())
+
+    def _get_embedding(self, text_content: str) -> list[float]:
+        return list(self._encode_text_cached(text_content))
 
     async def index_note(self, session: AsyncSession, note: Note):
         # 1. Update SQLite FTS5 table
-
-        # Remove old entry if exists, then insert
         await session.execute(text("DELETE FROM note_fts WHERE id = :id"), {"id": str(note.id)})
         await session.execute(
             text("INSERT INTO note_fts (id, title, content) VALUES (:id, :title, :content)"),
@@ -53,15 +59,15 @@ class SearchEngine:
                 ],
                 ids=[str(note.id)],
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to index note {note.id} in ChromaDB: {e}", exc_info=True)
 
     async def remove_note(self, session: AsyncSession, note_id: uuid.UUID):
         await session.execute(text("DELETE FROM note_fts WHERE id = :id"), {"id": str(note_id)})
         try:
             self.collection.delete(ids=[str(note_id)])
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to delete note {note_id} from ChromaDB: {e}", exc_info=True)
 
     async def hybrid_search(
         self,
@@ -78,13 +84,11 @@ class SearchEngine:
         else:
             where_clause = {"user_id": str(user_id)}
 
-        vector_results = self.collection.query(query_embeddings=[embedding], n_results=limit, where=where_clause)
-
-        vector_scores = {}
-        if vector_results["ids"] and vector_results["ids"][0]:
-            for doc_id, dist in zip(vector_results["ids"][0], vector_results["distances"][0]):
-                # Convert distance to a similarity score (lower distance = higher score)
-                vector_scores[doc_id] = 1.0 / (1.0 + dist)
+        vector_results = {}
+        try:
+            vector_results = self.collection.query(query_embeddings=[embedding], n_results=limit, where=where_clause)
+        except Exception as e:
+            logger.error(f"ChromaDB vector query failed: {e}", exc_info=True)
 
         # FTS Search
         fts_query = text("""
@@ -94,7 +98,6 @@ class SearchEngine:
             ORDER BY rank 
             LIMIT :limit
         """)
-        # Basic query normalization for FTS
         clean_query = " OR ".join([word for word in query.replace('"', "").split() if word.isalnum()])
         if not clean_query:
             clean_query = '""'
@@ -102,38 +105,48 @@ class SearchEngine:
         try:
             fts_res = await session.execute(fts_query, {"query": clean_query, "limit": limit})
             fts_rows = fts_res.fetchall()
-        except Exception:
+        except Exception as e:
+            logger.warning(f"FTS search query failed: {e}")
             fts_rows = []
 
-        fts_scores = {}
-        for row in fts_rows:
-            fts_scores[row.id] = abs(row.rank) if row.rank != 0 else 1.0
+        # Reciprocal Rank Fusion (RRF) standard score combination (k=60)
+        rrf_k = 60
+        rrf_scores: dict[str, float] = {}
 
-        # Combine scores
-        combined_scores = {}
-        all_ids = set(vector_scores.keys()).union(set(fts_scores.keys()))
+        if vector_results.get("ids") and vector_results["ids"][0]:
+            for rank, doc_id in enumerate(vector_results["ids"][0]):
+                rrf_scores[doc_id] = rrf_scores.get(doc_id, 0.0) + (1.0 / (rrf_k + rank + 1))
 
-        for doc_id in all_ids:
-            v_score = vector_scores.get(doc_id, 0.0)
-            f_score = fts_scores.get(doc_id, 0.0)
-            combined_scores[doc_id] = v_score + (1.0 / (1.0 + f_score))
+        for rank, row in enumerate(fts_rows):
+            doc_id = str(row.id)
+            rrf_scores[doc_id] = rrf_scores.get(doc_id, 0.0) + (1.0 / (rrf_k + rank + 1))
 
-        sorted_ids = sorted(combined_scores.keys(), key=lambda x: combined_scores[x], reverse=True)[:limit]
+        sorted_ids = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)[:limit]
 
         if not sorted_ids:
             return []
 
-        placeholders = ",".join([f"'{i}'" for i in sorted_ids])
+        uuid_ids = []
+        for i in sorted_ids:
+            try:
+                uuid_ids.append(uuid.UUID(i))
+            except ValueError:
+                pass
 
-        project_param = str(project_id) if project_id else ""
-
-        notes_query = text(
-            f"SELECT id, title, content FROM note WHERE id IN ({placeholders}) AND user_id = :user_id AND is_archived = 0 AND (project_id = :project_id OR (:project_id = '' AND project_id IS NULL))"
+        stmt = select(Note).where(
+            Note.id.in_(uuid_ids),
+            Note.user_id == user_id,
+            Note.is_archived == False,
         )
-        notes_res = await session.execute(notes_query, {"user_id": str(user_id), "project_id": project_param})
+        if project_id:
+            stmt = stmt.where(Note.project_id == project_id)
+
+        notes_res = await session.execute(stmt)
+        found_notes = notes_res.scalars().all()
 
         notes_map = {
-            str(row.id): {"id": str(row.id), "title": row.title, "content": row.content} for row in notes_res.fetchall()
+            str(note.id): {"id": str(note.id), "title": note.title, "content": note.content}
+            for note in found_notes
         }
 
         results = []

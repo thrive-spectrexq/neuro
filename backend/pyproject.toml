@@ -17,7 +17,6 @@ dependencies = [
     "bcrypt>=4.0.1",
     "python-multipart>=0.0.9",
     "httpx>=0.27.0",
-    "langchain>=0.1.13",
     "sentence-transformers>=2.6.1",
     "pymupdf>=1.23.0",
     "pyyaml>=6.0.1",
@@ -29,6 +28,9 @@ dependencies = [
 neuro = "app.cli:app"
 
 [project.optional-dependencies]
+voice = [
+    "pipecat-ai>=0.0.40",
+]
 dev = [
     "pytest>=8.1.1",
     "pytest-asyncio>=0.23.6",

@@ -8,7 +8,11 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-engine = create_async_engine(settings.DATABASE_URL, echo=settings.NEURO_ENV == "development", future=True)
+db_url = settings.DATABASE_URL
+if db_url.startswith("sqlite://"):
+    db_url = db_url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+
+engine = create_async_engine(db_url, echo=settings.NEURO_ENV == "development", future=True)
 
 
 async def create_db_and_tables():

@@ -22,6 +22,12 @@ if config.config_file_name is not None:
 target_metadata = SQLModel.metadata
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name and name.startswith("note_fts"):
+        return False
+    return True
+
+
 def run_migrations_offline() -> None:
     url = settings.DATABASE_URL
     context.configure(
@@ -29,6 +35,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -36,7 +44,12 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_object=include_object,
+        render_as_batch=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 

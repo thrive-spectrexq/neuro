@@ -94,66 +94,65 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
   ];
 
   return (
-    <div className="flex flex-col h-full glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
+    <div className="flex flex-col h-full glass-panel rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl relative">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#0E1017]/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-accent-purple via-indigo-500 to-accent-blue rounded-xl shadow-lg animate-pulse">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="p-1.5 bg-indigo-600/30 border border-indigo-500/40 rounded-xl">
+            <Sparkles className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-white flex items-center gap-2">
               Neuro RAG Assistant
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-accent-purple/30 text-purple-300 border border-purple-500/30 rounded-full">
-                Active Context
+              <span className="px-2 py-0.5 text-[10px] font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">
+                RAG Active
               </span>
             </h2>
-            <p className="text-xs text-gray-400">Grounding responses in your local notes</p>
+            <p className="text-[11px] text-slate-400">Grounding responses in your local notes</p>
           </div>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
           >
             <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages Feed */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ai' && (
-              <div className="w-8 h-8 rounded-xl bg-accent-purple/20 border border-accent-purple/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot className="w-4 h-4 text-accent-cyan" />
+              <div className="w-7 h-7 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Bot className="w-4 h-4 text-indigo-400" />
               </div>
             )}
-            <div className={`max-w-[80%] flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+            <div className={`max-w-[82%] flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
               <div
-                className={`p-3.5 rounded-2xl text-sm leading-relaxed ${
+                className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-accent-purple to-indigo-600 text-white rounded-br-none shadow-md'
-                    : 'glass-panel text-gray-200 rounded-bl-none border border-white/10'
+                    ? 'bg-indigo-600 text-white rounded-br-none shadow-md font-sans'
+                    : 'bg-[#141622] text-slate-200 rounded-bl-none border border-white/[0.08]'
                 }`}
               >
                 {msg.text}
 
-                {/* Sources list if present */}
                 {msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3 pt-2 border-t border-white/10 space-y-1">
-                    <p className="text-[11px] font-semibold text-accent-cyan flex items-center gap-1">
+                  <div className="mt-3 pt-2.5 border-t border-white/10 space-y-1">
+                    <p className="text-[10px] font-semibold text-sky-400 flex items-center gap-1">
                       <FileText className="w-3 h-3" /> Grounded In:
                     </p>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {msg.sources.map((src) => (
                         <span
                           key={src.id}
-                          className="px-2 py-0.5 text-[11px] bg-white/5 hover:bg-white/10 text-gray-300 rounded border border-white/10 cursor-pointer transition-all"
+                          className="px-2 py-0.5 text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 rounded border border-white/10 cursor-pointer transition-all"
                         >
                           {src.title}
                         </span>
@@ -162,11 +161,11 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
                   </div>
                 )}
               </div>
-              <span className="text-[10px] text-gray-400 mt-1 px-1">{msg.timestamp}</span>
+              <span className="text-[10px] font-mono text-slate-400 mt-1 px-1">{msg.timestamp}</span>
             </div>
             {msg.sender === 'user' && (
-              <div className="w-8 h-8 rounded-xl bg-accent-blue/20 border border-accent-blue/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-4 h-4 text-accent-blue" />
+              <div className="w-7 h-7 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <User className="w-4 h-4 text-sky-400" />
               </div>
             )}
           </div>
@@ -174,36 +173,36 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
 
         {isLoading && (
           <div className="flex gap-3 items-center">
-            <div className="w-8 h-8 rounded-xl bg-accent-purple/20 border border-accent-purple/30 flex items-center justify-center flex-shrink-0">
-              <Bot className="w-4 h-4 text-accent-cyan animate-spin" />
+            <div className="w-7 h-7 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+              <Bot className="w-4 h-4 text-indigo-400 animate-spin" />
             </div>
-            <div className="glass-panel p-3 rounded-2xl rounded-bl-none text-xs text-gray-400 flex items-center gap-2">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-accent-purple" />
-              Searching vector database & synthesizing answer...
+            <div className="bg-[#141622] p-3 rounded-2xl rounded-bl-none text-xs text-slate-400 border border-white/[0.08] flex items-center gap-2 font-mono">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+              Synthesizing local knowledge base...
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Prompts */}
-      <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto border-t border-white/5 no-scrollbar">
-        <span className="text-[11px] font-medium text-gray-400 flex items-center gap-1 flex-shrink-0">
-          <Terminal className="w-3 h-3 text-accent-cyan" /> Suggested:
+      {/* Quick Prompts Bar */}
+      <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto border-t border-white/[0.06] bg-[#0E1017]/60 no-scrollbar">
+        <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 flex-shrink-0">
+          <Terminal className="w-3 h-3 text-sky-400" /> Suggested:
         </span>
         {quickPrompts.map((prompt, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(prompt)}
-            className="px-2.5 py-1 text-xs glass-panel hover:bg-white/10 text-gray-300 rounded-lg whitespace-nowrap transition-all border border-white/10"
+            className="px-2.5 py-1 text-[11px] neuro-button-secondary rounded-lg whitespace-nowrap transition-all"
           >
             {prompt}
           </button>
         ))}
       </div>
 
-      {/* Input Form */}
-      <div className="p-3 border-t border-white/10 bg-white/5 backdrop-blur-md">
+      {/* Input Bar */}
+      <div className="p-3 border-t border-white/[0.08] bg-[#0E1017]/90 backdrop-blur-md">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -215,15 +214,15 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Neuro AI about your notes..."
-            className="flex-1 bg-black/40 border border-white/10 focus:border-accent-purple rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-all"
+            placeholder="Ask Neuro AI..."
+            className="flex-1 neuro-input rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 font-sans"
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="p-2.5 bg-gradient-to-r from-accent-purple to-accent-blue text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-all shadow-md active:scale-95 flex items-center justify-center"
+            className="p-2 neuro-button-primary rounded-xl text-white disabled:opacity-50 transition-all flex items-center justify-center"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3.5 h-3.5" />
           </button>
         </form>
       </div>

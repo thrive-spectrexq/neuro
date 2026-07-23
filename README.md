@@ -106,7 +106,7 @@ Whether you're a researcher tracking sources, a developer documenting systems, a
 | ORM | SQLModel + Alembic |
 | Validation | Pydantic v2 |
 | Task Queue | Celery + Redis |
-| Background Jobs | APScheduler |
+| Background Jobs | Celery Beat + Redis |
 | Auth | JWT + bcrypt |
 
 ### Storage
@@ -314,9 +314,14 @@ OLLAMA_BASE_URL=http://localhost:11434
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 
-# Default embedding model
-EMBEDDING_MODEL=nomic-embed-text   # Ollama local model
+# Default embedding model (sentence-transformers repo ID)
+EMBEDDING_MODEL=all-MiniLM-L6-v2
 # EMBEDDING_MODEL=text-embedding-3-small   # OpenAI
+
+# Configurable AI Models
+OPENAI_MODEL=gpt-4o
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+OLLAMA_MODEL=llama3
 ```
 
 ### AI Configuration
@@ -389,38 +394,6 @@ The backend exposes a versioned REST API. Interactive docs are available at `htt
 | `POST` | `/api/v1/ai/chat` | AI chat with knowledge base context |
 | `POST` | `/api/v1/ingest` | Import content from files or URLs |
 | `GET` | `/api/v1/graph` | Knowledge graph data |
-
----
-
-## Roadmap
-
-### Phase 1 — Foundation
-- [x] Core note editor (Markdown + rich text)
-- [x] Bi-directional linking
-- [x] Full-text search
-- [x] Basic AI chat (with Ollama/OpenAI)
-- [x] Local vector embeddings + semantic search
-- [x] Plugin SDK v1
-
-### Phase 2 — Knowledge Graph
-- [x] Graph view (note relationships)
-- [x] Automatic entity extraction and linking
-- [x] Web clipper browser extension
-- [x] PDF ingestion and annotation
-- [x] Import from Obsidian, Notion, Roam
-
-### Phase 3 — Projects & Workflows
-- [x] Project workspaces
-- [x] Task management (Kanban + lists)
-- [x] Trigger-based automation engine
-- [x] Webhook support
-- [x] CLI for scripting and external integration
-
-### Phase 4 — Collaboration
-- [x] Optional end-to-end encrypted sync
-- [x] Shared workspaces (self-hosted)
-- [x] Commenting and review workflows
-- [x] Audit log
 
 ---
 

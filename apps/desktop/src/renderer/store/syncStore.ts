@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { deriveKeyFromPassword, encryptPayload, decryptPayload } from '@neuro/shared';
 
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+
 interface SyncState {
   masterKey: CryptoKey | null;
   setMasterPassword: (password: string, salt: string) => Promise<void>;
@@ -20,9 +22,9 @@ export const useSyncStore = create<SyncState>((set, get) => ({
       throw new Error('Master key not derived');
     }
 
-    const encryptedData = await encryptPayload(localData, masterKey);
+    const envelope = await encryptPayload(localData, masterKey);
 
-    const response = await fetch('http://localhost:8000/api/v1/sync', {
+    const response = await fetch(`${API_BASE_URL}/api/v1/sync`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -30,7 +32,9 @@ export const useSyncStore = create<SyncState>((set, get) => ({
       },
       body: JSON.stringify({
         user_id: userId,
-        encrypted_data: encryptedData,
+        encrypted_data: envelope.encrypted_data,
+        iv: envelope.iv,
+        salt: envelope.salt,
         version: 1,
       }),
     });
@@ -45,7 +49,7 @@ export const useSyncStore = create<SyncState>((set, get) => ({
       throw new Error('Master key not derived');
     }
 
-    const response = await fetch('http://localhost:8000/api/v1/sync/latest', {
+    const response = await fetch(`${API_BASE_URL}/api/v1/sync/latest`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -60,7 +64,11 @@ export const useSyncStore = create<SyncState>((set, get) => ({
     const blob = await response.json();
     if (!blob || !blob.encrypted_data) return null;
 
-    const decryptedData = await decryptPayload(blob.encrypted_data, masterKey);
+    const decryptedData = await decryptPayload(
+      { encrypted_data: blob.encrypted_data, iv: blob.iv, salt: blob.salt },
+      masterKey
+    );
     return decryptedData;
   }
 }));
+

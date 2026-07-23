@@ -30,7 +30,7 @@ async def register_device_key(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     fingerprint = crypto_service.compute_key_fingerprint(key_in.public_key)
 
     # Check if key already registered
@@ -60,7 +60,7 @@ async def list_device_keys(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     stmt = select(DeviceKey).where(DeviceKey.user_id == user_id).order_by(DeviceKey.created_at.desc())
     result = await session.execute(stmt)
     return result.scalars().all()
@@ -73,7 +73,7 @@ async def upload_sync_blob(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
 
     # Compute sequence number
     seq_stmt = select(func.coalesce(func.max(SyncBlob.sequence_number), 0)).where(SyncBlob.user_id == user_id)
@@ -100,7 +100,7 @@ async def push_sync_blobs(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
 
     seq_stmt = select(func.coalesce(func.max(SyncBlob.sequence_number), 0)).where(SyncBlob.user_id == user_id)
     current_max_seq = (await session.execute(seq_stmt)).scalar() or 0
@@ -133,7 +133,7 @@ async def pull_sync_blobs(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
 
     stmt = (
         select(SyncBlob)
@@ -158,7 +158,7 @@ async def get_latest_sync_blob(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> SyncBlobResponse | None:
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     statement = select(SyncBlob).where(SyncBlob.user_id == user_id).order_by(SyncBlob.sequence_number.desc()).limit(1)
     result = await session.execute(statement)
     return result.scalars().first()
@@ -169,7 +169,7 @@ async def get_sync_status(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
 
     cnt_stmt = select(func.count(SyncBlob.id)).where(SyncBlob.user_id == user_id)
     count = (await session.execute(cnt_stmt)).scalar() or 0
@@ -193,7 +193,7 @@ async def get_sync_history(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     statement = (
         select(SyncBlob).where(SyncBlob.user_id == user_id).order_by(SyncBlob.sequence_number.desc()).limit(limit)
     )
@@ -207,7 +207,7 @@ async def verify_sync_blob(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     blob = await session.get(SyncBlob, blob_id)
     if not blob or blob.user_id != user_id:
         raise HTTPException(status_code=404, detail="Sync blob not found")
@@ -227,7 +227,7 @@ async def clear_sync_data(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    user_id = current_user.id if hasattr(current_user, "id") else uuid.UUID(current_user.get("id"))
+    user_id = current_user.id
     statement = select(SyncBlob).where(SyncBlob.user_id == user_id)
     result = await session.execute(statement)
     blobs = result.scalars().all()

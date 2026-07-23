@@ -40,3 +40,5 @@ export interface PluginConfig {
 export function definePlugin(config: PluginConfig): PluginConfig {
   return config;
 }
+
+export * from './loader';

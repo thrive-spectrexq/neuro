@@ -28,21 +28,21 @@ class IngestionPipeline:
             async for chunk in self.ai_provider.generate_response_stream(prompt, context=[]):
                 response += chunk
 
-            response = response.strip()
-            if response.startswith("```json"):
-                response = response[7:]
-            if response.startswith("```"):
-                response = response[3:]
-            if response.endswith("```"):
-                response = response[:-3]
+            cleaned = response.strip()
+            match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+            if match:
+                cleaned = match.group(0)
 
             import json
 
-            entities = json.loads(response.strip())
+            entities = json.loads(cleaned)
             if isinstance(entities, list):
-                return [str(e) for e in entities]
+                return [str(e).strip() for e in entities if str(e).strip()]
         except Exception:
-            pass
+            lines = [line.strip("- *•").strip() for line in response.splitlines() if line.strip()]
+            valid = [l for l in lines if l and not l.startswith("```") and not l.startswith("{")]
+            if valid:
+                return valid[:10]
         return []
 
     async def process_markdown(self, content: str) -> dict:

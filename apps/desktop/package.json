@@ -4,9 +4,11 @@
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -p tsconfig.main.json && vite build && electron-builder"
+    "build": "tsc -p tsconfig.main.json && vite build && electron-builder",
+    "test": "tsc -p tsconfig.main.json --noEmit && tsc --noEmit"
   },
   "dependencies": {
+    "@neuro/shared": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.5.2",

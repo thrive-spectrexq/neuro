@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OPENAI_API_KEY: str | None = None
     ANTHROPIC_API_KEY: str | None = None
+    OPENAI_MODEL: str = "gpt-4o"
+    ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"
+    OLLAMA_MODEL: str = "llama3"
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
 
     # JWT Settings

@@ -68,7 +68,8 @@ export class AudioStreamingService {
     const buffer = new ArrayBuffer(float32Array.length * 2);
     const view = new DataView(buffer);
     for (let i = 0, offset = 0; i < float32Array.length; i++, offset += 2) {
-      const s = Math.max(-1, Math.min(1, float32Array[i]));
+      const val = float32Array[i] ?? 0;
+      const s = Math.max(-1, Math.min(1, val));
       view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
     }
     return buffer;
@@ -83,7 +84,7 @@ export class AudioStreamingService {
     const view = new Int16Array(arrayBuffer);
     const floatArray = new Float32Array(view.length);
     for (let i = 0; i < view.length; i++) {
-      floatArray[i] = view[i] / 32768.0;
+      floatArray[i] = (view[i] ?? 0) / 32768.0;
     }
     
     const audioBuffer = this.audioContext.createBuffer(1, floatArray.length, 24000);

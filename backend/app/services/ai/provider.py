@@ -32,14 +32,21 @@ class AIProvider(ABC):
             context=[],
         ):
             chunks.append(chunk)
-        raw_tags = "".join(chunks)
-        tags = [t.strip().lower().replace("#", "") for t in raw_tags.split(",") if t.strip()]
+        raw_tags = "".join(chunks).strip()
+        if raw_tags.startswith("```"):
+            import re
+            raw_tags = re.sub(r"```[a-z]*", "", raw_tags).strip()
+
+        import re
+        parts = re.split(r"[,;\n]+", raw_tags)
+        tags = [t.strip().lower().replace("#", "") for t in parts if t.strip()]
         return tags[:5]
 
 
 class OpenAIProvider(AIProvider):
     def __init__(self):
         self.api_key = settings.OPENAI_API_KEY
+        self.model = settings.OPENAI_MODEL
 
     async def generate_response_stream(self, prompt: str, context: list[dict]) -> AsyncGenerator[str, None]:
         context_str = "\n\n".join([f"Title: {c['title']}\nContent: {c['content']}" for c in context])
@@ -55,18 +62,33 @@ class OpenAIProvider(AIProvider):
         ]
 
         async with httpx.AsyncClient() as client:
-            req = client.build_request(
-                "POST",
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={"model": "gpt-4o", "messages": messages, "stream": True},
-            )
-            response = await client.send(req, stream=True)
-            if response.status_code != 200:
-                error = await response.aread()
+            response = None
+            for attempt in range(3):
+                try:
+                    req = client.build_request(
+                        "POST",
+                        "https://api.openai.com/v1/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json={"model": self.model, "messages": messages, "stream": True},
+                    )
+                    response = await client.send(req, stream=True)
+                    if response.status_code == 200:
+                        break
+                    if attempt < 2 and response.status_code >= 500:
+                        import asyncio
+                        await asyncio.sleep(0.5 * (2 ** attempt))
+                except httpx.TransportError:
+                    if attempt == 2:
+                        yield json.dumps({"error": "Failed to connect to OpenAI API"})
+                        return
+                    import asyncio
+                    await asyncio.sleep(0.5 * (2 ** attempt))
+
+            if not response or response.status_code != 200:
+                error = await response.aread() if response else b"Request failed"
                 yield json.dumps({"error": error.decode()})
                 return
 
@@ -86,6 +108,7 @@ class OpenAIProvider(AIProvider):
 class AnthropicProvider(AIProvider):
     def __init__(self):
         self.api_key = settings.ANTHROPIC_API_KEY
+        self.model = settings.ANTHROPIC_MODEL
 
     async def generate_response_stream(self, prompt: str, context: list[dict]) -> AsyncGenerator[str, None]:
         context_str = "\n\n".join([f"Title: {c['title']}\nContent: {c['content']}" for c in context])
@@ -96,25 +119,40 @@ class AnthropicProvider(AIProvider):
             system_prompt += f"\n\nContext Notes:\n{context_str}"
 
         async with httpx.AsyncClient() as client:
-            req = client.build_request(
-                "POST",
-                "https://api.anthropic.com/v1/messages",
-                headers={
-                    "x-api-key": self.api_key or "",
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json",
-                },
-                json={
-                    "model": "claude-3-5-sonnet-20241022",
-                    "max_tokens": 1024,
-                    "system": system_prompt,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": True,
-                },
-            )
-            response = await client.send(req, stream=True)
-            if response.status_code != 200:
-                error = await response.aread()
+            response = None
+            for attempt in range(3):
+                try:
+                    req = client.build_request(
+                        "POST",
+                        "https://api.anthropic.com/v1/messages",
+                        headers={
+                            "x-api-key": self.api_key or "",
+                            "anthropic-version": "2023-06-01",
+                            "content-type": "application/json",
+                        },
+                        json={
+                            "model": self.model,
+                            "max_tokens": 1024,
+                            "system": system_prompt,
+                            "messages": [{"role": "user", "content": prompt}],
+                            "stream": True,
+                        },
+                    )
+                    response = await client.send(req, stream=True)
+                    if response.status_code == 200:
+                        break
+                    if attempt < 2 and response.status_code >= 500:
+                        import asyncio
+                        await asyncio.sleep(0.5 * (2 ** attempt))
+                except httpx.TransportError:
+                    if attempt == 2:
+                        yield json.dumps({"error": "Failed to connect to Anthropic API"})
+                        return
+                    import asyncio
+                    await asyncio.sleep(0.5 * (2 ** attempt))
+
+            if not response or response.status_code != 200:
+                error = await response.aread() if response else b"Request failed"
                 yield json.dumps({"error": error.decode()})
                 return
 
@@ -133,6 +171,7 @@ class AnthropicProvider(AIProvider):
 class OllamaProvider(AIProvider):
     def __init__(self):
         self.base_url = settings.OLLAMA_BASE_URL
+        self.model = settings.OLLAMA_MODEL
 
     async def generate_response_stream(self, prompt: str, context: list[dict]) -> AsyncGenerator[str, None]:
         context_str = "\n\n".join([f"Title: {c['title']}\nContent: {c['content']}" for c in context])
@@ -147,7 +186,7 @@ class OllamaProvider(AIProvider):
                 "POST",
                 f"{self.base_url}/api/chat",
                 json={
-                    "model": "llama3",
+                    "model": self.model,
                     "messages": [
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt},

@@ -7,17 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0f',
-        panel: '#12121a',
-        surface: '#1a1a2e',
+        background: '#090a0f',
+        panel: '#11131c',
+        surface: '#161926',
+        border: 'rgba(255, 255, 255, 0.08)',
         accent: {
-          purple: '#7c3aed',
-          blue: '#3b82f6',
+          purple: '#6366f1',
+          indigo: '#4f46e5',
+          blue: '#38bdf8',
           cyan: '#06b6d4',
+          emerald: '#10b981',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       }
     },
   },

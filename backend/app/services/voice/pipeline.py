@@ -6,7 +6,10 @@ try:
     from pipecat.pipeline.task import PipelineParams, PipelineTask
     from pipecat.services.openai.stt import OpenAISTTService
     from pipecat.services.openai.tts import OpenAITTSService
+
+    HAS_PIPECAT = True
 except ImportError:
+    HAS_PIPECAT = False
 
     class Pipeline:
         def __init__(self, *args, **kwargs):
@@ -146,6 +149,8 @@ async def run_voice_pipeline(websocket):
     """
     Run the Pipecat voice pipeline attached to a FastAPI websocket.
     """
+    if not HAS_PIPECAT:
+        raise RuntimeError("pipecat-ai is required for voice streaming. Please install with: pip install '.[voice]'")
     # Configure Transport using the existing websocket connection
     transport = WebsocketServerTransport(
         websocket=websocket,
