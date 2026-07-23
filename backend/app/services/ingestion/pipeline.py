@@ -40,7 +40,11 @@ class IngestionPipeline:
                 return [str(e).strip() for e in entities if str(e).strip()]
         except Exception:
             lines = [line.strip("- *•").strip() for line in response.splitlines() if line.strip()]
-            valid = [l for l in lines if l and not l.startswith("```") and not l.startswith("{")]
+            valid = [
+                line_item
+                for line_item in lines
+                if line_item and not line_item.startswith("```") and not line_item.startswith("{")
+            ]
             if valid:
                 return valid[:10]
         return []

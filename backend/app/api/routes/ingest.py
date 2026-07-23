@@ -1,5 +1,4 @@
 import os
-import uuid
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel, HttpUrl

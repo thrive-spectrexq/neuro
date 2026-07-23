@@ -1,6 +1,6 @@
-from functools import lru_cache
 import logging
 import uuid
+from functools import lru_cache
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -136,7 +136,7 @@ class SearchEngine:
         stmt = select(Note).where(
             Note.id.in_(uuid_ids),
             Note.user_id == user_id,
-            Note.is_archived == False,
+            Note.is_archived == False,  # noqa: E712
         )
         if project_id:
             stmt = stmt.where(Note.project_id == project_id)

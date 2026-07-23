@@ -15,8 +15,9 @@ export function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
   if (typeof btoa !== 'undefined') {
     return btoa(binary);
   }
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(binary, 'binary').toString('base64');
+  const NodeBuffer = (globalThis as any).Buffer;
+  if (NodeBuffer) {
+    return NodeBuffer.from(binary, 'binary').toString('base64');
   }
   throw new Error('No base64 encoding environment found');
 }
@@ -30,8 +31,9 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     }
     return bytes.buffer;
   }
-  if (typeof Buffer !== 'undefined') {
-    const buf = Buffer.from(base64, 'base64');
+  const NodeBuffer = (globalThis as any).Buffer;
+  if (NodeBuffer) {
+    const buf = NodeBuffer.from(base64, 'base64');
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
   }
   throw new Error('No base64 decoding environment found');
