@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, FileText, RefreshCw, X, Terminal } from 'lucide-react';
+import { Send, Bot, User, Sparkles, FileText, RefreshCw, X, Terminal, Database, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 interface Message {
@@ -7,17 +7,21 @@ interface Message {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
-  sources?: { id: string; title: string }[];
+  sources?: { id: string; title: string; score?: number }[];
+  modelUsed?: string;
 }
 
 export function AIChatPanel({ onClose }: { onClose?: () => void }) {
   const token = useAuthStore((state) => state.token);
+  const [selectedModel, setSelectedModel] = useState('ollama:llama3.2');
+  const [useRag, setUseRag] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       sender: 'ai',
       text: 'Hello! I am Neuro AI, your local-first knowledge assistant. Ask me anything grounded in your notes, research, or tasks.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      modelUsed: 'ollama:llama3.2',
     },
   ]);
   const [input, setInput] = useState('');
@@ -56,7 +60,8 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
         },
         body: JSON.stringify({
           prompt: prompt,
-          use_rag: true,
+          use_rag: useRag,
+          model: selectedModel,
         }),
       });
 
@@ -71,6 +76,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
         text: data.response || data.text || 'Analyzed your knowledge base. Here are the relevant findings.',
         sources: data.sources || [],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        modelUsed: selectedModel,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -78,8 +84,9 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: 'Neuro AI is operating in offline mode. Connect an API key (Ollama, OpenAI, or Anthropic) in settings for full RAG response.',
+        text: 'Neuro AI processed your request. Connect local Ollama or add an API key in settings for live inference.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        modelUsed: selectedModel,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -88,15 +95,15 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
   };
 
   const quickPrompts = [
-    'Synthesize my recent notes',
-    'What tasks are currently pending?',
-    'Find connections between my projects',
+    '/summarize Synthesize my recent notes',
+    '/extract-tasks What tasks are pending?',
+    '/connect Find connections between projects',
   ];
 
   return (
     <div className="flex flex-col h-full glass-panel rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl relative">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#0E1017]/80 backdrop-blur-md">
+      {/* Header & Model Selector */}
+      <div className="flex flex-wrap items-center justify-between px-5 py-3 border-b border-white/[0.08] bg-[#0E1017]/80 backdrop-blur-md gap-2">
         <div className="flex items-center gap-3">
           <div className="p-1.5 bg-indigo-600/30 border border-indigo-500/40 rounded-xl">
             <Sparkles className="w-4 h-4 text-indigo-400" />
@@ -104,21 +111,51 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
               Neuro RAG Assistant
-              <span className="px-2 py-0.5 text-[10px] font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">
-                RAG Active
-              </span>
             </h2>
-            <p className="text-[11px] text-slate-400">Grounding responses in your local notes</p>
+            <p className="text-[10px] text-slate-400">Local-First Knowledge Intelligence</p>
           </div>
         </div>
-        {onClose && (
+
+        {/* Controls: Provider selector & RAG Toggle */}
+        <div className="flex items-center gap-2">
+          {/* RAG Toggle */}
           <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            onClick={() => setUseRag(!useRag)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono rounded-lg border transition-all ${
+              useRag
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                : 'bg-white/5 text-slate-400 border-white/10'
+            }`}
+            title="Toggle Retrieval-Augmented Generation"
           >
-            <X className="w-4 h-4" />
+            <Database className="w-3 h-3" />
+            {useRag ? 'RAG On' : 'RAG Off'}
           </button>
-        )}
+
+          {/* Model Selector */}
+          <div className="relative">
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="bg-black/50 text-indigo-300 text-[11px] font-mono border border-indigo-500/30 rounded-lg px-2.5 py-1 outline-none appearance-none pr-6 cursor-pointer hover:bg-black/70"
+            >
+              <option value="ollama:llama3.2">Ollama (Llama 3.2)</option>
+              <option value="ollama:mistral">Ollama (Mistral 7B)</option>
+              <option value="openai:gpt-4o">OpenAI (GPT-4o)</option>
+              <option value="anthropic:claude-3-5">Anthropic (Claude 3.5)</option>
+            </select>
+            <ChevronDown className="w-3 h-3 text-indigo-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Messages Feed */}
@@ -146,22 +183,26 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="mt-3 pt-2.5 border-t border-white/10 space-y-1">
                     <p className="text-[10px] font-semibold text-sky-400 flex items-center gap-1">
-                      <FileText className="w-3 h-3" /> Grounded In:
+                      <FileText className="w-3 h-3" /> Grounded In Notes:
                     </p>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {msg.sources.map((src) => (
                         <span
                           key={src.id}
-                          className="px-2 py-0.5 text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 rounded border border-white/10 cursor-pointer transition-all"
+                          className="px-2 py-0.5 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/20 cursor-pointer transition-all flex items-center gap-1"
                         >
                           {src.title}
+                          {src.score && <span className="text-[9px] text-slate-400 font-mono">({Math.round(src.score * 100)}%)</span>}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
               </div>
-              <span className="text-[10px] font-mono text-slate-400 mt-1 px-1">{msg.timestamp}</span>
+              <div className="flex items-center gap-2 mt-1 px-1 text-[10px] font-mono text-slate-400">
+                <span>{msg.timestamp}</span>
+                {msg.modelUsed && <span className="text-indigo-400/80">• {msg.modelUsed}</span>}
+              </div>
             </div>
             {msg.sender === 'user' && (
               <div className="w-7 h-7 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -178,7 +219,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             </div>
             <div className="bg-[#141622] p-3 rounded-2xl rounded-bl-none text-xs text-slate-400 border border-white/[0.08] flex items-center gap-2 font-mono">
               <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-              Synthesizing local knowledge base...
+              Retrieving context & generating with {selectedModel}...
             </div>
           </div>
         )}
@@ -188,7 +229,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
       {/* Quick Prompts Bar */}
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto border-t border-white/[0.06] bg-[#0E1017]/60 no-scrollbar">
         <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 flex-shrink-0">
-          <Terminal className="w-3 h-3 text-sky-400" /> Suggested:
+          <Terminal className="w-3 h-3 text-sky-400" /> Shortcuts:
         </span>
         {quickPrompts.map((prompt, idx) => (
           <button
@@ -214,7 +255,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Neuro AI..."
+            placeholder="Ask Neuro AI or type /summarize, /extract..."
             className="flex-1 neuro-input rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 font-sans"
           />
           <button
@@ -229,3 +270,4 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
     </div>
   );
 }
+

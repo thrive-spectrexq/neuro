@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { FileText, Save, Tag } from 'lucide-react';
+import { FileText, Save, Tag, Eye, Edit3, Columns, Check, List, Link2 } from 'lucide-react';
 
 interface NoteEditorProps {
   initialTitle?: string;
@@ -11,6 +11,8 @@ interface NoteEditorProps {
   initialTags?: string[];
   onSave?: (note: { title: string; content: string; tags: string[] }) => void;
 }
+
+type ViewMode = 'edit' | 'preview' | 'split';
 
 export function NoteEditor({
   initialTitle = '',
@@ -22,6 +24,9 @@ export function NoteEditor({
   const [content, setContent] = useState(initialContent);
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(initialTags);
+  const [viewMode, setViewMode] = useState<ViewMode>('split');
+  const [isSaved, setIsSaved] = useState(true);
+  const [showOutline, setShowOutline] = useState(false);
 
   useEffect(() => {
     setTitle(initialTitle);
@@ -31,10 +36,12 @@ export function NoteEditor({
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
+    setIsSaved(false);
   };
 
   const handleContentChange = useCallback((val: string) => {
     setContent(val);
+    setIsSaved(false);
   }, []);
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,6 +50,7 @@ export function NoteEditor({
       const newTag = tagInput.trim().toLowerCase().replace(/^#/, '');
       if (!tags.includes(newTag)) {
         setTags([...tags, newTag]);
+        setIsSaved(false);
       }
       setTagInput('');
     }
@@ -50,12 +58,76 @@ export function NoteEditor({
 
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter((t) => t !== tagToRemove));
+    setIsSaved(false);
   };
 
   const handleSave = () => {
     if (onSave) {
       onSave({ title, content, tags });
+      setIsSaved(true);
     }
+  };
+
+  // Extract headings for outline navigation
+  const headings = useMemo(() => {
+    const lines = content.split('\n');
+    return lines
+      .map((line, idx) => {
+        const match = line.match(/^(#{1,6})\s+(.+)$/);
+        if (match && match[1] && match[2]) {
+          return { level: match[1].length, text: match[2], line: idx };
+        }
+        return null;
+      })
+      .filter((item): item is { level: number; text: string; line: number } => item !== null);
+  }, [content]);
+
+  // Extract [[WikiLinks]] found in content
+  const wikiLinks = useMemo(() => {
+    const matches = Array.from(content.matchAll(/\[\[(.*?)\]\]/g));
+    return Array.from(new Set(matches.map((m) => m[1])));
+  }, [content]);
+
+  // Helper to render markdown content with wiki-links preview
+  const renderPreview = () => {
+    if (!content.trim()) {
+      return <div className="text-slate-500 italic p-6 text-sm">Nothing to preview...</div>;
+    }
+
+    const lines = content.split('\n');
+    return (
+      <div className="p-6 space-y-3 text-slate-200 text-sm font-sans leading-relaxed">
+        {lines.map((line, i) => {
+          if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-black text-white border-b border-white/10 pb-2 my-2">{line.slice(2)}</h1>;
+          if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold text-indigo-300 border-b border-white/5 pb-1 my-2">{line.slice(3)}</h2>;
+          if (line.startsWith('### ')) return <h3 key={i} className="text-base font-bold text-sky-300 my-1">{line.slice(4)}</h3>;
+          if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 list-disc text-slate-300">{line.slice(2)}</li>;
+          
+          // WikiLink replacement in text
+          const parts = line.split(/(\[\[.*?\]\])/g);
+          return (
+            <p key={i} className="min-h-[1.25rem]">
+              {parts.map((part, pIdx) => {
+                if (part.startsWith('[[') && part.endsWith(']]')) {
+                  const target = part.slice(2, -2);
+                  return (
+                    <span
+                      key={pIdx}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 mx-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold cursor-pointer hover:bg-indigo-500/30 transition-colors"
+                      title={`Jump to [[${target}]]`}
+                    >
+                      <Link2 className="w-3 h-3 text-indigo-400" />
+                      {target}
+                    </span>
+                  );
+                }
+                return part;
+              })}
+            </p>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -63,64 +135,159 @@ export function NoteEditor({
       {/* Top Title & Action Header */}
       <div className="p-4 border-b border-white/10 flex items-center justify-between gap-4 bg-black/20">
         <div className="flex items-center gap-3 flex-1">
-          <FileText className="w-5 h-5 text-accent-purple" />
+          <FileText className="w-5 h-5 text-indigo-400" />
           <input
             type="text"
             placeholder="Untitled Note..."
             value={title}
             onChange={handleTitleChange}
-            className="bg-transparent text-xl font-extrabold text-white outline-none w-full placeholder-gray-500"
+            className="bg-transparent text-xl font-extrabold text-white outline-none w-full placeholder-slate-500"
           />
         </div>
+
+        {/* View Mode Toggle Controls */}
+        <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
+          <button
+            onClick={() => setViewMode('edit')}
+            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+              viewMode === 'edit' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Edit Mode"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setViewMode('split')}
+            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+              viewMode === 'split' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Split Mode"
+          >
+            <Columns className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setViewMode('preview')}
+            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+              viewMode === 'preview' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Preview Mode"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Outline Drawer Toggle */}
+        <button
+          onClick={() => setShowOutline(!showOutline)}
+          className={`p-2 rounded-xl border border-white/10 text-xs font-semibold transition-all ${
+            showOutline ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/40' : 'text-slate-400 hover:text-white hover:bg-white/5'
+          }`}
+          title="Document Outline"
+        >
+          <List className="w-4 h-4" />
+        </button>
+
+        {/* Save Button & Status */}
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-accent-purple to-accent-blue text-white shadow-lg hover:brightness-110 active:scale-95 transition-all"
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl transition-all shadow-lg active:scale-95 ${
+            isSaved
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+              : 'bg-gradient-to-r from-indigo-600 to-sky-600 text-white hover:brightness-110'
+          }`}
         >
-          <Save className="w-4 h-4" />
-          Save Note
+          {isSaved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+          {isSaved ? 'Saved' : 'Save Note'}
         </button>
       </div>
 
-      {/* Tags Section */}
-      <div className="px-4 py-2 border-b border-white/5 flex items-center gap-2 bg-black/10 overflow-x-auto">
-        <Tag className="w-3.5 h-3.5 text-accent-cyan flex-shrink-0" />
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {tags.map((t) => (
-            <span
-              key={t}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-accent-purple/20 text-purple-200 border border-purple-500/30"
-            >
-              #{t}
-              <button
-                onClick={() => handleRemoveTag(t)}
-                className="hover:text-white font-bold ml-1"
+      {/* Tags Section & WikiLinks Bar */}
+      <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between gap-4 bg-black/10 overflow-x-auto">
+        <div className="flex items-center gap-2">
+          <Tag className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {tags.map((t) => (
+              <span
+                key={t}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30"
               >
-                &times;
-              </button>
-            </span>
-          ))}
-          <input
-            type="text"
-            placeholder="Add tag + Enter"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleAddTag}
-            className="bg-transparent text-xs text-gray-300 outline-none w-28 placeholder-gray-600"
-          />
+                #{t}
+                <button
+                  onClick={() => handleRemoveTag(t)}
+                  className="hover:text-white font-bold ml-1"
+                >
+                  &times;
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              placeholder="Add tag + Enter"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleAddTag}
+              className="bg-transparent text-xs text-slate-300 outline-none w-28 placeholder-slate-600"
+            />
+          </div>
         </div>
+
+        {wikiLinks.length > 0 && (
+          <div className="flex items-center gap-1 text-[11px] text-indigo-300 flex-shrink-0 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">
+            <Link2 className="w-3 h-3 text-indigo-400" />
+            <span>{wikiLinks.length} Linked Notes</span>
+          </div>
+        )}
       </div>
 
-      {/* CodeMirror Markdown Editor */}
-      <div className="flex-1 overflow-auto bg-black/40">
-        <CodeMirror
-          value={content}
-          height="100%"
-          theme={oneDark}
-          extensions={[markdown({ base: markdownLanguage, codeLanguages: languages })]}
-          onChange={handleContentChange}
-          className="h-full text-sm [&_.cm-editor]:h-full [&_.cm-scroller]:font-mono [&_.cm-gutters]:bg-black/20 [&_.cm-gutters]:border-r-white/5"
-        />
+      {/* Main Workspace Area (Edit / Preview / Split + Optional Outline Sidebar) */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Document Outline Drawer */}
+        {showOutline && (
+          <div className="w-56 border-r border-white/10 bg-black/50 p-3 overflow-y-auto flex-shrink-0">
+            <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <List className="w-3 h-3" /> Outline
+            </h4>
+            {headings.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No headings found</p>
+            ) : (
+              <div className="space-y-1">
+                {headings.map((h, idx) => (
+                  <div
+                    key={idx}
+                    className="text-xs text-slate-300 hover:text-indigo-400 cursor-pointer truncate py-1 transition-colors"
+                    style={{ paddingLeft: `${(h.level - 1) * 12}px` }}
+                  >
+                    {h.text}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Editor and Preview Containers */}
+        <div className="flex-1 flex overflow-hidden">
+          {(viewMode === 'edit' || viewMode === 'split') && (
+            <div className={`h-full overflow-auto bg-black/40 ${viewMode === 'split' ? 'w-1/2 border-r border-white/10' : 'w-full'}`}>
+              <CodeMirror
+                value={content}
+                height="100%"
+                theme={oneDark}
+                extensions={[markdown({ base: markdownLanguage, codeLanguages: languages })]}
+                onChange={handleContentChange}
+                className="h-full text-sm [&_.cm-editor]:h-full [&_.cm-scroller]:font-mono [&_.cm-gutters]:bg-black/20 [&_.cm-gutters]:border-r-white/5"
+              />
+            </div>
+          )}
+
+          {(viewMode === 'preview' || viewMode === 'split') && (
+            <div className={`h-full overflow-y-auto bg-[#0B0D14]/80 ${viewMode === 'split' ? 'w-1/2' : 'w-full'}`}>
+              {renderPreview()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
