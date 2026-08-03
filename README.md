@@ -224,6 +224,7 @@ neuro/
 | Tool | Version | Purpose |
 |---|---|---|
 | Python | 3.12+ | Backend runtime |
+| uv | latest | Fast Python package & environment manager (recommended) |
 | Node.js | 20+ | Frontend & Electron |
 | pnpm | 9+ | JS package manager |
 | Redis | 7+ | Task queue & cache |
@@ -250,8 +251,16 @@ The API will be available at `http://localhost:8000` and the desktop app will la
 
 ### Manual Setup
 
-**Backend**
+**Backend (with `uv`)**
 
+```bash
+cd backend
+uv sync --extra dev
+uv run alembic upgrade head
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+*(Alternative using standard `venv` & `pip`)*:
 ```bash
 cd backend
 python -m venv .venv
