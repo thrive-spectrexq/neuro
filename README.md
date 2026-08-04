@@ -257,7 +257,7 @@ The API will be available at `http://localhost:8000` and the desktop app will la
 cd backend
 uv sync --extra dev
 uv run alembic upgrade head
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --reload-exclude ".venv/*" --port 8000
 ```
 
 *(Alternative using standard `venv` & `pip`)*:
