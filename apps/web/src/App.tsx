@@ -5,12 +5,15 @@ import CreateNoteForm from './components/CreateNoteForm';
 import { AIChatPanel } from './components/AIChatPanel';
 import { TaskKanbanBoard } from './components/TaskKanbanBoard';
 import { AuditLogViewer } from './components/AuditLogViewer';
+import { AutomationBuilder } from './components/AutomationBuilder';
+import { ImportHubModal } from './components/ImportHubModal';
+import { WebClipperModal } from './components/WebClipperModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { useAuthStore } from './stores/authStore';
-import { Brain, LogOut, Network, CheckSquare, Shield, Sparkles, Search, Command } from 'lucide-react';
+import { Brain, LogOut, Network, CheckSquare, Shield, Sparkles, Search, Command, Zap, FolderPlus, Globe } from 'lucide-react';
 import { VoiceAssistant } from './components/VoiceAssistant';
 
-type ActiveTab = 'graph' | 'tasks' | 'audit';
+type ActiveTab = 'graph' | 'tasks' | 'automations' | 'audit';
 
 export default function App() {
   const token = useAuthStore((state) => state.token);
@@ -18,6 +21,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('graph');
   const [showAIChat, setShowAIChat] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [showImportHub, setShowImportHub] = useState(false);
+  const [showWebClipper, setShowWebClipper] = useState(false);
 
   // Global keyboard shortcut listener (⌘K / Ctrl+K)
   useEffect(() => {
@@ -63,7 +68,7 @@ export default function App() {
         {/* Center Command Palette Search Bar */}
         <button
           onClick={() => setIsCommandPaletteOpen(true)}
-          className="flex items-center gap-3 px-4 py-2 bg-black/40 hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/20 rounded-xl text-slate-400 hover:text-slate-200 transition-all text-xs font-sans w-72 justify-between group shadow-inner"
+          className="flex items-center gap-3 px-4 py-2 bg-black/40 hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/20 rounded-xl text-slate-400 hover:text-slate-200 transition-all text-xs font-sans w-64 justify-between group shadow-inner"
         >
           <div className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-400 transition-colors" />
@@ -76,10 +81,30 @@ export default function App() {
 
         {/* Right Tab Switcher & User Actions */}
         <div className="flex items-center gap-3">
+          {/* Quick Import & Clipper Action Buttons */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setShowImportHub(true)}
+              className="p-2 text-slate-400 hover:text-indigo-300 hover:bg-white/5 border border-white/10 rounded-xl transition-all"
+              title="Import Hub (Obsidian, Notion, Markdown)"
+            >
+              <FolderPlus className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowWebClipper(true)}
+              className="p-2 text-slate-400 hover:text-sky-300 hover:bg-white/5 border border-white/10 rounded-xl transition-all"
+              title="Web Clipper"
+            >
+              <Globe className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-white/10" />
+
           <div className="flex items-center p-1 bg-black/40 border border-white/[0.08] rounded-xl gap-1">
             <button
               onClick={() => setActiveTab('graph')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'graph'
                   ? 'bg-indigo-600 text-white shadow-md border border-white/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -90,7 +115,7 @@ export default function App() {
             </button>
             <button
               onClick={() => setActiveTab('tasks')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'tasks'
                   ? 'bg-indigo-600 text-white shadow-md border border-white/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -100,8 +125,19 @@ export default function App() {
               Tasks
             </button>
             <button
+              onClick={() => setActiveTab('automations')}
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'automations'
+                  ? 'bg-indigo-600 text-white shadow-md border border-white/10'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Automations
+            </button>
+            <button
               onClick={() => setActiveTab('audit')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'audit'
                   ? 'bg-indigo-600 text-white shadow-md border border-white/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -157,6 +193,12 @@ export default function App() {
             </div>
           )}
 
+          {activeTab === 'automations' && (
+            <div className="w-full h-full">
+              <AutomationBuilder />
+            </div>
+          )}
+
           {activeTab === 'audit' && (
             <div className="w-full h-full">
               <AuditLogViewer />
@@ -172,11 +214,15 @@ export default function App() {
         )}
       </div>
 
+      {/* Modals */}
+      {showImportHub && <ImportHubModal onClose={() => setShowImportHub(false)} />}
+      {showWebClipper && <WebClipperModal onClose={() => setShowWebClipper(false)} />}
+
       {/* Command Palette Modal */}
       <CommandPaletteModal
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
-        onSelectTab={setActiveTab}
+        onSelectTab={(tab) => setActiveTab(tab as any)}
       />
 
       {/* Voice Assistant */}
@@ -184,3 +230,4 @@ export default function App() {
     </div>
   );
 }
+
