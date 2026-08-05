@@ -114,54 +114,6 @@ That's it! Neuro will boot the background supervisor, compile native bridges, st
 
 ---
 
-## Architecture
-
-```
-neuro/
-├── apps/
-│   └── desktop/
-│       ├── src/
-│       │   ├── main/
-│       │   │   ├── backend-process.ts  # Silent FastAPI background process supervisor
-│       │   │   ├── os-tools.ts         # Native OS bridges (apps, Spotify, notifications)
-│       │   │   └── main.ts             # Global hotkey registration (Ctrl+Space)
-│       │   ├── preload/
-│       │   │   └── preload.ts          # Typed Electron IPC context bridge
-│       │   └── renderer/
-│       │       ├── components/
-│       │       │   ├── JarvisHUD.tsx   # Tactical HUD & speech visualizer
-│       │       │   └── Layout.tsx      # Sidebar with trigger & status pulse
-│       │       └── hooks/
-│       │           └── useJarvisAgent.ts # Web Speech API & voice execution hook
-│       └── package.json
-│
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── routes/
-│   │   │       ├── agent.py            # /api/v1/agent/execute & /tools endpoints
-│   │   │       └── voice.py            # Real-time WebSocket audio streaming
-│   │   ├── services/
-│   │   │   └── agent/
-│   │   │       ├── intent_parser.py    # Zero-key offline deterministic regex parser
-│   │   │       ├── tools.py            # OS Native Tool registry (Brave, Spotify, Code)
-│   │   │       └── orchestrator.py     # Deterministic + LLM fallback coordinator
-│   │   └── main.py                     # FastAPI application
-│   └── tests/
-│       ├── test_intent_parser.py       # Intent parser unit tests
-│       └── test_agent_tools.py         # Agent execution test suite
-│
-├── scripts/
-│   ├── launch.js                       # Cross-platform single-command runner
-│   └── dev.sh
-├── neuro.ps1                           # Windows single-command launcher
-├── neuro.sh                            # Unix single-command launcher
-└── package.json
-```
-
-For in-depth architectural details, see [docs/architecture/jarvis-agent-engine.md](docs/architecture/jarvis-agent-engine.md) and [docs/architecture/overview.md](docs/architecture/overview.md).
-
----
 
 ## Configuration & Environment
 
