@@ -1,6 +1,9 @@
+import ast
 import logging
+import operator as op
 import os
 import platform
+import random
 import subprocess
 import urllib.parse
 import webbrowser
@@ -26,7 +29,7 @@ class ToolParameter(BaseModel):
 class Tool(BaseModel):
     name: str
     description: str
-    category: str  # "os", "media", "knowledge", "productivity", "system"
+    category: str  # "os", "media", "knowledge", "productivity", "system", "utility"
     parameters: List[ToolParameter] = Field(default_factory=list)
 
 
@@ -38,6 +41,46 @@ class ToolResult(BaseModel):
     voice_feedback: Optional[str] = None
 
 
+# Supported arithmetic operators for safe math evaluation
+SAFE_OPERATORS = {
+    ast.Add: op.add,
+    ast.Sub: op.sub,
+    ast.Mult: op.mul,
+    ast.Div: op.truediv,
+    ast.FloorDiv: op.floordiv,
+    ast.Pow: op.pow,
+    ast.BitXor: op.pow,  # Support ^ as exponentiation common in voice/text math
+    ast.Mod: op.mod,
+    ast.USub: op.neg,
+    ast.UAdd: op.pos,
+}
+
+
+def safe_eval_expr(expr_str: str) -> float:
+    """Safely evaluate arithmetic expressions without using raw eval."""
+    def _eval(node):
+        if isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.BinOp):
+            left = _eval(node.left)
+            right = _eval(node.right)
+            operator_fn = SAFE_OPERATORS.get(type(node.op))
+            if operator_fn is None:
+                raise ValueError(f"Unsupported operator: {type(node.op)}")
+            return operator_fn(left, right)
+        elif isinstance(node, ast.UnaryOp):
+            operand = _eval(node.operand)
+            operator_fn = SAFE_OPERATORS.get(type(node.op))
+            if operator_fn is None:
+                raise ValueError(f"Unsupported unary operator: {type(node.op)}")
+            return operator_fn(operand)
+        else:
+            raise ValueError(f"Unsupported AST node: {type(node)}")
+
+    parsed = ast.parse(expr_str, mode='eval')
+    return _eval(parsed.body)
+
+
 # Known Application executable commands per platform
 APP_MAPPINGS: Dict[str, Dict[str, List[str]]] = {
     "brave": {
@@ -45,10 +88,60 @@ APP_MAPPINGS: Dict[str, Dict[str, List[str]]] = {
         "darwin": ["open -a 'Brave Browser'"],
         "linux": ["brave-browser", "brave"],
     },
+    "chrome": {
+        "windows": ["chrome.exe", r"C:\Program Files\Google\Chrome\Application\chrome.exe"],
+        "darwin": ["open -a 'Google Chrome'"],
+        "linux": ["google-chrome", "chromium-browser"],
+    },
+    "firefox": {
+        "windows": ["firefox.exe", r"C:\Program Files\Mozilla Firefox\firefox.exe"],
+        "darwin": ["open -a Firefox"],
+        "linux": ["firefox"],
+    },
+    "edge": {
+        "windows": ["msedge.exe", "start microsoft-edge:"],
+        "darwin": ["open -a 'Microsoft Edge'"],
+        "linux": ["microsoft-edge"],
+    },
+    "arc": {
+        "windows": ["arc.exe"],
+        "darwin": ["open -a Arc"],
+        "linux": ["arc"],
+    },
+    "opera": {
+        "windows": ["opera.exe", "launcher.exe"],
+        "darwin": ["open -a Opera"],
+        "linux": ["opera"],
+    },
     "vscode": {
         "windows": ["code.cmd", "code.exe", "code"],
         "darwin": ["code", "open -a 'Visual Studio Code'"],
         "linux": ["code"],
+    },
+    "visual_studio": {
+        "windows": ["devenv.exe"],
+        "darwin": ["open -a 'Visual Studio'"],
+        "linux": ["monodevelop"],
+    },
+    "cursor": {
+        "windows": ["cursor.cmd", "cursor.exe", "cursor"],
+        "darwin": ["cursor", "open -a Cursor"],
+        "linux": ["cursor"],
+    },
+    "pycharm": {
+        "windows": ["pycharm64.exe", "pycharm.exe", "pycharm"],
+        "darwin": ["open -a PyCharm"],
+        "linux": ["pycharm"],
+    },
+    "intellij": {
+        "windows": ["idea64.exe", "idea.exe", "idea"],
+        "darwin": ["open -a 'IntelliJ IDEA'"],
+        "linux": ["idea"],
+    },
+    "sublime": {
+        "windows": ["sublime_text.exe", "subl.exe", "subl"],
+        "darwin": ["open -a 'Sublime Text'"],
+        "linux": ["subl"],
     },
     "spotify": {
         "windows": ["spotify.exe", "spotify"],
@@ -75,20 +168,10 @@ APP_MAPPINGS: Dict[str, Dict[str, List[str]]] = {
         "darwin": ["open -a Calculator"],
         "linux": ["gnome-calculator"],
     },
-    "chrome": {
-        "windows": ["chrome.exe", r"C:\Program Files\Google\Chrome\Application\chrome.exe"],
-        "darwin": ["open -a 'Google Chrome'"],
-        "linux": ["google-chrome", "chromium-browser"],
-    },
-    "firefox": {
-        "windows": ["firefox.exe"],
-        "darwin": ["open -a Firefox"],
-        "linux": ["firefox"],
-    },
-    "cursor": {
-        "windows": ["cursor.cmd", "cursor.exe", "cursor"],
-        "darwin": ["cursor", "open -a Cursor"],
-        "linux": ["cursor"],
+    "paint": {
+        "windows": ["mspaint.exe"],
+        "darwin": ["open -a Paintbrush"],
+        "linux": ["gimp", "drawing"],
     },
     "taskmgr": {
         "windows": ["taskmgr.exe"],
@@ -114,6 +197,56 @@ APP_MAPPINGS: Dict[str, Dict[str, List[str]]] = {
         "windows": ["slack.exe"],
         "darwin": ["open -a Slack"],
         "linux": ["slack"],
+    },
+    "telegram": {
+        "windows": ["telegram.exe"],
+        "darwin": ["open -a Telegram"],
+        "linux": ["telegram-desktop"],
+    },
+    "whatsapp": {
+        "windows": ["whatsapp.exe"],
+        "darwin": ["open -a WhatsApp"],
+        "linux": ["whatsapp-for-linux"],
+    },
+    "teams": {
+        "windows": ["teams.exe", "ms-teams.exe"],
+        "darwin": ["open -a 'Microsoft Teams'"],
+        "linux": ["teams"],
+    },
+    "zoom": {
+        "windows": ["zoom.exe"],
+        "darwin": ["open -a zoom.us"],
+        "linux": ["zoom"],
+    },
+    "obsidian": {
+        "windows": ["obsidian.exe"],
+        "darwin": ["open -a Obsidian"],
+        "linux": ["obsidian"],
+    },
+    "notion": {
+        "windows": ["notion.exe"],
+        "darwin": ["open -a Notion"],
+        "linux": ["notion-app"],
+    },
+    "steam": {
+        "windows": ["steam.exe"],
+        "darwin": ["open -a Steam"],
+        "linux": ["steam"],
+    },
+    "figma": {
+        "windows": ["figma.exe"],
+        "darwin": ["open -a Figma"],
+        "linux": ["figma-linux"],
+    },
+    "obs": {
+        "windows": ["obs64.exe", "obs.exe"],
+        "darwin": ["open -a OBS"],
+        "linux": ["obs"],
+    },
+    "vlc": {
+        "windows": ["vlc.exe"],
+        "darwin": ["open -a VLC"],
+        "linux": ["vlc"],
     },
 }
 
@@ -160,10 +293,10 @@ class AgentToolsRegistry:
         self.register(
             Tool(
                 name="open_app",
-                description="Launch or switch to a desktop application (Brave, VS Code, Spotify, Terminal, Notepad, Cursor, etc.)",
+                description="Launch or switch to a desktop application (Brave, Chrome, VS Code, Discord, Slack, Spotify, Terminal, Notepad, Cursor, etc.)",
                 category="os",
                 parameters=[
-                    ToolParameter(name="app_name", type="string", description="Name of the application (e.g. brave, vscode, spotify, notepad, terminal, explorer)"),
+                    ToolParameter(name="app_name", type="string", description="Name of the application"),
                     ToolParameter(name="args", type="string", description="Optional argument or target path/url", required=False),
                 ]
             ),
@@ -184,15 +317,15 @@ class AgentToolsRegistry:
             self._handle_play_spotify
         )
 
-        # 3. Web Search
+        # 3. Web Search & Maps & Lookups
         self.register(
             Tool(
                 name="web_search",
-                description="Search the web using Google, DuckDuckGo, YouTube, GitHub or Wikipedia",
+                description="Search Google, YouTube, GitHub, Reddit, Wikipedia, Maps or DuckDuckGo",
                 category="os",
                 parameters=[
                     ToolParameter(name="query", type="string", description="Search query keywords"),
-                    ToolParameter(name="engine", type="string", description="Search engine (google, youtube, github, duckduckgo)", required=False, default="google"),
+                    ToolParameter(name="engine", type="string", description="Search engine (google, youtube, github, reddit, wikipedia, maps, duckduckgo)", required=False, default="google"),
                 ]
             ),
             self._handle_web_search
@@ -256,15 +389,43 @@ class AgentToolsRegistry:
             self._handle_search_knowledge_base
         )
 
-        # 8. System Action
+        # 8. Quick Math Calculator
+        self.register(
+            Tool(
+                name="quick_calculate",
+                description="Safely evaluate mathematical expressions and percentages offline",
+                category="utility",
+                parameters=[
+                    ToolParameter(name="expression", type="string", description="Arithmetic math expression"),
+                    ToolParameter(name="raw_expression", type="string", description="Original user phrasing", required=False),
+                ]
+            ),
+            self._handle_quick_calculate
+        )
+
+        # 9. Random Decisions (Coin Flip, Dice Roll)
+        self.register(
+            Tool(
+                name="random_decision",
+                description="Coin flip and dice rolling for fast decision making",
+                category="utility",
+                parameters=[
+                    ToolParameter(name="type", type="string", description="Type of random decision: coin_flip, dice_roll"),
+                    ToolParameter(name="sides", type="integer", description="Number of sides for dice", required=False, default=6),
+                ]
+            ),
+            self._handle_random_decision
+        )
+
+        # 10. System Action (Volume, Mute, Folders, Lock, Sleep, Screenshot, Time, Date)
         self.register(
             Tool(
                 name="system_action",
-                description="Perform system level utilities (get system status, copy to clipboard, screenshot)",
+                description="Perform system level utilities (volume control, folders, lock screen, sleep, empty bin, screenshot, time)",
                 category="system",
                 parameters=[
-                    ToolParameter(name="action", type="string", description="Action: status, screenshot, copy, time"),
-                    ToolParameter(name="payload", type="string", description="Optional data payload", required=False),
+                    ToolParameter(name="action", type="string", description="Action: volume_up, volume_down, mute, unmute, lock_pc, sleep_pc, empty_recycle_bin, take_screenshot, open_folder, time, date, status"),
+                    ToolParameter(name="payload", type="string", description="Optional data payload (e.g. folder name)", required=False),
                 ]
             ),
             self._handle_system_action
@@ -280,8 +441,28 @@ class AgentToolsRegistry:
         app_key = raw_name
         if "brave" in raw_name:
             app_key = "brave"
-        elif "code" in raw_name or "vs code" in raw_name or "vscode" in raw_name:
+        elif "chrome" in raw_name:
+            app_key = "chrome"
+        elif "firefox" in raw_name:
+            app_key = "firefox"
+        elif "edge" in raw_name:
+            app_key = "edge"
+        elif "arc" in raw_name:
+            app_key = "arc"
+        elif "opera" in raw_name:
+            app_key = "opera"
+        elif "vs code" in raw_name or "vscode" in raw_name or raw_name == "code":
             app_key = "vscode"
+        elif "visual studio" in raw_name or "devenv" in raw_name:
+            app_key = "visual_studio"
+        elif "cursor" in raw_name:
+            app_key = "cursor"
+        elif "pycharm" in raw_name:
+            app_key = "pycharm"
+        elif "intellij" in raw_name:
+            app_key = "intellij"
+        elif "sublime" in raw_name:
+            app_key = "sublime"
         elif "spotify" in raw_name:
             app_key = "spotify"
         elif "notepad" in raw_name or "text" in raw_name:
@@ -292,12 +473,32 @@ class AgentToolsRegistry:
             app_key = "explorer"
         elif "calc" in raw_name:
             app_key = "calculator"
-        elif "chrome" in raw_name:
-            app_key = "chrome"
-        elif "firefox" in raw_name:
-            app_key = "firefox"
-        elif "cursor" in raw_name:
-            app_key = "cursor"
+        elif "paint" in raw_name:
+            app_key = "paint"
+        elif "discord" in raw_name:
+            app_key = "discord"
+        elif "slack" in raw_name:
+            app_key = "slack"
+        elif "telegram" in raw_name:
+            app_key = "telegram"
+        elif "whatsapp" in raw_name:
+            app_key = "whatsapp"
+        elif "teams" in raw_name:
+            app_key = "teams"
+        elif "zoom" in raw_name:
+            app_key = "zoom"
+        elif "obsidian" in raw_name:
+            app_key = "obsidian"
+        elif "notion" in raw_name:
+            app_key = "notion"
+        elif "steam" in raw_name:
+            app_key = "steam"
+        elif "figma" in raw_name:
+            app_key = "figma"
+        elif "obs" in raw_name:
+            app_key = "obs"
+        elif "vlc" in raw_name:
+            app_key = "vlc"
 
         candidates = APP_MAPPINGS.get(app_key, {}).get(
             "windows" if "windows" in CURRENT_OS else ("darwin" if "darwin" in CURRENT_OS else "linux"),
@@ -312,7 +513,6 @@ class AgentToolsRegistry:
                     cmd = f'start "" "{candidate}"'
                     if extra_args:
                         cmd += f' "{extra_args}"'
-                    # Use shell=True for windows start command
                     subprocess.Popen(cmd, shell=True)
                     launched = True
                     launched_cmd = candidate
@@ -370,7 +570,6 @@ class AgentToolsRegistry:
         action = args.get("action", "play").lower()
 
         if query:
-            # Spotify URI search format
             encoded_query = urllib.parse.quote(query)
             spotify_uri = f"spotify:search:{encoded_query}"
             web_fallback = f"https://open.spotify.com/search/{encoded_query}"
@@ -378,7 +577,6 @@ class AgentToolsRegistry:
             opened = False
             if "windows" in CURRENT_OS:
                 try:
-                    # Windows URI protocol handler
                     os.startfile(spotify_uri)
                     opened = True
                 except Exception:
@@ -407,7 +605,6 @@ class AgentToolsRegistry:
                 voice_feedback=f"Playing {query} on Spotify."
             )
         else:
-            # General Spotify app trigger
             return await self._handle_open_app({"app_name": "spotify"}, context)
 
     async def _handle_web_search(self, args: Dict[str, Any], context: Dict[str, Any]) -> ToolResult:
@@ -429,12 +626,18 @@ class AgentToolsRegistry:
         elif "github" in engine:
             url = f"https://github.com/search?q={encoded}"
             engine_name = "GitHub"
-        elif "duckduckgo" in engine or "ddg" in engine:
-            url = f"https://duckduckgo.com/?q={encoded}"
-            engine_name = "DuckDuckGo"
+        elif "reddit" in engine:
+            url = f"https://www.reddit.com/search/?q={encoded}"
+            engine_name = "Reddit"
         elif "wiki" in engine:
             url = f"https://en.wikipedia.org/wiki/Special:Search?search={encoded}"
             engine_name = "Wikipedia"
+        elif "maps" in engine or "location" in engine:
+            url = f"https://www.google.com/maps/search/{encoded}"
+            engine_name = "Google Maps"
+        elif "duckduckgo" in engine or "ddg" in engine:
+            url = f"https://duckduckgo.com/?q={encoded}"
+            engine_name = "DuckDuckGo"
         else:
             url = f"https://www.google.com/search?q={encoded}"
             engine_name = "Google"
@@ -477,7 +680,7 @@ class AgentToolsRegistry:
             )
 
         if not content:
-            content = f"# {title}\n\n*Captured via JARVIS Agent*"
+            content = f"# {title}\n\n*Captured via Neuro Agent*"
 
         session = context.get("session")
         user_id = context.get("user_id")
@@ -499,7 +702,6 @@ class AgentToolsRegistry:
             except Exception as e:
                 logger.error(f"Failed to create note in database: {e}")
 
-        # In-memory/fallback representation
         return ToolResult(
             success=True,
             tool_name="create_quick_note",
@@ -526,7 +728,7 @@ class AgentToolsRegistry:
 
                 task_in = TaskCreate(
                     title=f"Reminder: {title}",
-                    description=f"Set via JARVIS Agent. Due in {minutes} minutes ({due_str})",
+                    description=f"Set via Neuro Agent. Due in {minutes} minutes ({due_str})",
                     priority=priority,
                     due_date=due_time,
                     user_id=user_id
@@ -587,17 +789,202 @@ class AgentToolsRegistry:
             voice_feedback=f"Searched notes for {query}."
         )
 
+    async def _handle_quick_calculate(self, args: Dict[str, Any], context: Dict[str, Any]) -> ToolResult:
+        expr = args.get("expression", "").strip()
+        raw_expr = args.get("raw_expression", expr)
+        try:
+            val = safe_eval_expr(expr)
+            formatted_val = f"{val:g}" if isinstance(val, (int, float)) else str(val)
+            return ToolResult(
+                success=True,
+                tool_name="quick_calculate",
+                message=f"{raw_expr} = {formatted_val}",
+                data={"result": val, "formatted": formatted_val, "expression": expr},
+                voice_feedback=f"The answer is {formatted_val}."
+            )
+        except Exception as e:
+            return ToolResult(
+                success=False,
+                tool_name="quick_calculate",
+                message=f"Could not calculate expression: {expr}",
+                voice_feedback="I couldn't calculate that math expression."
+            )
+
+    async def _handle_random_decision(self, args: Dict[str, Any], context: Dict[str, Any]) -> ToolResult:
+        decision_type = args.get("type", "coin_flip")
+        if decision_type == "coin_flip":
+            outcome = random.choice(["Heads", "Tails"])
+            return ToolResult(
+                success=True,
+                tool_name="random_decision",
+                message=f"Coin flip result: {outcome}",
+                data={"outcome": outcome, "type": "coin_flip"},
+                voice_feedback=f"It's {outcome}."
+            )
+        else:
+            sides = int(args.get("sides", 6))
+            roll = random.randint(1, sides)
+            return ToolResult(
+                success=True,
+                tool_name="random_decision",
+                message=f"Rolled a {roll} (on a {sides}-sided die)",
+                data={"roll": roll, "sides": sides, "type": "dice_roll"},
+                voice_feedback=f"You rolled a {roll}."
+            )
+
     async def _handle_system_action(self, args: Dict[str, Any], context: Dict[str, Any]) -> ToolResult:
         action = args.get("action", "status").lower()
+        payload = args.get("payload", "").strip()
 
-        if "time" in action or "date" in action or "clock" in action:
-            now_str = datetime.now().strftime("%A, %B %d at %I:%M %p")
+        # Volume Controls
+        if action == "volume_up":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen('powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]175)"', shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("osascript -e 'set volume output volume ((output volume of (get volume settings)) + 10)'", shell=True)
             return ToolResult(
                 success=True,
                 tool_name="system_action",
-                message=f"Current time: {now_str}",
-                data={"time": now_str},
-                voice_feedback=f"It is currently {now_str}."
+                message="Increased system volume",
+                data={"action": action},
+                voice_feedback="Volume increased."
+            )
+
+        elif action == "volume_down":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen('powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]174)"', shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("osascript -e 'set volume output volume ((output volume of (get volume settings)) - 10)'", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message="Decreased system volume",
+                data={"action": action},
+                voice_feedback="Volume decreased."
+            )
+
+        elif action == "mute" or action == "unmute":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen('powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]173)"', shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("osascript -e 'set volume output muted not (output muted of (get volume settings))'", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message=f"Toggled audio {action}",
+                data={"action": action},
+                voice_feedback=f"Audio {action}d."
+            )
+
+        # Lock PC
+        elif action == "lock_pc":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen("rundll32.exe user32.dll,LockWorkStation", shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("pmset displaysleepnow", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message="Locked computer workstation",
+                data={"action": action},
+                voice_feedback="Locking your workstation now."
+            )
+
+        # Sleep PC
+        elif action == "sleep_pc":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen("rundll32.exe powrprof.dll,SetSuspendState 0,1,0", shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("pmset sleepnow", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message="Putting computer to sleep",
+                data={"action": action},
+                voice_feedback="Putting PC to sleep."
+            )
+
+        # Empty Recycle Bin
+        elif action == "empty_recycle_bin":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen('powershell -Command "Clear-RecycleBin -Force -ErrorAction SilentlyContinue"', shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("rm -rf ~/.Trash/*", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message="Emptied Recycle Bin",
+                data={"action": action},
+                voice_feedback="Recycle bin emptied."
+            )
+
+        # Screenshot / Snip
+        elif action == "take_screenshot":
+            if "windows" in CURRENT_OS:
+                subprocess.Popen("start ms-screenclip:", shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen("screencapture -i", shell=True)
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message="Opened Screen Snip tool",
+                data={"action": action},
+                voice_feedback="Opening screenshot capture tool."
+            )
+
+        # Open Folders
+        elif action == "open_folder":
+            folder_clean = payload.lower()
+            target_path = ""
+            if "download" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Downloads")
+            elif "document" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Documents")
+            elif "desktop" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Desktop")
+            elif "picture" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Pictures")
+            elif "music" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Music")
+            elif "video" in folder_clean:
+                target_path = os.path.join(os.path.expanduser("~"), "Videos")
+            else:
+                target_path = os.path.expanduser("~")
+
+            if "windows" in CURRENT_OS:
+                subprocess.Popen(f'explorer.exe "{target_path}"', shell=True)
+            elif "darwin" in CURRENT_OS:
+                subprocess.Popen(["open", target_path])
+            else:
+                subprocess.Popen(["xdg-open", target_path])
+
+            display_folder = payload.capitalize() if payload else "User"
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message=f"Opened {display_folder} folder",
+                data={"folder": display_folder, "path": target_path},
+                voice_feedback=f"Opening {display_folder} folder."
+            )
+
+        # Time & Date
+        elif "date" in action:
+            date_str = datetime.now().strftime("%A, %B %d, %Y")
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message=f"Today is {date_str}",
+                data={"date": date_str},
+                voice_feedback=f"Today is {date_str}."
+            )
+        elif "time" in action:
+            time_str = datetime.now().strftime("%I:%M %p")
+            return ToolResult(
+                success=True,
+                tool_name="system_action",
+                message=f"Current time: {time_str}",
+                data={"time": time_str},
+                voice_feedback=f"It is currently {time_str}."
             )
         elif "status" in action or "stats" in action:
             uname = platform.uname()
