@@ -89,14 +89,16 @@ export function useGraph() {
         const wikiRegex = /\[\[(.*?)\]\]/g;
         let match;
         while ((match = wikiRegex.exec(note.content)) !== null) {
-          const targetTitle = match[1].trim().toLowerCase();
-          const targetId = noteTitleMap.get(targetTitle);
-          if (targetId && targetId !== note.id) {
-            links.push({
-              source: note.id,
-              target: targetId,
-              type: 'link',
-            });
+          if (match[1]) {
+            const targetTitle = match[1].trim().toLowerCase();
+            const targetId = noteTitleMap.get(targetTitle);
+            if (targetId && targetId !== note.id) {
+              links.push({
+                source: note.id,
+                target: targetId,
+                type: 'link',
+              });
+            }
           }
         }
 

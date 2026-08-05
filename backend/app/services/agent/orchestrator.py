@@ -1,12 +1,11 @@
 import logging
-from typing import Any, Dict, List, Optional
-from uuid import UUID
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 from app.core.config import get_settings
-from app.services.agent.intent_parser import intent_parser, ParsedIntent
-from app.services.agent.tools import agent_tools_registry, ToolResult
+from app.services.agent.intent_parser import ParsedIntent, intent_parser
+from app.services.agent.tools import ToolResult, agent_tools_registry
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -15,9 +14,9 @@ settings = get_settings()
 class AgentExecutionResult(BaseModel):
     success: bool
     input_text: str
-    tool_name: Optional[str] = None
-    parameters: Dict[str, Any] = Field(default_factory=dict)
-    tool_result: Optional[ToolResult] = None
+    tool_name: str | None = None
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    tool_result: ToolResult | None = None
     voice_response: str = ""
     display_text: str = ""
     is_offline_native: bool = True
@@ -39,7 +38,7 @@ class AgentOrchestrator:
     async def execute_command(
         self,
         command_text: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> AgentExecutionResult:
         if not command_text or not command_text.strip():
             return AgentExecutionResult(
@@ -71,11 +70,7 @@ class AgentOrchestrator:
                     confidence=1.0,
                 )
 
-            tool_res = await self.registry.execute(
-                tool_name=parsed.tool_name,
-                args=parsed.parameters,
-                context=context
-            )
+            tool_res = await self.registry.execute(tool_name=parsed.tool_name, args=parsed.parameters, context=context)
 
             voice_msg = tool_res.voice_feedback or tool_res.message
             return AgentExecutionResult(
@@ -93,6 +88,7 @@ class AgentOrchestrator:
         # 2. Try LLM Provider if available
         try:
             from app.services.ai.provider import get_ai_provider
+
             provider = get_ai_provider()
             provider_name = provider.__class__.__name__
 
@@ -119,7 +115,7 @@ class AgentOrchestrator:
         return AgentExecutionResult(
             success=True,
             input_text=command_text,
-            voice_response=f"Command received. I can open applications, play Spotify, create notes, or search the web.",
+            voice_response="Command received. I can open applications, play Spotify, create notes, or search the web.",
             display_text=fallback_msg,
             is_offline_native=True,
             confidence=0.5,

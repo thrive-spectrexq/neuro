@@ -18,6 +18,7 @@ async def create_note(args: dict[str, Any]) -> str:
 
     async with AsyncSession(engine) as session:
         import uuid
+
         note = Note(
             id=uuid.uuid4(),
             title=title,

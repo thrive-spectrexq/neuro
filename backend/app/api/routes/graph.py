@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
@@ -16,7 +14,7 @@ router = APIRouter()
 @router.get("")
 async def get_graph(
     session: AsyncSession = Depends(get_session),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     """
     Build interactive knowledge graph topology with notes, tags, and bi-directional links.
@@ -38,12 +36,7 @@ async def get_graph(
     for note in notes:
         node_id = str(note.id)
         if node_id not in seen_node_ids:
-            nodes.append({
-                "id": node_id,
-                "name": note.title or "Untitled Note",
-                "type": "note",
-                "val": 6
-            })
+            nodes.append({"id": node_id, "name": note.title or "Untitled Note", "type": "note", "val": 6})
             seen_node_ids.add(node_id)
         note_ids.add(note.id)
 
@@ -53,23 +46,14 @@ async def get_graph(
 
         # Note-to-note links (ensure both source and target belong to valid notes)
         links_result = await session.execute(
-            select(NoteLink).where(
-                NoteLink.source_id.in_(note_id_list),
-                NoteLink.target_id.in_(note_id_list)
-            )
+            select(NoteLink).where(NoteLink.source_id.in_(note_id_list), NoteLink.target_id.in_(note_id_list))
         )
         note_links = links_result.scalars().all()
         for link in note_links:
-            links.append({
-                "source": str(link.source_id),
-                "target": str(link.target_id),
-                "type": "link"
-            })
+            links.append({"source": str(link.source_id), "target": str(link.target_id), "type": "link"})
 
         # Tags associated with these notes
-        tags_result = await session.execute(
-            select(NoteTag).where(NoteTag.note_id.in_(note_id_list))
-        )
+        tags_result = await session.execute(select(NoteTag).where(NoteTag.note_id.in_(note_id_list)))
         note_tags = tags_result.scalars().all()
 
         tag_ids = list({nt.tag_id for nt in note_tags})
@@ -78,12 +62,7 @@ async def get_graph(
             for tag in actual_tags.scalars().all():
                 tag_node_id = str(tag.id)
                 if tag_node_id not in seen_node_ids:
-                    nodes.append({
-                        "id": tag_node_id,
-                        "name": f"#{tag.name}",
-                        "type": "tag",
-                        "val": 4
-                    })
+                    nodes.append({"id": tag_node_id, "name": f"#{tag.name}", "type": "tag", "val": 4})
                     seen_node_ids.add(tag_node_id)
 
             # Create links from notes to tags
@@ -91,15 +70,6 @@ async def get_graph(
                 source_id = str(nt.note_id)
                 target_id = str(nt.tag_id)
                 if source_id in seen_node_ids and target_id in seen_node_ids:
-                    links.append({
-                        "source": source_id,
-                        "target": target_id,
-                        "type": "tag"
-                    })
+                    links.append({"source": source_id, "target": target_id, "type": "tag"})
 
-    return {
-        "nodes": nodes,
-        "links": links,
-        "edges": links
-    }
-
+    return {"nodes": nodes, "links": links, "edges": links}

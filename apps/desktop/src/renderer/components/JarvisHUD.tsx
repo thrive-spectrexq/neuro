@@ -23,7 +23,8 @@ import {
   ArrowRight,
   Radio,
   Copy,
-  Check
+  Check,
+  type LucideIcon,
 } from 'lucide-react';
 import { useJarvisAgent, AgentExecutionResponse } from '../hooks/useJarvisAgent';
 import { soundEngine } from '../utils/soundEngine';
@@ -38,7 +39,7 @@ interface QuickAction {
   label: string;
   cmd: string;
   category: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   hotkey?: string;
 }
 
@@ -171,7 +172,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
         // Calculate average audio level
         let sum = 0;
         for (let i = 0; i < bufferLength; i++) {
-          sum += dataArray[i];
+          sum += dataArray[i] ?? 0;
         }
         const avg = sum / bufferLength;
         phase += 0.04;

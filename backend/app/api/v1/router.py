@@ -34,4 +34,3 @@ api_router.include_router(sync.router, prefix="/sync", tags=["sync"])
 api_router.include_router(automations.router, prefix="/automations", tags=["automations"])
 api_router.include_router(tags.router, prefix="/tags", tags=["tags"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
-

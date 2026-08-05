@@ -2,8 +2,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
-from app.services.agent.tools import agent_tools_registry
 from app.services.agent.orchestrator import agent_orchestrator
+from app.services.agent.tools import agent_tools_registry
 
 
 @pytest.mark.asyncio

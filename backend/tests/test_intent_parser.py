@@ -1,4 +1,3 @@
-import pytest
 from app.services.agent.intent_parser import intent_parser
 
 
@@ -180,6 +179,7 @@ def test_math_calculation_parsing():
         assert res.is_matched is True
         assert res.tool_name == "quick_calculate"
         from app.services.agent.tools import safe_eval_expr
+
         parsed_expr = res.parameters.get("expression")
         val = safe_eval_expr(parsed_expr)
         assert f"{val:g}" == expected_result

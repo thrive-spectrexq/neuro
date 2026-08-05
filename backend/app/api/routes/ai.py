@@ -60,7 +60,9 @@ async def summarize_content(request: SummarizeRequest, current_user: User | None
 
 
 @router.post("/extract-tags")
-async def extract_tags_content(request: ExtractTagsRequest, current_user: User | None = Depends(get_current_user_optional)):
+async def extract_tags_content(
+    request: ExtractTagsRequest, current_user: User | None = Depends(get_current_user_optional)
+):
     provider = get_ai_provider()
     tags = await provider.extract_tags(request.text)
     return {"tags": tags}

@@ -18,7 +18,11 @@ async def test_graph_with_linked_notes_and_tags(test_client: AsyncClient, auth_h
     # 1. Create Target Note
     target_resp = await test_client.post(
         "/api/v1/notes",
-        json={"title": "Graph Target Concept", "content": "Foundation of the knowledge graph", "tags": ["graph", "core"]},
+        json={
+            "title": "Graph Target Concept",
+            "content": "Foundation of the knowledge graph",
+            "tags": ["graph", "core"],
+        },
         headers=auth_headers,
     )
     assert target_resp.status_code in [200, 201]
@@ -27,7 +31,11 @@ async def test_graph_with_linked_notes_and_tags(test_client: AsyncClient, auth_h
     # 2. Create Source Note linking to target
     source_resp = await test_client.post(
         "/api/v1/notes",
-        json={"title": "Graph Source Idea", "content": "Linking to [[Graph Target Concept]] directly.", "tags": ["research"]},
+        json={
+            "title": "Graph Source Idea",
+            "content": "Linking to [[Graph Target Concept]] directly.",
+            "tags": ["research"],
+        },
         headers=auth_headers,
     )
     assert source_resp.status_code in [200, 201]
@@ -54,10 +62,7 @@ async def test_graph_with_linked_notes_and_tags(test_client: AsyncClient, auth_h
     assert "#graph" in node_names or "graph" in node_names or any(n.get("type") == "tag" for n in nodes)
 
     # Verify valid links between source and target
-    has_note_link = any(
-        link["source"] == source_data["id"] and link["target"] == target_data["id"]
-        for link in links
-    )
+    has_note_link = any(link["source"] == source_data["id"] and link["target"] == target_data["id"] for link in links)
     assert has_note_link, f"Expected link from {source_data['id']} to {target_data['id']} in links: {links}"
 
     # Verify all link sources and targets are in node_ids

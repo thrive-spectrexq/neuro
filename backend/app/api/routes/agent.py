@@ -1,6 +1,5 @@
 import platform
-from typing import Any, Dict, List, Optional
-from uuid import UUID
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -9,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.core.security import get_current_user_optional
 from app.models.user import User
-from app.services.agent.orchestrator import agent_orchestrator, AgentExecutionResult
-from app.services.agent.tools import agent_tools_registry, Tool
+from app.services.agent.orchestrator import AgentExecutionResult, agent_orchestrator
+from app.services.agent.tools import Tool, agent_tools_registry
 
 router = APIRouter()
 
@@ -21,14 +20,14 @@ class AgentExecuteRequest(BaseModel):
 
 
 class DirectToolExecuteRequest(BaseModel):
-    parameters: Dict[str, Any] = Field(default_factory=dict, description="Parameters to pass to the tool")
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Parameters to pass to the tool")
 
 
 @router.post("/execute", response_model=AgentExecutionResult)
 async def execute_agent_command(
     request: AgentExecuteRequest,
     session: AsyncSession = Depends(get_session),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     """
     Execute a natural language voice or text command through the JARVIS Agent.
@@ -48,7 +47,7 @@ async def execute_agent_command(
     return result
 
 
-@router.get("/tools", response_model=List[Tool])
+@router.get("/tools", response_model=list[Tool])
 async def list_available_tools():
     """
     List all available OS-native and internal tools registered in the JARVIS Agent.
@@ -61,7 +60,7 @@ async def direct_execute_tool(
     tool_name: str,
     request: DirectToolExecuteRequest,
     session: AsyncSession = Depends(get_session),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     """
     Directly execute a registered tool with explicit typed parameters.
