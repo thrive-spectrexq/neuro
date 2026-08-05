@@ -1,13 +1,13 @@
 <div align="center">
 
-# ⚡ NEURO
+# NEURO
 
-<p><strong>The Open-Source, Local-First AI Second Brain & OS-Native JARVIS Voice Agent</strong></p>
+<p><strong>The Open-Source, Local-First AI Second Brain & OS-Native Voice Agent</strong></p>
 
 <p>Zero-Latency OS Tool Calling · Voice Control · Note Graph · Semantic Search · 100% Offline Capable</p>
 
 <p>
-  <img src="https://img.shields.io/badge/JARVIS%20Agent-Active%20%26%20Native-00f5d4?style=for-the-badge&logo=probot&logoColor=black" />
+  <img src="https://img.shields.io/badge/Agent-Active%20%26%20Native-00f5d4?style=for-the-badge&logo=probot&logoColor=black" />
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
@@ -19,19 +19,19 @@
 
 ---
 
-## 🌟 What is Neuro?
+## What is Neuro?
 
-Neuro is a next-generation personal second brain and OS-native desktop agent inspired by **JARVIS**. It combines local-first knowledge management with an autonomous agent capable of listening to your voice and executing real operating system actions on your computer—**even without an external LLM API key**.
+Neuro is a next-generation personal second brain and OS-native desktop agent. It combines local-first knowledge management with an autonomous agent capable of listening to your voice and executing real operating system actions on your computer—**even without an external LLM API key**.
 
 Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the tactical HUD. Neuro can open your browser, play your music on Spotify, launch VS Code, jot down notes, schedule reminders, and query your personal knowledge base in milliseconds.
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
-       │              🎙️ "Neuro wake up, open Brave"                  │
+       │                "Neuro wake up, open Brave"                  │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
                    ┌──────────────────▼──────────────────┐
-                   │       NEURO JARVIS OS ENGINE        │
+                   │          NEURO OS ENGINE            │
                    │  • Zero-Key Deterministic Matcher   │
                    │  • Voice Synthesis & Speech Recog   │
                    │  • Silent Process Supervisor        │
@@ -39,14 +39,14 @@ Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to
                                       │
        ┌──────────────────────────────┼──────────────────────────────┐
        ▼                              ▼                              ▼
-🚀 Open Apps (Brave/Code)     🎵 Spotify Controller       📝 Instant Notes & Tasks
+Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 ```
 
 ---
 
-## ⚡ Key Highlights
+## Key Highlights
 
-### 🤖 1. JARVIS OS-Native Agent (Zero API Key Needed)
+### 1. OS-Native Agent (Zero API Key Needed)
 - **Voice Wake-Word:** Speak *"Neuro wake up"*, *"Hey Neuro"*, or *"Wake up"* to activate listening mode.
 - **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*, *"Open Notepad"*, *"Open Calculator"*.
 - **Spotify Music Controller:** *"Play Bohemian Rhapsody on Spotify"*, *"Play Drake in Spotify"*, *"Spotify play lofi beats"*.
@@ -55,7 +55,7 @@ Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to
 - **Web Research Automation:** *"Search quantum computing on Google"*, *"Search YouTube for jazz"*, *"Search GitHub for FastAPI"*.
 - **Local Fallback:** Runs instantly with deterministic regex parsing even if disconnected from the internet or without AI keys.
 
-### 🚀 2. Single-Command Launch (Silent Background Supervisor)
+### 2. Single-Command Launch (Silent Background Supervisor)
 - Launch the entire system with **one single command**:
   ```bash
   pnpm start
@@ -63,11 +63,11 @@ Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to
 - **Hides backend logs completely:** The FastAPI backend starts silently in the background, supervised by Electron. No separate terminal windows or log spam.
 - Logs are cleanly preserved in `.neuro/logs/backend.log` for inspection whenever needed.
 
-### 🌌 3. Futuristic Tactical HUD
-- Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the glowing cyber HUD.
+### 3. Tactical HUD
+- Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the HUD.
 - Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with sound responses.
 
-### 🧠 4. Second Brain & Knowledge Graph
+### 4. Second Brain & Knowledge Graph
 - Markdown-first note editor with bi-directional wiki links (`[[Note Title]]`).
 - Dynamic interactive force-directed graph view (D3.js).
 - Hybrid search combining SQLite FTS5 full-text indexing and ChromaDB vector embeddings.
@@ -75,7 +75,7 @@ Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to
 
 ---
 
-## 🚀 Quickstart (One Command)
+## Quickstart (One Command)
 
 ### Windows
 ```powershell
@@ -97,7 +97,7 @@ That's it! Neuro will boot the background supervisor, compile native bridges, st
 
 ---
 
-## 🗣️ Voice & Agent Command Reference
+## Voice & Agent Command Reference
 
 | Spoken Voice / Written Command | Action Triggered | OS / App Target |
 |---|---|---|
@@ -114,7 +114,7 @@ That's it! Neuro will boot the background supervisor, compile native bridges, st
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 neuro/
@@ -129,8 +129,8 @@ neuro/
 │       │   │   └── preload.ts          # Typed Electron IPC context bridge
 │       │   └── renderer/
 │       │       ├── components/
-│       │       │   ├── JarvisHUD.tsx   # Tactical sci-fi HUD & speech visualizer
-│       │       │   └── Layout.tsx      # Sidebar with JARVIS trigger & status pulse
+│       │       │   ├── JarvisHUD.tsx   # Tactical HUD & speech visualizer
+│       │       │   └── Layout.tsx      # Sidebar with trigger & status pulse
 │       │       └── hooks/
 │       │           └── useJarvisAgent.ts # Web Speech API & voice execution hook
 │       └── package.json
@@ -163,7 +163,7 @@ For in-depth architectural details, see [docs/architecture/jarvis-agent-engine.m
 
 ---
 
-## ⚙️ Configuration & Environment
+## Configuration & Environment
 
 Neuro works completely offline by default. To optionally enable cloud AI models or custom storage, configure `.env`:
 
@@ -188,9 +188,9 @@ OLLAMA_MODEL=llama3.2
 
 ---
 
-## 🧪 Testing
+## Testing
 
-Run backend tests for the JARVIS agent and intent parser:
+Run backend tests for the agent and intent parser:
 
 ```bash
 cd backend
@@ -199,6 +199,6 @@ python -m pytest tests/test_intent_parser.py tests/test_agent_tools.py -v
 
 ---
 
-## 📄 License
+## License
 
 Neuro is open-source software licensed under the [MIT License](LICENSE).
