@@ -22,7 +22,7 @@ def test_open_app_parsing():
         ("open the brave browser", "brave"),
         ("launch brave browser", "brave"),
         ("open vscode", "vscode"),
-        ("launch visual studio code", "vscode"),
+        ("launch visual studio code", "visual studio code"),
         ("open terminal", "terminal"),
         ("open powershell", "powershell"),
         ("open notepad", "notepad"),
