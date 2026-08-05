@@ -1,9 +1,11 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from app.core.database import get_session
-from app.core.security import get_current_user
+from app.core.security import get_current_user_optional
 from app.models.note import Note, NoteLink
 from app.models.tag import NoteTag, Tag
 from app.models.user import User
@@ -14,13 +16,18 @@ router = APIRouter()
 @router.get("")
 async def get_graph(
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """
     Build interactive knowledge graph topology with notes, tags, and bi-directional links.
+    Works for both authenticated users and local desktop instances.
     """
-    # Fetch notes for the current user
-    notes_result = await session.execute(select(Note).where(Note.user_id == current_user.id))
+    if current_user:
+        notes_stmt = select(Note).where(Note.user_id == current_user.id)
+    else:
+        notes_stmt = select(Note)
+
+    notes_result = await session.execute(notes_stmt)
     notes = notes_result.scalars().all()
 
     nodes = []

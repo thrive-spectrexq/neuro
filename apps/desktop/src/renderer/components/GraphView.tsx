@@ -4,8 +4,11 @@ import { useGraph } from '../hooks/useGraph';
 import { ZoomIn, ZoomOut, Maximize2, Sparkles, Network } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 
+import { useNoteStore } from '../store/noteStore';
+
 export default function GraphView() {
   const { data, isLoading, error } = useGraph();
+  const setActiveNoteId = useNoteStore((s) => s.setActiveNoteId);
   const fgRef = useRef<any>();
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,11 +31,14 @@ export default function GraphView() {
 
   const handleNodeClick = useCallback((node: any) => {
     soundEngine.playClick();
+    if (node.type === 'note' && !node.id.startsWith('tag-')) {
+      setActiveNoteId(node.id);
+    }
     if (fgRef.current) {
       fgRef.current.centerAt(node.x, node.y, 800);
       fgRef.current.zoom(3.5, 1200);
     }
-  }, []);
+  }, [setActiveNoteId]);
 
   const handleZoomIn = () => {
     if (fgRef.current) {
