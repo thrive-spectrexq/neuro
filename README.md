@@ -1,444 +1,204 @@
 <div align="center">
 
-<h1>Neuro</h1>
+# ⚡ NEURO
 
-<p><strong>An Open-Source, Local-First AI Second Brain</strong></p>
+<p><strong>The Open-Source, Local-First AI Second Brain & OS-Native JARVIS Voice Agent</strong></p>
 
-<p>Knowledge management · Semantic search · Research assistant · Workflow automation</p>
+<p>Zero-Latency OS Tool Calling · Voice Control · Note Graph · Semantic Search · 100% Offline Capable</p>
 
 <p>
-  <img src="https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/Electron-30+-47848F?logo=electron&logoColor=white" />
-  <img src="https://img.shields.io/badge/license-MIT-green" />
-  <img src="https://img.shields.io/badge/status-pre--alpha-orange" />
+  <img src="https://img.shields.io/badge/JARVIS%20Agent-Active%20%26%20Native-00f5d4?style=for-the-badge&logo=probot&logoColor=black" />
+  <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/Electron-30+-47848F?style=for-the-badge&logo=electron&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" />
 </p>
 
 </div>
 
 ---
 
-## What is Neuro?
+## 🌟 What is Neuro?
 
-Knowledge is scattered. Notes live in one app, tasks in another, research across a dozen browser tabs, and important context buried in chat history. Switching between tools fractures focus and loses connections between ideas.
+Neuro is a next-generation personal second brain and OS-native desktop agent inspired by **JARVIS**. It combines local-first knowledge management with an autonomous agent capable of listening to your voice and executing real operating system actions on your computer—**even without an external LLM API key**.
 
-Neuro is a **single intelligent workspace** that brings it all together — capturing knowledge, connecting ideas, managing projects, and letting AI help you think without ever leaving your machine or surrendering your data.
+Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the tactical HUD. Neuro can open your browser, play your music on Spotify, launch VS Code, jot down notes, schedule reminders, and query your personal knowledge base in milliseconds.
 
 ```
-capture → connect → search → act
+       ┌─────────────────────────────────────────────────────────────┐
+       │              🎙️ "Neuro wake up, open Brave"                  │
+       └──────────────────────────────┬──────────────────────────────┘
+                                      │
+                   ┌──────────────────▼──────────────────┐
+                   │       NEURO JARVIS OS ENGINE        │
+                   │  • Zero-Key Deterministic Matcher   │
+                   │  • Voice Synthesis & Speech Recog   │
+                   │  • Silent Process Supervisor        │
+                   └──────────────────┬──────────────────┘
+                                      │
+       ┌──────────────────────────────┼──────────────────────────────┐
+       ▼                              ▼                              ▼
+🚀 Open Apps (Brave/Code)     🎵 Spotify Controller       📝 Instant Notes & Tasks
 ```
 
-Whether you're a researcher tracking sources, a developer documenting systems, a student building a study base, or a team managing institutional knowledge — Neuro is designed to grow with you.
+---
+
+## ⚡ Key Highlights
+
+### 🤖 1. JARVIS OS-Native Agent (Zero API Key Needed)
+- **Voice Wake-Word:** Speak *"Neuro wake up"*, *"Hey Neuro"*, or *"Wake up"* to activate listening mode.
+- **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*, *"Open Notepad"*, *"Open Calculator"*.
+- **Spotify Music Controller:** *"Play Bohemian Rhapsody on Spotify"*, *"Play Drake in Spotify"*, *"Spotify play lofi beats"*.
+- **Quick Second Brain Capture:** *"Add this to note: Project roadmap specs"*, *"Take a note meeting summary"*.
+- **Timed Reminders & Alerts:** *"Set a reminder in 15 minutes to drink water"*, *"Remind me in 5 mins to call team"*.
+- **Web Research Automation:** *"Search quantum computing on Google"*, *"Search YouTube for jazz"*, *"Search GitHub for FastAPI"*.
+- **Local Fallback:** Runs instantly with deterministic regex parsing even if disconnected from the internet or without AI keys.
+
+### 🚀 2. Single-Command Launch (Silent Background Supervisor)
+- Launch the entire system with **one single command**:
+  ```bash
+  pnpm start
+  ```
+- **Hides backend logs completely:** The FastAPI backend starts silently in the background, supervised by Electron. No separate terminal windows or log spam.
+- Logs are cleanly preserved in `.neuro/logs/backend.log` for inspection whenever needed.
+
+### 🌌 3. Futuristic Tactical HUD
+- Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the glowing cyber HUD.
+- Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with sound responses.
+
+### 🧠 4. Second Brain & Knowledge Graph
+- Markdown-first note editor with bi-directional wiki links (`[[Note Title]]`).
+- Dynamic interactive force-directed graph view (D3.js).
+- Hybrid search combining SQLite FTS5 full-text indexing and ChromaDB vector embeddings.
+- Retrieval-Augmented Generation (RAG) using local Ollama models or OpenAI/Anthropic cloud keys when configured.
 
 ---
 
-## Core Design Principles
+## 🚀 Quickstart (One Command)
 
-| Principle | What It Means |
-|---|---|
-| **Local First** | All data lives on your device. Sync is opt-in, never required. |
-| **Privacy by Default** | No telemetry, no ads, no data sales. Ever. |
-| **AI Optional** | Works fully offline. Add local or cloud AI when you want it. |
-| **Open Source** | MIT licensed. Fork it, extend it, contribute back. |
-| **Extensible** | Plugin architecture with a first-class SDK. |
-| **Composable** | Every feature is an API. Build workflows that fit your mind. |
+### Windows
+```powershell
+# In PowerShell:
+./neuro.ps1
+# or
+pnpm start
+```
 
----
+### macOS / Linux
+```bash
+chmod +x ./neuro.sh
+./neuro.sh
+# or
+pnpm start
+```
 
-## Feature Overview
-
-### Knowledge Management
-- Markdown-first note editor with rich formatting
-- Bi-directional linking between notes, projects, and entities
-- Graph view for visualizing idea connections
-- Hierarchical and tag-based organization
-- Daily notes and journal system
-
-### AI & Search
-- Full-text and semantic (vector) search across all content
-- Retrieval-Augmented Generation (RAG) for AI responses grounded in your knowledge base
-- AI chat with context awareness of your notes and documents
-- Support for local models via Ollama, or cloud via OpenAI/Anthropic
-- Automatic summarization, extraction, and tagging
-
-### Research & Import
-- Web clipper for saving pages, highlights, and metadata
-- PDF ingestion with text extraction and annotation support
-- Import from Notion, Obsidian, Roam, Bear, and Markdown files
-- Citation management and source tracking
-
-### Projects & Tasks
-- Project workspaces with linked notes, tasks, and files
-- Kanban and list views for task management
-- Deadline tracking and priority queues
-- Cross-project references and dependencies
-
-### Workflow Automation
-- Trigger-based automations (on note creation, on tag, on schedule)
-- Plugin hooks for custom processing pipelines
-- CLI for scripting and integration with external tools
-- Webhook support for external service integration
+That's it! Neuro will boot the background supervisor, compile native bridges, start the Vite renderer, and open the desktop application with active voice listening and global hotkeys.
 
 ---
 
-## Technology Stack
+## 🗣️ Voice & Agent Command Reference
 
-### Frontend (`apps/desktop`, `apps/web`)
-
-| Layer | Technology |
-|---|---|
-| Language | TypeScript 5.x |
-| UI Framework | React 18 |
-| Desktop Shell | Electron 30+ |
-| Styling | Tailwind CSS |
-| State Management | Zustand |
-| Data Fetching | TanStack Query |
-| Editor | CodeMirror / ProseMirror |
-| Graph Visualization | D3.js / Cytoscape |
-
-### Backend (`backend/`)
-
-| Layer | Technology |
-|---|---|
-| Language | Python 3.12+ |
-| API Framework | FastAPI |
-| ORM | SQLModel + Alembic |
-| Validation | Pydantic v2 |
-| Task Queue | Celery + Redis |
-| Background Jobs | Celery Beat + Redis |
-| Auth | JWT + bcrypt |
-
-### Storage
-
-| Purpose | Technology |
-|---|---|
-| Relational data | SQLite (default) / PostgreSQL |
-| Vector embeddings | ChromaDB |
-| File storage | Local filesystem / S3-compatible |
-| Cache | Redis |
-
-### AI & Embeddings
-
-| Purpose | Technology |
-|---|---|
-| Local inference | Ollama |
-| Cloud AI | OpenAI API / Anthropic API |
-| Embeddings | sentence-transformers / text-embedding-3 |
-| Vector search | ChromaDB |
-| RAG pipeline | LangChain / custom |
+| Spoken Voice / Written Command | Action Triggered | OS / App Target |
+|---|---|---|
+| *"Neuro wake up"* / *"Hey Neuro"* | Wakes agent, plays audio chime, initiates listening | System State |
+| *"Open Brave"* / *"Open the Brave browser"* | Launches Brave Browser instantly | Brave Browser |
+| *"Open VSCode"* / *"Launch Visual Studio Code"* | Opens VS Code in current workspace | Visual Studio Code |
+| *"Play [Song/Artist] on Spotify"* | Searches & plays track in Spotify | Spotify Desktop / URI |
+| *"Add this to note: [Text]"* | Creates a new note in your second brain | SQLite / Markdown |
+| *"Set a reminder in [X] minutes to [Task]"* | Schedules a notification alert | Task System |
+| *"Search [Query] on Google"* | Opens browser with targeted search | Google Search |
+| *"Search YouTube for [Topic]"* | Launches YouTube search | YouTube |
+| *"Search GitHub for [Repo]"* | Searches GitHub repositories | GitHub |
+| *"What time is it"* / *"System status"* | Returns system time & engine health | Diagnostics |
 
 ---
 
-## Project Structure
+## 🏗️ Architecture
 
 ```
 neuro/
 ├── apps/
-│   ├── desktop/                  # Electron desktop application
-│   │   ├── src/
-│   │   │   ├── main/             # Main process (Node.js)
-│   │   │   │   └── main.ts
-│   │   │   ├── preload/          # Context bridge
-│   │   │   │   └── preload.ts
-│   │   │   └── renderer/         # React UI
-│   │   │       ├── components/
-│   │   │       ├── pages/
-│   │   │       ├── hooks/
-│   │   │       ├── store/
-│   │   │       └── App.tsx
-│   │   ├── electron-builder.json
-│   │   └── package.json
-│   │
-│   └── web/                      # Browser-based interface
+│   └── desktop/
 │       ├── src/
-│       │   ├── components/
-│       │   ├── pages/
-│       │   ├── hooks/
-│       │   ├── store/
-│       │   └── main.tsx
+│       │   ├── main/
+│       │   │   ├── backend-process.ts  # Silent FastAPI background process supervisor
+│       │   │   ├── os-tools.ts         # Native OS bridges (apps, Spotify, notifications)
+│       │   │   └── main.ts             # Global hotkey registration (Ctrl+Space)
+│       │   ├── preload/
+│       │   │   └── preload.ts          # Typed Electron IPC context bridge
+│       │   └── renderer/
+│       │       ├── components/
+│       │       │   ├── JarvisHUD.tsx   # Tactical sci-fi HUD & speech visualizer
+│       │       │   └── Layout.tsx      # Sidebar with JARVIS trigger & status pulse
+│       │       └── hooks/
+│       │           └── useJarvisAgent.ts # Web Speech API & voice execution hook
 │       └── package.json
 │
 ├── backend/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── routes/           # Endpoint routers
-│   │   │   └── v1/               # Versioned API surface
-│   │   ├── core/
-│   │   │   ├── config.py         # Settings & env management
-│   │   │   ├── security.py       # Auth, JWT, hashing
-│   │   │   └── logging.py        # Structured logging
-│   │   ├── models/               # SQLModel database models
-│   │   ├── schemas/              # Pydantic request/response schemas
-│   │   ├── services/             # Business logic layer
-│   │   │   ├── ai/               # AI provider abstractions
-│   │   │   ├── search/           # Full-text + vector search
-│   │   │   ├── ingestion/        # Import & parsing pipelines
-│   │   │   └── automation/       # Workflow automation engine
-│   │   ├── workers/              # Celery background tasks
-│   │   └── main.py               # FastAPI app entrypoint
-│   ├── migrations/               # Alembic database migrations
-│   ├── tests/
-│   └── pyproject.toml
-│
-├── packages/
-│   ├── ui/                       # Shared React component library
-│   ├── shared/                   # Shared types, utils, constants
-│   └── sdk/                      # Client SDK for plugin developers
-│
-├── plugins/
-│   ├── templates/                # Starter plugin templates
-│   ├── examples/                 # Reference plugin implementations
-│   └── registry.json             # Community plugin index
-│
-├── docs/
-│   ├── architecture/             # System design documents
-│   ├── api/                      # API reference
-│   ├── guides/                   # User and developer guides
-│   └── roadmap.md
+│   │   │   └── routes/
+│   │   │       ├── agent.py            # /api/v1/agent/execute & /tools endpoints
+│   │   │       └── voice.py            # Real-time WebSocket audio streaming
+│   │   ├── services/
+│   │   │   └── agent/
+│   │   │       ├── intent_parser.py    # Zero-key offline deterministic regex parser
+│   │   │       ├── tools.py            # OS Native Tool registry (Brave, Spotify, Code)
+│   │   │       └── orchestrator.py     # Deterministic + LLM fallback coordinator
+│   │   └── main.py                     # FastAPI application
+│   └── tests/
+│       ├── test_intent_parser.py       # Intent parser unit tests
+│       └── test_agent_tools.py         # Agent execution test suite
 │
 ├── scripts/
-│   ├── setup.sh
-│   ├── dev.sh
-│   └── build.sh
-│
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-│
-├── .env.example
-├── docker-compose.yml
-├── turbo.json                    # Turborepo monorepo config
-├── pnpm-workspace.yaml
-├── README.md
-└── LICENSE
+│   ├── launch.js                       # Cross-platform single-command runner
+│   └── dev.sh
+├── neuro.ps1                           # Windows single-command launcher
+├── neuro.sh                            # Unix single-command launcher
+└── package.json
 ```
+
+For in-depth architectural details, see [docs/architecture/jarvis-agent-engine.md](docs/architecture/jarvis-agent-engine.md) and [docs/architecture/overview.md](docs/architecture/overview.md).
 
 ---
 
-## Getting Started
+## ⚙️ Configuration & Environment
 
-### Prerequisites
+Neuro works completely offline by default. To optionally enable cloud AI models or custom storage, configure `.env`:
 
-| Tool | Version | Purpose |
-|---|---|---|
-| Python | 3.12+ | Backend runtime |
-| uv | latest | Fast Python package & environment manager (recommended) |
-| Node.js | 20+ | Frontend & Electron |
-| pnpm | 9+ | JS package manager |
-| Redis | 7+ | Task queue & cache |
-| Ollama | latest | Local AI (optional) |
-
-### Quickstart
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/thrive-spectrexq/neuro.git
-cd neuro
-
-# 2. Run the setup script (installs all dependencies)
-./scripts/setup.sh
-
-# 3. Copy environment config
-cp .env.example .env
-
-# 4. Start development servers (backend + frontend)
-./scripts/dev.sh
-```
-
-The API will be available at `http://localhost:8000` and the desktop app will launch automatically.
-
-### Manual Setup
-
-**Backend (with `uv`)**
-
-```bash
-cd backend
-uv sync --extra dev
-uv run alembic upgrade head
-uv run uvicorn app.main:app --reload --reload-exclude ".venv/*" --port 8000
-```
-
-*(Alternative using standard `venv` & `pip`)*:
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
-alembic upgrade head
-uvicorn app.main:app --reload --port 8000
-```
-
-**Frontend (Desktop)**
-
-```bash
-cd apps/desktop
-pnpm install
-pnpm dev
-```
-
-**Frontend (Web)**
-
-```bash
-cd apps/web
-pnpm install
-pnpm dev
-```
-
-### Docker
-
-```bash
-# Start all services
-docker-compose up -d
-
-# With local AI (Ollama)
-docker-compose --profile ai up -d
-```
-
----
-
-## Configuration
-
-Neuro is configured via environment variables. Copy `.env.example` to `.env` and adjust as needed.
-
-```bash
+```env
 # Core
 NEURO_ENV=development
-NEURO_SECRET_KEY=your-secret-key-here
+NEURO_SECRET_KEY=your-secure-random-secret-key-32-chars-long
 
-# Database (default: SQLite)
+# Database (Default: SQLite local-first)
 DATABASE_URL=sqlite:///./neuro.db
-# DATABASE_URL=postgresql://user:pass@localhost:5432/neuro
 
-# Redis
-REDIS_URL=redis://localhost:6379/0
-
-# Vector DB
-CHROMA_HOST=localhost
-CHROMA_PORT=8001
-
-# AI Providers (all optional)
+# Optional AI Providers (For complex conversational RAG)
 OLLAMA_BASE_URL=http://localhost:11434
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 
-# Default embedding model (sentence-transformers repo ID)
-EMBEDDING_MODEL=all-MiniLM-L6-v2
-# EMBEDDING_MODEL=text-embedding-3-small   # OpenAI
-
-# Configurable AI Models
+# Models
 OPENAI_MODEL=gpt-4o
 ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
-OLLAMA_MODEL=llama3
+OLLAMA_MODEL=llama3.2
 ```
 
-### AI Configuration
+---
 
-Neuro supports three AI modes:
+## 🧪 Testing
 
-**No AI** — Full functionality with no AI features enabled. Pure local knowledge management.
-
-**Local AI (Ollama)** — Pull and run models on your machine. No data leaves your device.
+Run backend tests for the JARVIS agent and intent parser:
 
 ```bash
-ollama pull llama3.2
-ollama pull nomic-embed-text   # For embeddings
-```
-
-**Cloud AI** — Set your API key in `.env` for OpenAI or Anthropic. Queries are sent to external APIs.
-
----
-
-## Plugin System
-
-Neuro has a first-class plugin architecture. Plugins can:
-
-- Register new content types and importers
-- Add custom UI panels and commands
-- Hook into the automation pipeline
-- Extend the AI context with custom tools
-
-**Scaffold a new plugin:**
-
-```bash
-pnpm neuro plugin create my-plugin
-```
-
-This creates a typed plugin package in `plugins/` using the SDK from `packages/sdk`. See [Plugin Development Guide](docs/guides/plugin-development.md) for the full API reference.
-
-**Example plugin entry point:**
-
-```typescript
-import { definePlugin } from '@neuro/sdk';
-
-export default definePlugin({
-  id: 'my-plugin',
-  name: 'My Plugin',
-  version: '0.1.0',
-  onLoad(ctx) {
-    ctx.registerImporter({
-      name: 'Custom Importer',
-      extensions: ['.custom'],
-      parse: async (file) => { /* ... */ }
-    });
-  }
-});
+cd backend
+python -m pytest tests/test_intent_parser.py tests/test_agent_tools.py -v
 ```
 
 ---
 
-## API
+## 📄 License
 
-The backend exposes a versioned REST API. Interactive docs are available at `http://localhost:8000/docs` (Swagger) and `http://localhost:8000/redoc` (ReDoc) when running in development mode.
-
-**Key endpoints:**
-
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/api/v1/auth/login` | Authenticate and receive JWT |
-| `GET` | `/api/v1/notes` | List notes with filters |
-| `POST` | `/api/v1/notes` | Create a new note |
-| `GET` | `/api/v1/search?q=...` | Full-text + semantic search |
-| `POST` | `/api/v1/ai/chat` | AI chat with knowledge base context |
-| `POST` | `/api/v1/ingest` | Import content from files or URLs |
-| `GET` | `/api/v1/graph` | Knowledge graph data |
-
----
-
-## Contributing
-
-Contributions are welcome. Before opening a PR, please:
-
-1. Check existing issues and discussions to avoid duplication
-2. Open an issue to discuss significant changes before implementing
-3. Follow the code style — `ruff` for Python, `eslint` + `prettier` for TypeScript
-4. Write tests for new functionality
-5. Update documentation where relevant
-
-**Development workflow:**
-
-```bash
-# Run all tests
-./scripts/test.sh
-
-# Python linting + formatting
-cd backend && ruff check . && ruff format .
-
-# TypeScript linting
-pnpm lint
-
-# Type checking
-pnpm typecheck
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide.
-
----
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
-
-
-</div>
+Neuro is open-source software licensed under the [MIT License](LICENSE).

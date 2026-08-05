@@ -4,15 +4,14 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  root: resolve(__dirname, 'src/renderer'),
+  base: './',
   build: {
-    outDir: 'dist/renderer',
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'src/renderer/index.html')
-      }
-    }
+    outDir: resolve(__dirname, 'dist/renderer'),
+    emptyOutDir: true,
   },
   server: {
-    port: 3000
-  }
+    port: 3000,
+    strictPort: false,
+  },
 });

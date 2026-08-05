@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_session
-from app.core.security import get_current_user
+from app.core.security import get_current_user_optional
 from app.models.user import User
 from app.services.ai.provider import get_ai_provider
 from app.services.search.engine import search_engine
@@ -32,12 +32,12 @@ class ExtractTagsRequest(BaseModel):
 async def chat_with_ai(
     request: ChatRequest,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     provider = get_ai_provider()
     context = []
     if request.include_context:
-        user_id = current_user.id if hasattr(current_user, "id") else current_user.get("id")
+        user_id = current_user.id if (current_user and hasattr(current_user, "id")) else None
         context = await search_engine.hybrid_search(
             session=session,
             query=request.message,
@@ -53,21 +53,21 @@ async def chat_with_ai(
 
 
 @router.post("/summarize")
-async def summarize_content(request: SummarizeRequest, current_user: User = Depends(get_current_user)):
+async def summarize_content(request: SummarizeRequest, current_user: User | None = Depends(get_current_user_optional)):
     provider = get_ai_provider()
     summary = await provider.summarize_text(request.text)
     return {"summary": summary}
 
 
 @router.post("/extract-tags")
-async def extract_tags_content(request: ExtractTagsRequest, current_user: User = Depends(get_current_user)):
+async def extract_tags_content(request: ExtractTagsRequest, current_user: User | None = Depends(get_current_user_optional)):
     provider = get_ai_provider()
     tags = await provider.extract_tags(request.text)
     return {"tags": tags}
 
 
 @router.get("/status")
-async def get_ai_status(current_user: User = Depends(get_current_user)):
+async def get_ai_status(current_user: User | None = Depends(get_current_user_optional)):
     provider = get_ai_provider()
     provider_name = provider.__class__.__name__
     return {

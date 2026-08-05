@@ -71,9 +71,20 @@ Neuro is an open-source, local-first AI second brain application designed to con
 - Powered by **Celery** with **Redis** as broker and result backend.
 - Handles heavy asynchronous operations: PDF parsing (`PyMuPDF`), vault imports (Obsidian, Notion, Roam), and batch vector re-indexing.
 
-### 7. Real-Time Voice Streaming (`backend/app/api/routes/voice.py`)
+### 7. JARVIS OS Native Agent Engine (`backend/app/services/agent/`)
+- Zero-API-Key deterministic intent execution engine with sub-10ms response times.
+- Native OS tool registry for direct application launching (Brave, VS Code, Spotify, Terminal, Notepad, Calculator).
+- Offline-first note capture, web research automation, and reminder scheduling.
+- Integrated with voice streaming and desktop tactile HUD (`Ctrl+Space`).
+
+### 8. Real-Time Voice Streaming (`backend/app/api/routes/voice.py`)
 - WebSocket endpoint for low-latency audio interaction.
 - Ingests PCM audio streams from client microphones and returns AI audio response frames.
+- Integrates with OS native tools and knowledge base search.
+
+### 9. Desktop Silent Supervisor (`apps/desktop/src/main/backend-process.ts`)
+- Electron lifecycle manager that spins up FastAPI silently in background without intrusive terminal windows.
+- Redirects logs to `.neuro/logs/backend.log` and coordinates hotkeys and native bridges.
 
 ---
 

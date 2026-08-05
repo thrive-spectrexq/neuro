@@ -4,6 +4,7 @@
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "vite",
+    "build:main": "tsc -p tsconfig.main.json",
     "build": "tsc -p tsconfig.main.json && vite build && electron-builder",
     "test": "tsc -p tsconfig.main.json --noEmit && tsc --noEmit"
   },
