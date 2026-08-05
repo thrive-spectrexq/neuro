@@ -75,11 +75,48 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 
 ---
 
-## Quickstart (One Command)
+## Getting Started
+
+### Prerequisites
+- **Node.js** >= 20.0.0
+- **pnpm** >= 9.0.0 (`npm install -g pnpm`)
+- **Python** >= 3.12 (or [uv](https://docs.astral.sh/uv/) package manager)
+
+### Installation & Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/thrive-spectrexq/neuro.git
+cd neuro
+
+# 2. Install monorepo dependencies
+pnpm install
+
+# 3. Setup Python Backend Environment
+# Using uv (Recommended - ultra fast):
+cd backend
+uv venv
+uv pip install -e .
+cd ..
+
+# Or using standard python & pip:
+cd backend
+python -m venv .venv
+# On Windows (PowerShell):
+.\.venv\Scripts\activate
+# On macOS / Linux:
+source .venv/bin/activate
+pip install -e .
+cd ..
+```
+
+---
+
+## Launch (One Command)
 
 ### Windows
 ```powershell
-# In PowerShell:
+# PowerShell:
 ./neuro.ps1
 # or
 pnpm start
@@ -93,7 +130,7 @@ chmod +x ./neuro.sh
 pnpm start
 ```
 
-That's it! Neuro will boot the background supervisor, compile native bridges, start the Vite renderer, and open the desktop application with active voice listening and global hotkeys.
+Neuro will automatically boot the background FastAPI engine silently, link the native OS hooks, launch the Vite renderer, and open the desktop application with active voice listening and global hotkeys (<kbd>Ctrl + Space</kbd>).
 
 ---
 
@@ -102,14 +139,21 @@ That's it! Neuro will boot the background supervisor, compile native bridges, st
 | Spoken Voice / Written Command | Action Triggered | OS / App Target |
 |---|---|---|
 | *"Hey Neuro"* | Wakes agent, plays audio chime, initiates listening | System State |
-| *"Open Brave"* / *"Open the Brave browser"* | Launches Brave Browser instantly | Brave Browser |
-| *"Open VSCode"* / *"Launch Visual Studio Code"* | Opens VS Code in current workspace | Visual Studio Code |
-| *"Play [Song/Artist] on Spotify"* | Searches & plays track in Spotify | Spotify Desktop / URI |
+| *"Open Brave"* / *"Launch Chrome"* | Launches browser application | Browser |
+| *"Open VSCode"* / *"Launch Terminal"* | Opens code editor or terminal | Developer Tools |
+| *"Open Downloads"* / *"Open Documents"* | Opens folder in file explorer | File System |
+| *"Play [Song/Artist] on Spotify"* | Searches & plays track in Spotify | Spotify Desktop / Web |
+| *"Mute volume"* / *"Set volume to 50%"* | Controls master audio levels | System Audio |
+| *"Take a screenshot"* / *"Capture screen"* | Captures display and saves to desktop | OS Display |
+| *"Lock screen"* / *"Lock my PC"* | Immediately locks the workstation | Security / OS |
+| *"Empty recycle bin"* / *"Clean trash"* | Empties deleted files safely | System Storage |
 | *"Add this to note: [Text]"* | Creates a new note in your second brain | SQLite / Markdown |
-| *"Set a reminder in [X] minutes to [Task]"* | Schedules a notification alert | Task System |
+| *"Set a reminder in [X] mins to [Task]"* | Schedules a notification alert | Task System |
 | *"Search [Query] on Google"* | Opens browser with targeted search | Google Search |
-| *"Search YouTube for [Topic]"* | Launches YouTube search | YouTube |
+| *"Search YouTube for [Topic]"* | Launches YouTube video search | YouTube |
 | *"Search GitHub for [Repo]"* | Searches GitHub repositories | GitHub |
+| *"Calculate (450 * 12) + 80"* | Safely computes mathematical expression | AST Math Engine |
+| *"Flip a coin"* / *"Roll a die"* | Random decision & number generation | Local Logic |
 | *"What time is it"* / *"System status"* | Returns system time & engine health | Diagnostics |
 
 ---

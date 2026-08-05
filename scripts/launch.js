@@ -16,7 +16,7 @@ const desktopDir = path.join(rootDir, 'apps', 'desktop');
 const logsDir = path.join(rootDir, '.neuro', 'logs');
 
 console.log('\x1b[35m%s\x1b[0m', '════════════════════════════════════════════════════════════');
-console.log('\x1b[36m%s\x1b[0m', '  ⚡ NEURO — AI Second Brain & OS Native JARVIS Agent');
+console.log('\x1b[36m%s\x1b[0m', '  ⚡ NEURO — AI Second Brain & OS Native Voice Agent');
 console.log('\x1b[35m%s\x1b[0m', '════════════════════════════════════════════════════════════\n');
 
 if (!fs.existsSync(logsDir)) {
