@@ -7,7 +7,7 @@ import {
   X,
   Sparkles,
   Command,
-  Send,
+  CornerDownLeft,
   ExternalLink,
   Play,
   FileText,
@@ -19,6 +19,11 @@ import {
   AlertCircle,
   Zap,
   Trash2,
+  Layers,
+  ArrowRight,
+  Radio,
+  Copy,
+  Check
 } from 'lucide-react';
 import { useJarvisAgent, AgentExecutionResponse } from '../hooks/useJarvisAgent';
 import { soundEngine } from '../utils/soundEngine';
@@ -28,13 +33,22 @@ interface JarvisHUDProps {
   onClose: () => void;
 }
 
-const QUICK_COMMANDS = [
-  { label: 'Open Brave', cmd: 'open brave', icon: ExternalLink },
-  { label: 'Play Spotify', cmd: 'play starboy on spotify', icon: Play },
-  { label: 'Open VS Code', cmd: 'open vscode', icon: Terminal },
-  { label: 'Add Quick Note', cmd: 'add this to note: brainstorming agent features', icon: FileText },
-  { label: 'Set Reminder', cmd: 'set a reminder in 15 minutes to review pull request', icon: Clock },
-  { label: 'Google Search', cmd: 'search quantum computing on google', icon: Search },
+interface QuickAction {
+  id: string;
+  label: string;
+  cmd: string;
+  category: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  hotkey?: string;
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { id: 'brave', label: 'Launch Brave', cmd: 'open brave', category: 'Apps', icon: ExternalLink, hotkey: '1' },
+  { id: 'spotify', label: 'Play on Spotify', cmd: 'play starboy on spotify', category: 'Media', icon: Play, hotkey: '2' },
+  { id: 'vscode', label: 'Open VS Code', cmd: 'open vscode', category: 'Dev', icon: Terminal, hotkey: '3' },
+  { id: 'note', label: 'Quick Capture Note', cmd: 'add this to note: brainstorming architecture improvements', category: 'Brain', icon: FileText, hotkey: '4' },
+  { id: 'reminder', label: 'Set 15m Reminder', cmd: 'set a reminder in 15 minutes to review roadmap', category: 'Tasks', icon: Clock, hotkey: '5' },
+  { id: 'search', label: 'Web Research', cmd: 'search quantum algorithms on google', category: 'Web', icon: Search, hotkey: '6' },
 ];
 
 export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
@@ -54,7 +68,10 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
   } = useJarvisAgent();
 
   const [inputVal, setInputVal] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [localHistory, setLocalHistory] = useState<AgentExecutionResponse[]>([]);
+  const [activeTab, setActiveTab] = useState<'console' | 'actions' | 'telemetry'>('console');
+
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -68,7 +85,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     setLocalHistory(history);
   }, [history]);
 
-  // Audio effect when HUD opens
+  // Audio effect and mic on opening HUD
   useEffect(() => {
     if (isOpen) {
       soundEngine.playWakeChime();
@@ -77,7 +94,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
         if (isSpeechSupported && !isListening) {
           startListening();
         }
-      }, 150);
+      }, 100);
       startAudioVisualizer();
     } else {
       stopListening();
@@ -100,7 +117,20 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     }
   }, [lastResult]);
 
-  // Live Audio Spectrum Canvas Visualizer
+  // Keyboard shortcut listener within HUD
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Live Fluid Harmonic Spectrum Canvas Visualizer
   const startAudioVisualizer = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
@@ -111,7 +141,8 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       const ctx = new AudioCtx();
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 64;
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.8;
       const source = ctx.createMediaStreamSource(stream);
       source.connect(analyser);
 
@@ -125,6 +156,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
 
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
+      let phase = 0;
 
       const render = () => {
         animFrameRef.current = requestAnimationFrame(render);
@@ -132,31 +164,50 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
 
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = 38;
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerY = height / 2;
 
-        // Draw dynamic reactive neon circular bars
-        const totalBars = 32;
-        for (let i = 0; i < totalBars; i++) {
-          const angle = (i * 2 * Math.PI) / totalBars;
-          const val = dataArray[i % bufferLength] || 10;
-          const barHeight = Math.max(4, (val / 255) * 28);
+        // Calculate average audio level
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / bufferLength;
+        phase += 0.04;
 
-          const x1 = centerX + Math.cos(angle) * radius;
-          const y1 = centerY + Math.sin(angle) * radius;
-          const x2 = centerX + Math.cos(angle) * (radius + barHeight);
-          const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+        // Draw smooth symmetric wave bars
+        const barCount = 36;
+        const barWidth = 3;
+        const gap = (width - barCount * barWidth) / (barCount + 1);
 
+        for (let i = 0; i < barCount; i++) {
+          const freqIndex = Math.floor((i / barCount) * (bufferLength / 2));
+          const freqVal = dataArray[freqIndex] || 0;
+          
+          // Combine frequency data with subtle harmonic breathing
+          const wave = isListening 
+            ? Math.max(4, (freqVal / 255) * (height * 0.75) + Math.sin(phase + i * 0.2) * 4)
+            : Math.max(3, Math.sin(phase + i * 0.2) * 6 + 4);
+
+          const x = gap + i * (barWidth + gap);
+          const y = centerY - wave / 2;
+
+          // Gradient color from Cyan to Neural Violet
+          const gradient = canvasCtx.createLinearGradient(0, y, 0, y + wave);
+          if (isListening) {
+            gradient.addColorStop(0, '#22d3ee');
+            gradient.addColorStop(0.5, '#6366f1');
+            gradient.addColorStop(1, '#818cf8');
+          } else {
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+          }
+
+          canvasCtx.fillStyle = gradient;
           canvasCtx.beginPath();
-          canvasCtx.moveTo(x1, y1);
-          canvasCtx.lineTo(x2, y2);
-          canvasCtx.strokeStyle = isListening
-            ? `rgba(6, 182, 212, ${0.4 + (val / 255) * 0.6})`
-            : `rgba(124, 58, 237, 0.4)`;
-          canvasCtx.lineWidth = 2.5;
-          canvasCtx.lineCap = 'round';
-          canvasCtx.stroke();
+          canvasCtx.roundRect(x, y, barWidth, wave, 2);
+          canvasCtx.fill();
         }
       };
       render();
@@ -195,68 +246,108 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     await executeCommand(cmd);
   };
 
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 1500);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-      {/* HUD Container */}
-      <div className="w-full max-w-2xl bg-surface/95 border border-accent-purple/30 rounded-3xl shadow-[0_0_60px_rgba(124,58,237,0.3)] overflow-hidden flex flex-col max-h-[88vh] relative">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xl animate-in fade-in duration-150 select-none"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      {/* Precision Obsidian Command Surface */}
+      <div 
+        className="w-full max-w-2xl bg-[#0b0e17] border border-white/[0.09] rounded-2xl shadow-elevated overflow-hidden flex flex-col max-h-[86vh] relative animate-in scale-in duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         
-        {/* Glowing Top Cyber Header */}
-        <div className="p-5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-panel via-surface to-panel">
+        {/* Top Control & Status Bar */}
+        <div className="px-5 py-3.5 border-b border-white/[0.07] flex items-center justify-between bg-[#0e121e]">
+          
+          {/* Agent Identity & Live State Pill */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center bg-gradient-to-tr from-accent-purple via-accent-blue to-accent-cyan shadow-lg ${
-                isListening ? 'animate-pulse ring-4 ring-accent-cyan/30' : ''
-              }`}>
-                <Zap size={22} className="text-white" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-brand-primary/20 border border-brand-primary/40 flex items-center justify-center text-brand-primary-light">
+                <Zap size={14} className={isListening ? 'animate-pulse' : ''} />
               </div>
-              {isListening && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-accent-cyan rounded-full animate-ping" />
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white tracking-wide flex items-center gap-1.5 font-sans">
-                  NEURO <span className="text-accent-cyan tracking-wider">JARVIS</span>
-                </h2>
-                <span className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-full">
-                  OS Native Agent
-                </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold tracking-tight text-white uppercase font-sans">
+                    Neuro Agent
+                  </span>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                    <span 
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isProcessing 
+                          ? 'bg-brand-amber animate-ping' 
+                          : isListening 
+                          ? 'bg-brand-cyan animate-pulse shadow-glow-cyan' 
+                          : 'bg-zinc-500'
+                      }`} 
+                    />
+                    <span className="text-[10px] font-medium tracking-wide text-zinc-400">
+                      {isProcessing ? 'Executing' : isListening ? 'Listening ("Hey Neuro")' : 'Standby'}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-gray-400">
-                {isProcessing
-                  ? '⚡ Executing action...'
-                  : isListening
-                  ? '🎙️ Listening for speech ("Hey Neuro", "Open Brave", "Play Spotify")...'
-                  : 'Zero-API-Key Offline Engine Ready'}
-              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Controls & Dismiss */}
+          <div className="flex items-center gap-1.5">
+            {/* View Mode Tabs */}
+            <div className="flex items-center bg-black/40 p-0.5 rounded-lg border border-white/[0.05] mr-2">
+              <button
+                onClick={() => setActiveTab('console')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
+                  activeTab === 'console' 
+                    ? 'bg-white/[0.08] text-white shadow-sm' 
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                Console
+              </button>
+              <button
+                onClick={() => setActiveTab('actions')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
+                  activeTab === 'actions' 
+                    ? 'bg-white/[0.08] text-white shadow-sm' 
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                Actions
+              </button>
+            </div>
+
             {/* Clear History */}
             {localHistory.length > 0 && (
               <button
                 onClick={() => setLocalHistory([])}
-                className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                title="Clear activity feed"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors"
+                title="Clear activity log"
               >
-                <Trash2 size={16} />
+                <Trash2 size={14} />
               </button>
             )}
 
             {/* Voice Mute Toggle */}
             <button
               onClick={() => setIsMuted(!isMuted)}
-              className={`p-2 rounded-xl border transition-colors ${
+              className={`p-1.5 rounded-lg transition-colors ${
                 isMuted
-                  ? 'bg-red-500/20 border-red-500/40 text-red-400'
-                  : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+                  ? 'text-brand-rose bg-brand-rose/10'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]'
               }`}
               title={isMuted ? 'Unmute voice responses' : 'Mute voice responses'}
             >
-              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
             </button>
 
             {/* Mic Toggle */}
@@ -265,15 +356,17 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 soundEngine.playClick();
                 toggleListening();
               }}
-              className={`p-2 rounded-xl border transition-all ${
+              className={`p-1.5 rounded-lg transition-colors ${
                 isListening
-                  ? 'bg-accent-cyan/20 border-accent-cyan/50 text-accent-cyan shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-                  : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                  ? 'text-brand-cyan bg-brand-cyan/10 ring-1 ring-brand-cyan/30'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]'
               }`}
               title={isListening ? 'Stop listening' : 'Start microphone listening'}
             >
-              {isListening ? <Mic size={18} /> : <MicOff size={18} />}
+              {isListening ? <Mic size={14} /> : <MicOff size={14} />}
             </button>
+
+            <div className="w-[1px] h-4 bg-white/[0.08] mx-1" />
 
             {/* Close Button */}
             <button
@@ -281,128 +374,153 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 soundEngine.playClick();
                 onClose();
               }}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-colors ml-1"
-              title="Close HUD (Esc)"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+              title="Close (Esc)"
             >
-              <X size={18} />
+              <X size={14} />
             </button>
           </div>
         </div>
 
-        {/* Live Audio Spectrum Canvas & Visualizer Core */}
-        <div className="py-6 px-6 bg-background/60 flex flex-col items-center justify-center border-b border-white/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/10 via-transparent to-transparent pointer-events-none" />
-
-          {/* Reactor & Waveform Canvas */}
-          <div className="relative w-36 h-36 flex items-center justify-center my-1">
-            <canvas
-              ref={canvasRef}
-              width={144}
-              height={144}
-              className="absolute inset-0 z-0 pointer-events-none"
-            />
-            
-            {/* Spinning Neon Ring */}
-            <div
-              className={`absolute inset-2 rounded-full border border-dashed border-accent-cyan/40 ${
-                isListening ? 'animate-spin' : ''
-              }`}
-              style={{ animationDuration: '8s' }}
-            />
-
-            {/* Glowing Core Reactor */}
-            <div
-              className={`w-16 h-16 rounded-full bg-gradient-to-tr from-accent-purple to-accent-cyan flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.5)] z-10 ${
-                isListening ? 'scale-110' : 'scale-100'
-              } transition-transform duration-300`}
-            >
-              <Sparkles size={24} className="text-white animate-pulse" />
+        {/* Dynamic Voice Waveform & Streaming Transcript Section */}
+        <div className="px-6 py-4 bg-[#090b12] border-b border-white/[0.05] flex items-center justify-between gap-6">
+          
+          {/* Transcript / State Display */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Radio size={12} className={isListening ? 'text-brand-cyan animate-pulse' : 'text-zinc-500'} />
+              <span className="text-[11px] font-mono tracking-wider uppercase text-zinc-500">
+                {isProcessing ? 'Agent Active' : isListening ? 'Voice Stream' : 'Ready'}
+              </span>
             </div>
-          </div>
 
-          {/* Real-time Voice Transcript Ticker */}
-          <div className="mt-3 text-center min-h-[28px] max-w-lg">
             {transcript ? (
-              <p className="text-sm font-medium text-accent-cyan animate-pulse">
+              <p className="text-sm font-medium text-brand-cyan-light tracking-tight truncate font-sans">
                 "{transcript}"
               </p>
             ) : isListening ? (
-              <p className="text-xs text-gray-400 flex items-center justify-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-accent-cyan animate-ping" />
-                Listening for speech... Say "Open Brave", "Play Spotify", or "Add to note"
+              <p className="text-xs text-zinc-400 font-sans tracking-tight">
+                Listening for wake-word <span className="text-white font-medium">"Hey Neuro"</span> or direct commands...
               </p>
             ) : (
-              <p className="text-xs text-gray-500">
-                Tap microphone or type command below to trigger instant OS actions
+              <p className="text-xs text-zinc-500 font-sans">
+                Type or speak an OS instruction: <span className="text-zinc-400">"Open Brave"</span>, <span className="text-zinc-400">"Play Spotify"</span>, <span className="text-zinc-400">"Add to note"</span>
               </p>
             )}
           </div>
+
+          {/* Fluid Multi-Band Audio Spectrum Canvas */}
+          <div className="w-36 h-10 flex items-center justify-center flex-shrink-0 bg-black/40 rounded-xl px-2 border border-white/[0.04]">
+            <canvas
+              ref={canvasRef}
+              width={140}
+              height={36}
+              className="w-full h-full"
+            />
+          </div>
         </div>
 
-        {/* Quick Command Chips */}
-        <div className="p-4 border-b border-white/5 bg-panel/40 flex flex-wrap gap-2">
-          {QUICK_COMMANDS.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={idx}
-                onClick={() => handleQuickCommand(item.cmd)}
-                disabled={isProcessing}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-accent-purple/50 hover:bg-accent-purple/10 text-xs text-gray-300 hover:text-white transition-all disabled:opacity-50"
-              >
-                <Icon size={13} className="text-accent-cyan" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Action History & Execution Cards */}
-        <div ref={scrollRef} className="flex-1 p-5 overflow-y-auto space-y-3 min-h-[160px] max-h-[250px]">
-          {localHistory.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center py-6 text-gray-500">
-              <Cpu size={32} className="mb-2 opacity-40 text-accent-purple" />
-              <p className="text-sm">No commands executed yet.</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Say "Hey Neuro", "Open Spotify", "Open VSCode", or "Set a reminder"
-              </p>
-            </div>
-          ) : (
-            localHistory.map((item, idx) => (
-              <div
-                key={idx}
-                className="glass-panel p-4 rounded-2xl border border-white/10 hover:border-accent-purple/30 transition-all flex items-start justify-between gap-3 bg-panel/70"
-              >
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    {item.success ? (
-                      <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                    ) : (
-                      <AlertCircle size={16} className="text-amber-400 flex-shrink-0" />
-                    )}
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      {item.tool_name || 'Direct Command'}
-                    </span>
-                    {item.is_offline_native && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950/60 text-accent-cyan border border-accent-cyan/20">
-                        Native OS
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-white">
-                    {item.display_text || item.voice_response}
-                  </p>
-                  <p className="text-xs text-gray-400 italic">
-                    Prompt: "{item.input_text}"
-                  </p>
+        {/* Main Content Area: Console / History or Quick Actions */}
+        {activeTab === 'console' ? (
+          <div ref={scrollRef} className="flex-1 p-5 overflow-y-auto space-y-2.5 min-h-[220px] max-h-[300px] bg-[#07080e]">
+            {localHistory.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center py-8 text-zinc-500">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
+                  <Cpu size={18} className="text-zinc-400" />
                 </div>
+                <p className="text-xs font-medium text-zinc-300">Deterministic OS Execution Engine</p>
+                <p className="text-[11px] text-zinc-500 mt-1 max-w-sm">
+                  Commands execute locally with zero external API latency. Try saying <span className="text-zinc-400">"Hey Neuro"</span> or choose a quick action.
+                </p>
               </div>
-            ))
-          )}
-        </div>
+            ) : (
+              localHistory.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl border border-white/[0.06] bg-[#0e121d] hover:border-white/[0.12] transition-all flex items-start justify-between gap-3 group"
+                >
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {item.success ? (
+                        <CheckCircle2 size={13} className="text-brand-emerald flex-shrink-0" />
+                      ) : (
+                        <AlertCircle size={13} className="text-brand-amber flex-shrink-0" />
+                      )}
+                      
+                      <span className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider">
+                        {item.tool_name || 'System Command'}
+                      </span>
+
+                      {item.is_offline_native && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20">
+                          Native
+                        </span>
+                      )}
+
+                      <span className="text-[10px] text-zinc-600 ml-auto font-mono">
+                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-medium text-zinc-200 leading-relaxed font-sans">
+                      {item.display_text || item.voice_response}
+                    </p>
+
+                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-mono">
+                      <span>Input:</span>
+                      <span className="text-zinc-400">"{item.input_text}"</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => copyToClipboard(item.display_text || item.voice_response || '', `hist-${idx}`)}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-white/[0.08] text-zinc-400 hover:text-white transition-opacity"
+                    title="Copy output"
+                  >
+                    {copiedId === `hist-${idx}` ? <Check size={12} className="text-brand-emerald" /> : <Copy size={12} />}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="flex-1 p-5 overflow-y-auto min-h-[220px] max-h-[300px] bg-[#07080e]">
+            <div className="text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider font-mono">
+              Available Native Commands
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {QUICK_ACTIONS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleQuickCommand(item.cmd)}
+                    disabled={isProcessing}
+                    className="p-3 rounded-xl bg-[#0e121d] border border-white/[0.06] hover:border-brand-primary/40 hover:bg-[#121626] transition-all flex items-center justify-between text-left group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-400 group-hover:text-brand-cyan transition-colors">
+                        <Icon size={14} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-zinc-200 group-hover:text-white truncate">
+                          {item.label}
+                        </div>
+                        <div className="text-[10px] text-zinc-500 font-mono truncate">
+                          {item.cmd}
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRight size={12} className="text-zinc-600 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Command Input Bar */}
-        <div className="p-4 border-t border-white/10 bg-panel/90">
+        <div className="p-3.5 border-t border-white/[0.07] bg-[#0d101a]">
           <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <div className="relative flex-1">
               <input
@@ -410,29 +528,36 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="Ask JARVIS... (e.g., 'open brave', 'play jazz on spotify', 'add to note')"
+                placeholder="Ask Neuro... (e.g. 'open brave', 'play jazz on spotify', 'add to note')"
                 disabled={isProcessing}
-                className="w-full bg-background/80 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-accent-purple/60 focus:ring-2 focus:ring-accent-purple/20 transition-all"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/30 transition-all font-sans"
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[11px] text-gray-500 font-mono">
-                <Command size={12} />
-                <span>Enter</span>
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-zinc-500 font-mono pointer-events-none">
+                <kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-zinc-400">↵ Enter</kbd>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={!inputVal.trim() || isProcessing}
-              className="p-3 bg-gradient-to-r from-accent-purple to-accent-blue hover:from-accent-purple/80 hover:to-accent-blue/80 text-white rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent-purple/20 flex-shrink-0"
+              className="px-3 py-2.5 bg-brand-primary hover:bg-brand-primary-dark text-white text-xs font-medium rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-glow-primary flex items-center gap-1.5 flex-shrink-0"
               title="Execute command"
             >
-              <Send size={18} />
+              <span>Run</span>
+              <CornerDownLeft size={12} />
             </button>
           </form>
 
-          <div className="mt-2.5 flex items-center justify-between text-[11px] text-gray-500 px-1">
-            <span>Global Hotkey: <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-gray-300">Ctrl + Space</kbd></span>
-            <span>Wake Word: <span className="text-accent-cyan">"Hey Neuro"</span></span>
+          {/* Quick Footer Hints */}
+          <div className="mt-2.5 flex items-center justify-between text-[10px] text-zinc-500 px-1 font-mono">
+            <div className="flex items-center gap-3">
+              <span>Wake: <strong className="text-zinc-300 font-normal">"Hey Neuro"</strong></span>
+              <span>•</span>
+              <span>Shortcut: <kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded text-zinc-400">Ctrl + Space</kbd></span>
+            </div>
+            <div className="text-zinc-500">
+              Zero API Key Offline Execution
+            </div>
           </div>
         </div>
 

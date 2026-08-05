@@ -1,5 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, Wand2, FileText, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
+import {
+  Send,
+  Bot,
+  User,
+  Sparkles,
+  Wand2,
+  FileText,
+  CheckCircle2,
+  Loader2,
+  RefreshCw,
+  Zap,
+  CornerDownLeft,
+  Copy,
+  Check,
+  Brain,
+  MessageSquare
+} from 'lucide-react';
 import { useNoteStore } from '../store/noteStore';
 import { useNotes } from '../hooks/useNotes';
 import { soundEngine } from '../utils/soundEngine';
@@ -11,17 +27,25 @@ interface Message {
   timestamp: string;
 }
 
+const QUICK_PROMPTS = [
+  { label: 'Summarize Note', prompt: 'Please summarize the key takeaways of this note into bullet points.' },
+  { label: 'Extract Tasks', prompt: 'Extract any actionable tasks, to-dos, or next steps from this note.' },
+  { label: 'Find Connections', prompt: 'What related ideas or wiki links should be connected to this topic?' },
+  { label: 'Brainstorm Ideas', prompt: 'Generate 3 creative ideas or expansions related to this content.' },
+];
+
 export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hello! I'm your Neuro AI Assistant. I can analyze your active note, search your knowledge graph, or execute OS commands.",
+      content: "Hello! I'm your Neuro Assistant. I have full context of your active note and knowledge graph.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { activeNoteId } = useNoteStore();
@@ -50,17 +74,14 @@ export default function AIChat() {
     setIsLoading(true);
 
     try {
-      // Build context from active note
-      let contextMsg = textToSend;
-      if (activeNote) {
-        contextMsg = `Context Note: "${activeNote.title}"\nContent: ${activeNote.content.slice(0, 1000)}\n\nQuery: ${textToSend}`;
-      }
-
       // First check local agent orchestrator / backend AI
       const res = await fetch('http://localhost:8000/api/v1/agent/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input_text: textToSend }),
+        body: JSON.stringify({
+          input_text: textToSend,
+          context_note: activeNote ? { id: activeNote.id, title: activeNote.title, content: activeNote.content.slice(0, 1000) } : null,
+        }),
       });
 
       if (res.ok) {
@@ -68,20 +89,20 @@ export default function AIChat() {
         const assistantMsg: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: data.display_text || data.voice_response || 'Action processed.',
+          content: data.display_text || data.voice_response || 'Processed action successfully.',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         soundEngine.playSuccessTone();
         setMessages((prev) => [...prev, assistantMsg]);
       } else {
-        throw new Error('Fallback to local assistant');
+        throw new Error('Local agent fallback');
       }
     } catch (e) {
-      // Fallback local response
+      // Fallback local intelligent response
       const fallbackMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I've analyzed your query regarding "${activeNote?.title || 'your workspace'}". The second brain knowledge base is synced and ready.`,
+        content: `Analyzed query for "${activeNote?.title || 'your workspace'}". The offline deterministic engine and SQLite knowledge repository are active.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
@@ -90,144 +111,132 @@ export default function AIChat() {
     }
   };
 
-  const handleQuickPrompt = (prompt: string) => {
-    handleSendMessage(prompt);
+  const copyMessage = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 1500);
   };
 
   return (
-    <div className="flex flex-col h-full bg-panel border-l border-white/5">
-      {/* Header */}
-      <div className="p-4 border-b border-white/5 flex items-center justify-between bg-surface/50">
+    <div className="flex flex-col h-full bg-[#0a0d16] border-l border-white/[0.06] select-none">
+      
+      {/* Copilot Header */}
+      <div className="p-4 border-b border-white/[0.06] bg-[#0d101c] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-accent-purple to-accent-blue flex items-center justify-center shadow">
-            <Sparkles size={14} className="text-white" />
+          <div className="w-6 h-6 rounded-lg bg-brand-primary/20 border border-brand-primary/40 flex items-center justify-center text-brand-primary-light">
+            <Sparkles size={13} />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-white uppercase tracking-wider">AI Copilot</h2>
-            <p className="text-[11px] text-gray-400">
-              {activeNote ? `Linked to: ${activeNote.title}` : 'Workspace context'}
+            <h3 className="text-xs font-semibold text-white tracking-tight">
+              Neuro Copilot
+            </h3>
+            <p className="text-[10px] text-zinc-500 font-mono">
+              {activeNote ? `Context: ${activeNote.title}` : 'Workspace Context'}
             </p>
           </div>
         </div>
 
-        <button
-          onClick={() =>
-            setMessages([
-              {
-                id: 'welcome',
-                role: 'assistant',
-                content: "Context refreshed. How can I help you with your notes today?",
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              },
-            ])
-          }
-          className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-          title="Reset conversation"
-        >
-          <RefreshCw size={13} />
-        </button>
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse" />
+          <span className="text-[10px] text-zinc-400 font-mono">Ready</span>
+        </div>
       </div>
 
-      {/* Quick Prompts (if note is active) */}
+      {/* Quick Context Prompt Chips */}
       {activeNote && (
-        <div className="px-3 py-2 border-b border-white/5 bg-panel/40 flex items-center gap-1.5 overflow-x-auto text-[11px]">
-          <button
-            onClick={() => handleQuickPrompt(`Summarize key points in note: ${activeNote.title}`)}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-accent-purple/20 text-gray-300 hover:text-accent-cyan border border-white/5 transition-all flex items-center gap-1 whitespace-nowrap"
-          >
-            <FileText size={11} />
-            <span>Summarize</span>
-          </button>
-          <button
-            onClick={() => handleQuickPrompt(`Extract action items from note: ${activeNote.title}`)}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-accent-purple/20 text-gray-300 hover:text-accent-cyan border border-white/5 transition-all flex items-center gap-1 whitespace-nowrap"
-          >
-            <CheckCircle2 size={11} />
-            <span>Action Items</span>
-          </button>
-          <button
-            onClick={() => handleQuickPrompt(`Suggest tags and related topics for: ${activeNote.title}`)}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-accent-purple/20 text-gray-300 hover:text-accent-cyan border border-white/5 transition-all flex items-center gap-1 whitespace-nowrap"
-          >
-            <Wand2 size={11} />
-            <span>Tag Suggestions</span>
-          </button>
+        <div className="p-3 border-b border-white/[0.04] bg-[#07080e] flex flex-wrap gap-1.5">
+          {QUICK_PROMPTS.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSendMessage(item.prompt)}
+              disabled={isLoading}
+              className="px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] text-[11px] text-zinc-400 hover:text-zinc-200 transition-all disabled:opacity-40"
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            {m.role === 'assistant' && (
-              <div className="w-6 h-6 rounded-md bg-accent-purple/20 border border-accent-purple/40 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot size={13} className="text-accent-purple" />
-              </div>
-            )}
-
+      {/* Chat Messages Feed */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#080a10]">
+        {messages.map((msg) => {
+          const isUser = msg.role === 'user';
+          return (
             <div
-              className={`p-3 rounded-2xl text-xs max-w-[85%] leading-relaxed ${
-                m.role === 'user'
-                  ? 'bg-gradient-to-r from-accent-purple to-accent-blue text-white rounded-tr-none'
-                  : 'bg-surface border border-white/5 text-gray-200 rounded-tl-none shadow-sm'
-              }`}
+              key={msg.id}
+              className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} group`}
             >
-              <div className="whitespace-pre-wrap">{m.content}</div>
+              <div className="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-zinc-500 font-mono">
+                <span>{isUser ? 'You' : 'Neuro'}</span>
+                <span>•</span>
+                <span>{msg.timestamp}</span>
+              </div>
+
               <div
-                className={`text-[9px] mt-1.5 ${
-                  m.role === 'user' ? 'text-white/60 text-right' : 'text-gray-500'
+                className={`relative p-3.5 rounded-2xl text-xs max-w-[92%] leading-relaxed ${
+                  isUser
+                    ? 'bg-brand-primary text-white shadow-glow-primary rounded-tr-sm'
+                    : 'bg-[#101422] text-zinc-200 border border-white/[0.06] rounded-tl-sm'
                 }`}
               >
-                {m.timestamp}
+                <div className="whitespace-pre-wrap select-text font-sans">
+                  {msg.content}
+                </div>
+
+                {!isUser && (
+                  <button
+                    onClick={() => copyMessage(msg.content, msg.id)}
+                    className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-1 rounded hover:bg-white/[0.1] text-zinc-400 hover:text-white transition-opacity"
+                    title="Copy message"
+                  >
+                    {copiedId === msg.id ? <Check size={11} className="text-brand-emerald" /> : <Copy size={11} />}
+                  </button>
+                )}
               </div>
             </div>
-
-            {m.role === 'user' && (
-              <div className="w-6 h-6 rounded-md bg-accent-blue/20 border border-accent-blue/40 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User size={13} className="text-accent-blue" />
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && (
-          <div className="flex gap-2.5 items-center text-gray-400 text-xs py-2">
-            <Loader2 size={14} className="animate-spin text-accent-cyan" />
-            <span>Thinking...</span>
+          <div className="flex items-center gap-2 text-zinc-500 text-xs py-2 px-1 font-mono">
+            <Loader2 size={13} className="animate-spin text-brand-primary" />
+            <span>Reasoning across knowledge graph...</span>
           </div>
         )}
+
         <div ref={scrollRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-3 border-t border-white/5 bg-surface/30">
+      {/* Message Input Box */}
+      <div className="p-3 border-t border-white/[0.06] bg-[#0d101c]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="relative"
+          className="flex items-center gap-2"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask AI or command JARVIS..."
+            placeholder="Ask copilot about this note..."
             disabled={isLoading}
-            className="w-full bg-background border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-accent-purple/50 pr-9 transition-colors"
+            className="flex-1 bg-[#070912] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/20 transition-all font-sans"
           />
+
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent-cyan disabled:opacity-30 p-1 transition-colors"
+            className="p-2.5 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-glow-primary flex-shrink-0"
+            title="Send prompt"
           >
-            <Send size={14} />
+            <Send size={13} />
           </button>
         </form>
       </div>
+
     </div>
   );
 }

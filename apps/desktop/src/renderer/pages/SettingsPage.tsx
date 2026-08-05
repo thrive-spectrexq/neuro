@@ -11,6 +11,9 @@ import {
   CheckCircle2,
   Radio,
   ExternalLink,
+  Shield,
+  Key,
+  Laptop
 } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 
@@ -24,7 +27,6 @@ export default function SettingsPage() {
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
   const [ollamaModel, setOllamaModel] = useState('llama3.2');
   const [openaiKey, setOpenaiKey] = useState('');
-  const [anthropicKey, setAnthropicKey] = useState('');
   const [saved, setSaved] = useState(false);
   const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
 
@@ -39,118 +41,113 @@ export default function SettingsPage() {
     soundEngine.playSuccessTone();
     soundEngine.setMuted(!sfxEnabled);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   return (
-    <div className="p-8 h-full overflow-y-auto max-w-4xl mx-auto space-y-8">
+    <div className="p-8 h-full overflow-y-auto max-w-4xl mx-auto space-y-7 select-none font-sans">
+      
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-5">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <span>System Settings</span>
-            <span className="text-xs px-2.5 py-1 bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-full font-normal">
+          <div className="flex items-center gap-2.5 mb-1">
+            <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+              System Settings
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary-light text-[11px] font-mono">
               v1.2.0 Active
             </span>
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Configure JARVIS voice agent, default OS tools, AI providers, and knowledge storage.
+          </div>
+          <p className="text-xs text-zinc-400 font-sans">
+            Configure Neuro voice engine, default OS integrations, LLM providers, and background processes.
           </p>
         </div>
 
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent-purple to-accent-blue hover:from-accent-purple/80 hover:to-accent-blue/80 text-white font-medium shadow-lg shadow-accent-purple/25 transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white text-xs font-semibold shadow-glow-primary transition-all"
         >
-          {saved ? <CheckCircle2 size={16} className="text-emerald-300" /> : <Save size={16} />}
-          <span>{saved ? 'Saved!' : 'Save Changes'}</span>
+          {saved ? <CheckCircle2 size={14} className="text-emerald-300" /> : <Save size={14} />}
+          <span>{saved ? 'Saved Successfully' : 'Save Changes'}</span>
         </button>
       </div>
 
-      {/* 1. JARVIS OS Voice Agent Settings */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Zap size={18} className="text-accent-cyan" />
-          <span>JARVIS OS Agent & Voice Settings</span>
+      {/* 1. Neuro OS Voice Agent Settings */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
+          <Zap size={14} className="text-brand-cyan" />
+          <span>Neuro Voice Agent</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 bg-surface/60">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">Wake-Word Listening</h3>
-                <p className="text-xs text-gray-400">Activates on "Hey Neuro"</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={wakeWordEnabled}
-                onChange={(e) => setWakeWordEnabled(e.target.checked)}
-                className="w-5 h-5 accent-accent-cyan cursor-pointer"
-              />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-200">Wake-Word Listening</h3>
+              <p className="text-[11px] text-zinc-400">Activates microphone on "Hey Neuro"</p>
             </div>
+            <input
+              type="checkbox"
+              checked={wakeWordEnabled}
+              onChange={(e) => setWakeWordEnabled(e.target.checked)}
+              className="w-4 h-4 accent-brand-primary cursor-pointer"
+            />
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 bg-surface/60">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">Voice Speech Responses</h3>
-                <p className="text-xs text-gray-400">JARVIS speaks confirmation replies aloud</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={voiceResponses}
-                onChange={(e) => setVoiceResponses(e.target.checked)}
-                className="w-5 h-5 accent-accent-cyan cursor-pointer"
-              />
+          <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-200">Voice Speech Responses</h3>
+              <p className="text-[11px] text-zinc-400">Speaks action confirmation audio</p>
             </div>
+            <input
+              type="checkbox"
+              checked={voiceResponses}
+              onChange={(e) => setVoiceResponses(e.target.checked)}
+              className="w-4 h-4 accent-brand-primary cursor-pointer"
+            />
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 bg-surface/60">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">Tactile Cyber SFX</h3>
-                <p className="text-xs text-gray-400">Synthesized audio chimes & click feedback</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={sfxEnabled}
-                onChange={(e) => setSfxEnabled(e.target.checked)}
-                className="w-5 h-5 accent-accent-cyan cursor-pointer"
-              />
+          <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-200">Tactile Audio Chimes</h3>
+              <p className="text-[11px] text-zinc-400">Synthesized spatial clicks & feedback</p>
             </div>
+            <input
+              type="checkbox"
+              checked={sfxEnabled}
+              onChange={(e) => setSfxEnabled(e.target.checked)}
+              className="w-4 h-4 accent-brand-primary cursor-pointer"
+            />
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 bg-surface/60">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">Global Shortcut</h3>
-                <p className="text-xs text-gray-400">Summon JARVIS HUD from any app</p>
-              </div>
-              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-accent-cyan font-mono">
-                Ctrl + Space
-              </span>
+          <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-200">Global Shortcut</h3>
+              <p className="text-[11px] text-zinc-400">Summon agent HUD from any application</p>
             </div>
+            <span className="px-2 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[11px] text-brand-cyan font-mono">
+              Ctrl + Space
+            </span>
           </div>
         </div>
       </section>
 
       {/* 2. OS Integration Preferences */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Sliders size={18} className="text-accent-purple" />
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
+          <Laptop size={14} className="text-brand-primary-light" />
           <span>OS Tool Preferences</span>
         </h2>
 
-        <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-5 bg-surface/60">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-5 rounded-2xl border border-white/[0.06] bg-[#0c0f18] space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+              <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
                 Default Web Browser
               </label>
               <select
                 value={browser}
                 onChange={(e) => setBrowser(e.target.value)}
-                className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-accent-purple/50 cursor-pointer"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-brand-primary/50 cursor-pointer"
               >
                 <option value="Brave">Brave Browser (Recommended)</option>
                 <option value="Chrome">Google Chrome</option>
@@ -160,13 +157,13 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+              <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
                 Default Search Engine
               </label>
               <select
                 value={searchEngine}
                 onChange={(e) => setSearchEngine(e.target.value)}
-                className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-accent-purple/50 cursor-pointer"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-brand-primary/50 cursor-pointer"
               >
                 <option value="Google">Google Search</option>
                 <option value="DuckDuckGo">DuckDuckGo (Privacy)</option>
@@ -179,21 +176,21 @@ export default function SettingsPage() {
       </section>
 
       {/* 3. AI Providers Configuration */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Cpu size={18} className="text-accent-blue" />
-          <span>AI & Intelligence Providers</span>
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
+          <Cpu size={14} className="text-brand-cyan" />
+          <span>AI Intelligence Runtime</span>
         </h2>
 
-        <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-5 bg-surface/60">
+        <div className="p-5 rounded-2xl border border-white/[0.06] bg-[#0c0f18] space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-              Primary LLM Provider
+            <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+              Primary Model Engine
             </label>
             <select
               value={aiProvider}
               onChange={(e) => setAiProvider(e.target.value)}
-              className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-accent-purple/50 cursor-pointer"
+              className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-brand-primary/50 cursor-pointer"
             >
               <option value="Local Ollama (Offline)">Local Ollama (100% Offline & Private)</option>
               <option value="OpenAI">OpenAI (GPT-4o)</option>
@@ -204,25 +201,25 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
                 Ollama Base URL
               </label>
               <input
                 type="text"
                 value={ollamaUrl}
                 onChange={(e) => setOllamaUrl(e.target.value)}
-                className="w-full bg-background border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-accent-purple/50"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-brand-primary/50 font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-                Ollama Model
+              <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
+                Ollama Model Tag
               </label>
               <input
                 type="text"
                 value={ollamaModel}
                 onChange={(e) => setOllamaModel(e.target.value)}
-                className="w-full bg-background border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-accent-purple/50"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-brand-primary/50 font-mono"
               />
             </div>
           </div>
@@ -230,35 +227,35 @@ export default function SettingsPage() {
       </section>
 
       {/* 4. Backend Supervisor Diagnostics */}
-      <section className="space-y-4 pb-8">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Database size={18} className="text-emerald-400" />
-          <span>System & Background Process Supervisor</span>
+      <section className="space-y-3 pb-8">
+        <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
+          <Database size={14} className="text-brand-emerald" />
+          <span>Silent Background Supervisor</span>
         </h2>
 
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 bg-surface/60 text-xs">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-            <span className="text-gray-400">FastAPI Backend Status</span>
-            <span className="flex items-center gap-1.5 font-semibold">
+        <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] space-y-3 text-xs">
+          <div className="flex items-center justify-between border-b border-white/[0.04] pb-2.5">
+            <span className="text-zinc-400">FastAPI Backend Status</span>
+            <span className="flex items-center gap-1.5 font-medium">
               <span
-                className={`w-2 h-2 rounded-full ${
-                  backendHealthy ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                className={`w-1.5 h-1.5 rounded-full ${
+                  backendHealthy ? 'bg-brand-emerald animate-pulse' : 'bg-brand-amber'
                 }`}
               />
-              <span className={backendHealthy ? 'text-emerald-400' : 'text-amber-400'}>
+              <span className={backendHealthy ? 'text-brand-emerald' : 'text-brand-amber'}>
                 {backendHealthy ? 'Online (Port 8000)' : 'Supervising'}
               </span>
             </span>
           </div>
 
-          <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-            <span className="text-gray-400">Silent Log Target</span>
-            <span className="text-gray-300 font-mono">.neuro/logs/backend.log</span>
+          <div className="flex items-center justify-between border-b border-white/[0.04] pb-2.5">
+            <span className="text-zinc-400">Silent Log Target</span>
+            <span className="text-zinc-300 font-mono text-[11px]">.neuro/logs/backend.log</span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-gray-400">Knowledge Storage Database</span>
-            <span className="text-gray-300 font-mono">SQLite (Local-First WAL)</span>
+            <span className="text-zinc-400">Knowledge Storage</span>
+            <span className="text-zinc-300 font-mono text-[11px]">SQLite (Local WAL Mode)</span>
           </div>
         </div>
       </section>

@@ -42,6 +42,11 @@ const updateNote = async (note: Note): Promise<Note> => {
   return new Promise(resolve => setTimeout(() => resolve(note), 200));
 };
 
+const deleteNote = async (id: string): Promise<boolean> => {
+  mockNotes = mockNotes.filter(n => n.id !== id);
+  return new Promise(resolve => setTimeout(() => resolve(true), 200));
+};
+
 export function useNotes() {
   return useQuery({
     queryKey: ['notes'],
@@ -68,3 +73,14 @@ export function useUpdateNote() {
     }
   });
 }
+
+export function useDeleteNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    }
+  });
+}
+

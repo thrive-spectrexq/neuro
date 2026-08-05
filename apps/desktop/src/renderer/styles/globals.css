@@ -3,25 +3,93 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
   body {
-    @apply bg-background text-gray-100;
+    @apply bg-background text-zinc-100 font-sans select-none antialiased;
+    letter-spacing: -0.011em;
+  }
+
+  input, textarea {
+    @apply select-text;
   }
 }
 
-.glass-panel {
-  @apply bg-surface/80 backdrop-blur-md border border-white/10 shadow-xl;
+@layer utilities {
+  .glass-surface {
+    background: rgba(14, 17, 26, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-surface-elevated {
+    background: rgba(20, 23, 36, 0.85);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-panel {
+    background: rgba(16, 19, 28, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .hairline-border {
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hairline-b {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hairline-t {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hairline-r {
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hairline-l {
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hud-glow {
+    box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
 }
 
+/* Precision Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-white/20;
+  background: rgba(255, 255, 255, 0.2);
 }
+
+/* Electron Window Drag Utilities */
+.titlebar-drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+

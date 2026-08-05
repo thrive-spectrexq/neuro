@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, Tag, ArrowRight, Sparkles, Filter, Clock, Hash } from 'lucide-react';
+import { Search, FileText, Tag, ArrowRight, Sparkles, Filter, Clock, Hash, CornerDownLeft } from 'lucide-react';
 import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
 import { soundEngine } from '../utils/soundEngine';
@@ -62,7 +62,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
         }))
       );
       setIsSearching(false);
-    }, 250);
+    }, 200);
 
     return () => clearTimeout(timeout);
   }, [query, filterType, notes]);
@@ -76,53 +76,57 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
   };
 
   return (
-    <div className="p-8 h-full flex flex-col max-w-4xl mx-auto overflow-y-auto">
+    <div className="p-8 h-full flex flex-col max-w-4xl mx-auto overflow-y-auto select-none">
+      
+      {/* Search Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-          <span>Knowledge Search</span>
-          <span className="text-xs px-2.5 py-1 bg-accent-purple/20 text-accent-purple border border-accent-purple/30 rounded-full font-normal">
+        <div className="flex items-center gap-2.5 mb-1">
+          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+            Knowledge Search
+          </h1>
+          <span className="px-2.5 py-0.5 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary-light text-[11px] font-mono">
             Hybrid FTS & Vector
           </span>
-        </h1>
-        <p className="text-sm text-gray-400">
+        </div>
+        <p className="text-xs text-zinc-400 font-sans">
           Query your personal second brain across all notes, tags, and semantic embeddings.
         </p>
       </div>
 
-      {/* Search Input Bar */}
-      <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-accent-cyan" size={20} />
+      {/* Search Bar */}
+      <div className="relative mb-3">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by keywords, ideas, or [[links]]..."
-          className="w-full bg-surface border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-base text-white focus:outline-none focus:border-accent-purple/60 focus:ring-2 focus:ring-accent-purple/20 shadow-lg transition-all placeholder-gray-500"
+          className="w-full bg-[#0d101a] border border-white/[0.08] rounded-2xl pl-12 pr-20 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/20 shadow-card transition-all font-sans"
           autoFocus
         />
         {query && (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-white px-2 py-1 bg-white/5 rounded-md"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white px-2 py-1 bg-white/[0.06] rounded-md font-mono"
           >
             Clear
           </button>
         )}
       </div>
 
-      {/* Filters */}
+      {/* Filter Tabs */}
       <div className="flex items-center gap-2 mb-6 text-xs">
-        <span className="text-gray-500 flex items-center gap-1 mr-1">
-          <Filter size={13} /> Filter:
+        <span className="text-zinc-500 flex items-center gap-1 mr-1 text-[11px] font-mono">
+          <Filter size={12} /> Scope:
         </span>
         {(['all', 'notes', 'tags'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setFilterType(t)}
-            className={`px-3 py-1.5 rounded-xl border capitalize transition-all ${
+            className={`px-3 py-1 rounded-xl capitalize font-medium transition-all ${
               filterType === t
-                ? 'bg-accent-purple/20 border-accent-purple text-white'
-                : 'bg-white/5 border-white/5 text-gray-400 hover:text-white'
+                ? 'bg-white/[0.1] text-white border border-white/[0.1]'
+                : 'text-zinc-500 hover:text-zinc-300 bg-white/[0.02] border border-white/[0.04]'
             }`}
           >
             {t}
@@ -131,19 +135,19 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
       </div>
 
       {/* Results List */}
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 space-y-2.5">
         {isSearching && (
-          <div className="text-sm text-gray-400 py-8 text-center flex items-center justify-center gap-2">
-            <Sparkles size={16} className="text-accent-cyan animate-spin" />
+          <div className="text-xs text-zinc-400 py-12 text-center flex items-center justify-center gap-2 font-mono">
+            <Sparkles size={14} className="text-brand-cyan animate-spin" />
             <span>Scanning knowledge graph...</span>
           </div>
         )}
 
         {!isSearching && query && results.length === 0 && (
-          <div className="glass-panel p-8 rounded-2xl text-center text-gray-400">
-            <p className="text-base font-medium text-white mb-1">No matches found for "{query}"</p>
-            <p className="text-xs text-gray-500">
-              Try asking JARVIS using the microphone or refining your search keywords.
+          <div className="p-8 rounded-2xl border border-white/[0.06] bg-[#0c0f18] text-center text-zinc-400">
+            <p className="text-sm font-medium text-zinc-200 mb-1">No matches found for "{query}"</p>
+            <p className="text-xs text-zinc-500">
+              Try asking Neuro using the voice agent or refining your search keywords.
             </p>
           </div>
         )}
@@ -153,17 +157,17 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
             <div
               key={item.id || idx}
               onClick={() => handleSelectResult(item.id)}
-              className="glass-panel p-5 rounded-2xl border border-white/10 hover:border-accent-purple/50 cursor-pointer transition-all group flex items-start justify-between gap-4 bg-surface/60 hover:bg-surface/90"
+              className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] hover:border-brand-primary/40 hover:bg-[#111524] cursor-pointer transition-all group flex items-start justify-between gap-4 shadow-sm"
             >
-              <div className="space-y-2 flex-1">
+              <div className="space-y-1.5 flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <FileText size={16} className="text-accent-cyan flex-shrink-0" />
-                  <h3 className="text-base font-semibold text-white group-hover:text-accent-cyan transition-colors">
+                  <FileText size={15} className="text-brand-cyan flex-shrink-0" />
+                  <h3 className="text-sm font-semibold text-zinc-100 group-hover:text-brand-primary-light transition-colors truncate">
                     {item.title || 'Untitled Note'}
                   </h3>
                 </div>
 
-                <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed font-sans">
                   {item.content || item.snippet}
                 </p>
 
@@ -172,7 +176,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
                     {item.tags.map((tag: string) => (
                       <span
                         key={tag}
-                        className="px-2 py-0.5 bg-white/5 text-accent-purple text-[10px] rounded-md flex items-center gap-0.5 border border-accent-purple/20"
+                        className="px-2 py-0.2 bg-white/[0.04] text-zinc-400 text-[10px] rounded-md flex items-center gap-0.5 border border-white/[0.06] font-mono"
                       >
                         <Hash size={10} />
                         {tag}
@@ -182,18 +186,20 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
                 )}
               </div>
 
-              <div className="flex items-center text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all pt-1">
-                <ArrowRight size={18} />
+              <div className="flex items-center text-zinc-600 group-hover:text-brand-primary group-hover:translate-x-1 transition-all pt-1">
+                <ArrowRight size={16} />
               </div>
             </div>
           ))}
 
         {!query && (
-          <div className="py-12 flex flex-col items-center justify-center text-center text-gray-500">
-            <Search size={40} className="mb-3 opacity-30 text-accent-purple" />
-            <p className="text-sm text-gray-400">Type any concept or note title above</p>
-            <p className="text-xs text-gray-600 mt-1">
-              Supports full-text indexing, fuzzy search, and conceptual associations
+          <div className="py-16 flex flex-col items-center justify-center text-center text-zinc-500">
+            <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
+              <Search size={20} className="text-zinc-500" />
+            </div>
+            <p className="text-xs font-medium text-zinc-300">Type any concept or note title above</p>
+            <p className="text-[11px] text-zinc-500 mt-1 max-w-sm">
+              Supports full-text indexing, fuzzy search, and conceptual associations across your entire brain.
             </p>
           </div>
         )}
