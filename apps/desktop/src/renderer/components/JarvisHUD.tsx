@@ -228,7 +228,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 {isProcessing
                   ? '⚡ Executing action...'
                   : isListening
-                  ? '🎙️ Listening for speech ("Neuro wake up", "Open Brave", "Play Spotify")...'
+                  ? '🎙️ Listening for speech ("Hey Neuro", "Open Brave", "Play Spotify")...'
                   : 'Zero-API-Key Offline Engine Ready'}
               </p>
             </div>
@@ -364,7 +364,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
               <Cpu size={32} className="mb-2 opacity-40 text-accent-purple" />
               <p className="text-sm">No commands executed yet.</p>
               <p className="text-xs text-gray-600 mt-1">
-                Say "Neuro wake up", "Open Spotify", "Open VSCode", or "Set a reminder"
+                Say "Hey Neuro", "Open Spotify", "Open VSCode", or "Set a reminder"
               </p>
             </div>
           ) : (
@@ -432,7 +432,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
 
           <div className="mt-2.5 flex items-center justify-between text-[11px] text-gray-500 px-1">
             <span>Global Hotkey: <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-gray-300">Ctrl + Space</kbd></span>
-            <span>Wake Word: <span className="text-accent-cyan">"Neuro wake up"</span></span>
+            <span>Wake Word: <span className="text-accent-cyan">"Hey Neuro"</span></span>
           </div>
         </div>
 

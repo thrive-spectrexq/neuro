@@ -23,11 +23,11 @@
 
 Neuro is a next-generation personal second brain and OS-native desktop agent. It combines local-first knowledge management with an autonomous agent capable of listening to your voice and executing real operating system actions on your computer—**even without an external LLM API key**.
 
-Say *"Neuro wake up"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the tactical HUD. Neuro can open your browser, play your music on Spotify, launch VS Code, jot down notes, schedule reminders, and query your personal knowledge base in milliseconds.
+Say *"Hey Neuro"* or tap <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the tactical HUD. Neuro can open your browser, play your music on Spotify, launch VS Code, jot down notes, schedule reminders, and query your personal knowledge base in milliseconds.
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
-       │                "Neuro wake up, open Brave"                  │
+       │                  "Hey Neuro, open Brave"                    │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
                    ┌──────────────────▼──────────────────┐
@@ -47,7 +47,7 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 ## Key Highlights
 
 ### 1. OS-Native Agent (Zero API Key Needed)
-- **Voice Wake-Word:** Speak *"Neuro wake up"*, *"Hey Neuro"*, or *"Wake up"* to activate listening mode.
+- **Voice Wake-Word:** Speak *"Hey Neuro"* to activate listening mode.
 - **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*, *"Open Notepad"*, *"Open Calculator"*.
 - **Spotify Music Controller:** *"Play Bohemian Rhapsody on Spotify"*, *"Play Drake in Spotify"*, *"Spotify play lofi beats"*.
 - **Quick Second Brain Capture:** *"Add this to note: Project roadmap specs"*, *"Take a note meeting summary"*.
@@ -101,7 +101,7 @@ That's it! Neuro will boot the background supervisor, compile native bridges, st
 
 | Spoken Voice / Written Command | Action Triggered | OS / App Target |
 |---|---|---|
-| *"Neuro wake up"* / *"Hey Neuro"* | Wakes agent, plays audio chime, initiates listening | System State |
+| *"Hey Neuro"* | Wakes agent, plays audio chime, initiates listening | System State |
 | *"Open Brave"* / *"Open the Brave browser"* | Launches Brave Browser instantly | Brave Browser |
 | *"Open VSCode"* / *"Launch Visual Studio Code"* | Opens VS Code in current workspace | Visual Studio Code |
 | *"Play [Song/Artist] on Spotify"* | Searches & plays track in Spotify | Spotify Desktop / URI |

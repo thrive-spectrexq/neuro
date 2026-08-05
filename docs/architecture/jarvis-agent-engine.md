@@ -2,14 +2,14 @@
 
 ## Overview
 
-The **JARVIS Agent Execution Engine** transforms Neuro from a passive second brain into an active, proactive desktop operating partner. It allows users to invoke voice and text commands (e.g., *"Neuro wake up"*, *"Open Brave"*, *"Add this to note"*, *"Play Starboy on Spotify"*, *"Open VSCode"*, *"Set a reminder in 15 minutes"*, *"Search quantum physics on Google"*) with zero-latency execution.
+The **JARVIS Agent Execution Engine** transforms Neuro from a passive second brain into an active, proactive desktop operating partner. It allows users to invoke voice and text commands (e.g., *"Hey Neuro"*, *"Open Brave"*, *"Add this to note"*, *"Play Starboy on Spotify"*, *"Open VSCode"*, *"Set a reminder in 15 minutes"*, *"Search quantum physics on Google"*) with zero-latency execution.
 
 Critically, **the JARVIS Agent functions natively without requiring any external LLM API key**.
 
 ```
                            ┌──────────────────────────────────────────────┐
                            │               USER INPUT                     │
-                           │   Voice Speech ("Neuro wake up") / Hotkey    │
+                           │   Voice Speech ("Hey Neuro") / Hotkey        │
                            │   Global Shortcut (Ctrl+Space / Alt+Space)   │
                            └──────────────────────┬───────────────────────┘
                                                   │
@@ -42,7 +42,7 @@ To ensure instantaneous response times and full privacy offline, the engine uses
 
 | Category | Trigger Patterns | Resolved Tool | Fallback / Behavior |
 |---|---|---|---|
-| **Wake & Status** | *"Hey Neuro"*, *"Wake up"*, *"JARVIS"*, *"System status"* | `system_action` | Acknowledges wake state, reports time/uptime |
+| **Wake & Status** | *"Hey Neuro"*, *"System status"* | `system_action` | Acknowledges wake state, reports time/uptime |
 | **App Launch** | *"Open [brave/vscode/terminal/notepad/calc]"* | `open_app` | Launches OS native binary or protocol handler |
 | **Media & Music** | *"Play [song/artist] on Spotify"* | `play_spotify` | Triggers `spotify:search:<query>` or desktop app |
 | **Productivity** | *"Add this to note: [...]"*, *"Take a note [...]"* | `create_quick_note` | Instantly writes markdown note to database |

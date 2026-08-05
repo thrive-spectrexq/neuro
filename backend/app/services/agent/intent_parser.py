@@ -21,11 +21,7 @@ class IntentParser:
 
     WAKE_WORDS = [
         r"^hey\s+neuro[\s,]*",
-        r"^neuro[\s,]*wake\s+up[\s,]*",
-        r"^neuro[\s,]*",
-        r"^wake\s+up[\s,]*neuro[\s,]*",
-        r"^wake\s+up[\s,]*",
-        r"^jarvis[\s,]*",
+        r"^hey[\s,]+neuro[\s,]*",
         r"^ok\s+neuro[\s,]*",
     ]
 
@@ -41,7 +37,7 @@ class IntentParser:
     def parse(self, text: str) -> ParsedIntent:
         cleaned = self.clean_command(text)
         if not cleaned:
-            # Wake word only (e.g. "Hey Neuro", "Neuro wake up")
+            # Wake word only (e.g. "Hey Neuro")
             return ParsedIntent(
                 is_matched=True,
                 tool_name="system_action",

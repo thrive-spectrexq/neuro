@@ -79,7 +79,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-semibold text-white">Wake-Word Listening</h3>
-                <p className="text-xs text-gray-400">Activates on "Neuro wake up" or "Hey Neuro"</p>
+                <p className="text-xs text-gray-400">Activates on "Hey Neuro"</p>
               </div>
               <input
                 type="checkbox"

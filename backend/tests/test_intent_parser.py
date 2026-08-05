@@ -5,10 +5,8 @@ from app.services.agent.intent_parser import intent_parser
 def test_wake_word_detection():
     intents = [
         "Hey Neuro",
-        "Neuro wake up",
-        "wake up neuro",
-        "wake up",
-        "JARVIS",
+        "hey neuro",
+        "Hey, Neuro!",
         "ok neuro",
     ]
     for text in intents:

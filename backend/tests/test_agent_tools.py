@@ -28,7 +28,7 @@ async def test_agent_system_action_execution():
 
 @pytest.mark.asyncio
 async def test_orchestrator_wake_command():
-    res = await agent_orchestrator.execute_command("Neuro wake up")
+    res = await agent_orchestrator.execute_command("Hey Neuro")
     assert res.success is True
     assert "listening" in res.voice_response.lower() or "active" in res.display_text.lower()
 
