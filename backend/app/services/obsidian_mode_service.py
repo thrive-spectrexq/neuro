@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import re
 from datetime import UTC, datetime
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -67,15 +66,23 @@ class ObsidianModeService:
             # 2-Areas: Health, finance, career, habits, routine, 'area'
             # 3-Resources: Guides, references, algorithms, tools, docs, 'resource'
             # 4-Archives: Completed, old, historical, log, 'archive'
-            if any(w in title_lower or w in content_lower for w in ["deadline", "milestone", "sprint", "project", "todo"]):
+            if any(
+                w in title_lower or w in content_lower for w in ["deadline", "milestone", "sprint", "project", "todo"]
+            ):
                 folder = "1-Projects"
                 reason = "Contains active project indicators, milestones, or actionable deliverables."
                 para_tag = "project"
-            elif any(w in title_lower or w in content_lower for w in ["finance", "health", "habits", "routine", "personal", "admin"]):
+            elif any(
+                w in title_lower or w in content_lower
+                for w in ["finance", "health", "habits", "routine", "personal", "admin"]
+            ):
                 folder = "2-Areas"
                 reason = "Classified as an ongoing area of responsibility or personal system."
                 para_tag = "area"
-            elif any(w in title_lower or w in content_lower for w in ["completed", "archive", "legacy", "historical", "changelog"]):
+            elif any(
+                w in title_lower or w in content_lower
+                for w in ["completed", "archive", "legacy", "historical", "changelog"]
+            ):
                 folder = "4-Archives"
                 reason = "Identified as an inactive or archived record."
                 para_tag = "archive"
@@ -101,7 +108,15 @@ class ObsidianModeService:
             # LYT (Linking Your Thinking)
             # Notes go into 'notes/' and suggest an MOC (Map of Content)
             moc_name = None
-            for topic in ["AI", "Software Architecture", "Distributed Systems", "Frontend", "Backend", "Productivity", "Research"]:
+            for topic in [
+                "AI",
+                "Software Architecture",
+                "Distributed Systems",
+                "Frontend",
+                "Backend",
+                "Productivity",
+                "Research",
+            ]:
                 if topic.lower() in title_lower or topic.lower() in content_lower:
                     moc_name = f"MOC - {topic}"
                     break

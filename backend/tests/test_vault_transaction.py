@@ -1,11 +1,13 @@
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
+
+import pytest
+
 from app.services.vault_transaction_service import (
-    VaultTransactionService,
-    VaultBoundaryViolation,
     TransactionExecutionError,
+    VaultBoundaryViolation,
+    VaultTransactionService,
 )
 
 
@@ -35,7 +37,7 @@ def test_boundary_validation_success_and_violation(temp_vault):
 
 def test_transaction_create_and_apply(temp_vault):
     service = VaultTransactionService(vault_root=str(temp_vault))
-    plan = service.begin_transaction("tx_test_1")
+    service.begin_transaction("tx_test_1")
 
     service.stage_create("tx_test_1", "Notes/Architecture.md", "# Architecture\n\n- Zero Knowledge")
     summary = service.get_plan_summary("tx_test_1")
@@ -93,7 +95,7 @@ def test_transaction_rollback_on_failure(temp_vault):
     orig_file = temp_vault / "Important.md"
     orig_file.write_text("Critical Original Data", encoding="utf-8")
 
-    plan = service.begin_transaction("tx_fail")
+    service.begin_transaction("tx_fail")
     service.stage_update("tx_fail", "Important.md", "Modified Data")
 
     # Inject simulated failure during multi-step operation

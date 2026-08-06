@@ -8,22 +8,24 @@ Provides atomic plan-apply transactional mutability for notes, canvas, and vault
 - Strict vault-boundary sandboxing (path traversal prevention)
 """
 
+import hashlib
 import os
 import shutil
-import hashlib
-from pathlib import Path
-from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
 
 
 class VaultBoundaryViolation(Exception):
     """Raised when an operation attempts to read/write outside the designated vault root."""
+
     pass
 
 
 class TransactionExecutionError(Exception):
     """Raised when an atomic transaction fails during execution."""
+
     pass
 
 
@@ -31,19 +33,19 @@ class TransactionExecutionError(Exception):
 class TransactionOperation:
     op_type: str  # 'create', 'update', 'delete', 'rename'
     rel_path: str
-    content: Optional[str] = None
-    old_rel_path: Optional[str] = None
-    pre_checksum: Optional[str] = None
-    backup_path: Optional[str] = None
+    content: str | None = None
+    old_rel_path: str | None = None
+    pre_checksum: str | None = None
+    backup_path: str | None = None
 
 
 @dataclass
 class TransactionPlan:
     tx_id: str
     vault_root: str
-    operations: List[TransactionOperation] = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    diffs: Dict[str, str] = field(default_factory=dict)
+    operations: list[TransactionOperation] = field(default_factory=list)
+    created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
+    diffs: dict[str, str] = field(default_factory=dict)
     applied: bool = False
     rolled_back: bool = False
 
@@ -53,13 +55,13 @@ class VaultTransactionService:
     Manages atomic vault file operations with preview plans, boundary checks, and safe rollback.
     """
 
-    def __init__(self, vault_root: Optional[str] = None, backup_dir: Optional[str] = None):
+    def __init__(self, vault_root: str | None = None, backup_dir: str | None = None):
         self.vault_root = Path(vault_root or os.getcwd()).resolve()
         self.backup_dir = Path(backup_dir or (self.vault_root / ".neuro" / "tx_backups")).resolve()
         self.backup_dir.mkdir(parents=True, exist_ok=True)
-        self._active_transactions: Dict[str, TransactionPlan] = {}
+        self._active_transactions: dict[str, TransactionPlan] = {}
 
-    def _compute_checksum(self, file_path: Path) -> Optional[str]:
+    def _compute_checksum(self, file_path: Path) -> str | None:
         if not file_path.exists() or not file_path.is_file():
             return None
         hasher = hashlib.sha256()
@@ -81,9 +83,9 @@ class VaultTransactionService:
             )
         return target
 
-    def begin_transaction(self, tx_id: Optional[str] = None) -> TransactionPlan:
+    def begin_transaction(self, tx_id: str | None = None) -> TransactionPlan:
         """Initializes a new atomic plan/apply transaction."""
-        tid = tx_id or f"tx_{int(datetime.now(timezone.utc).timestamp() * 1000)}"
+        tid = tx_id or f"tx_{int(datetime.now(UTC).timestamp() * 1000)}"
         plan = TransactionPlan(tx_id=tid, vault_root=str(self.vault_root))
         self._active_transactions[tid] = plan
         return plan
@@ -155,7 +157,7 @@ class VaultTransactionService:
             raise ValueError(f"Unknown transaction '{tx_id}'")
 
         old_target = self.validate_boundary(old_rel_path)
-        new_target = self.validate_boundary(new_rel_path)
+        self.validate_boundary(new_rel_path)
 
         op = TransactionOperation(
             op_type="rename",
@@ -167,7 +169,7 @@ class VaultTransactionService:
         plan.diffs[new_rel_path] = f"rename: {old_rel_path} -> {new_rel_path}"
         return plan
 
-    def apply_transaction(self, tx_id: str) -> Dict[str, Any]:
+    def apply_transaction(self, tx_id: str) -> dict[str, Any]:
         """
         Executes all staged operations atomically.
         If any step fails, restores all affected files from snapshots immediately.
@@ -178,11 +180,11 @@ class VaultTransactionService:
         if plan.applied:
             raise ValueError(f"Transaction '{tx_id}' has already been applied")
 
-        executed_backups: List[Dict[str, Any]] = []
+        executed_backups: list[dict[str, Any]] = []
         try:
             for op in plan.operations:
                 target = self.validate_boundary(op.rel_path)
-                
+
                 # 1. Snapshot existing target if present
                 if target.exists():
                     backup_file = self.backup_dir / f"{tx_id}_{target.name}"
@@ -210,7 +212,7 @@ class VaultTransactionService:
                 "status": "success",
                 "tx_id": tx_id,
                 "operations_applied": len(plan.operations),
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -219,11 +221,11 @@ class VaultTransactionService:
             plan.rolled_back = True
             raise TransactionExecutionError(f"Transaction {tx_id} failed and was rolled back: {str(e)}")
 
-    def _rollback_backups(self, executed_backups: List[Dict[str, Any]]) -> None:
+    def _rollback_backups(self, executed_backups: list[dict[str, Any]]) -> None:
         """Rolls back files to their previous states."""
         for item in reversed(executed_backups):
             target: Path = item["target"]
-            backup: Optional[Path] = item["backup"]
+            backup: Path | None = item["backup"]
             item_type: str = item["type"]
 
             try:
@@ -234,7 +236,7 @@ class VaultTransactionService:
             except Exception as rollback_err:
                 print(f"Critical error during transaction rollback for {target}: {rollback_err}")
 
-    def get_plan_summary(self, tx_id: str) -> Dict[str, Any]:
+    def get_plan_summary(self, tx_id: str) -> dict[str, Any]:
         """Returns plan details and diffs for dry-run inspection."""
         plan = self._active_transactions.get(tx_id)
         if not plan:

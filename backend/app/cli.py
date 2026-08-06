@@ -438,12 +438,16 @@ def cli_obsidian_canvas(
     from app.services.obsidian_lint_service import ObsidianLintService
 
     report = ObsidianLintService.lint_filesystem_vault(".")
-    notes_data = [{"id": str(idx), "title": Path(file).stem, "content": file} for idx, file in enumerate(report.orphan_notes)]
+    notes_data = [
+        {"id": str(idx), "title": Path(file).stem, "content": file} for idx, file in enumerate(report.orphan_notes)
+    ]
     canvas_doc = ObsidianCanvasService.create_canvas_from_notes(notes_data, title=title)
     json_str = ObsidianCanvasService.to_json(canvas_doc)
 
     Path(out).write_text(json_str, encoding="utf-8")
-    typer.echo(f"✅ Generated native Obsidian Canvas file: {out} ({len(canvas_doc.nodes)} nodes, {len(canvas_doc.edges)} edges)")
+    typer.echo(
+        f"✅ Generated native Obsidian Canvas file: {out} ({len(canvas_doc.nodes)} nodes, {len(canvas_doc.edges)} edges)"
+    )
 
 
 @obsidian_app.command("route")
@@ -473,4 +477,3 @@ def cli_obsidian_route(
 
 if __name__ == "__main__":
     app()
-

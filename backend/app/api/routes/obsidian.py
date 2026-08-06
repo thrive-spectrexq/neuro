@@ -256,7 +256,10 @@ async def generate_obsidian_canvas(
         }
         for n in notes
     ]
-    links_data = [{"source": str(l.source_id), "target": str(l.target_id), "relation": "links_to"} for l in links]
+    links_data = [
+        {"source": str(link_item.source_id), "target": str(link_item.target_id), "relation": "links_to"}
+        for link_item in links
+    ]
 
     return ObsidianCanvasService.create_canvas_from_notes(notes_data, links_data, title=request.title)
 
@@ -301,4 +304,3 @@ async def route_note_methodology(request: RouteNoteApiRequest):
         tags=request.tags,
         mode=request.mode,
     )
-

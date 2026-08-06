@@ -62,9 +62,7 @@ class ObsidianLintService:
         return cleaned
 
     @classmethod
-    def lint_notes(
-        cls, notes: list[dict[str, Any]], vault_name: str = "Neuro-Vault"
-    ) -> VaultLintReport:
+    def lint_notes(cls, notes: list[dict[str, Any]], vault_name: str = "Neuro-Vault") -> VaultLintReport:
         """
         Lints an in-memory list of notes (each dict having 'id', 'title', 'content', 'tags', etc.).
         """
@@ -176,12 +174,7 @@ class ObsidianLintService:
                 orphan_notes.append(f"{title}.md")
 
         # Health score calculation
-        penalty = (
-            len(dead_links) * 4.0
-            + len(orphan_notes) * 3.0
-            + len(metadata_gaps) * 2.0
-            + len(empty_sections) * 1.5
-        )
+        penalty = len(dead_links) * 4.0 + len(orphan_notes) * 3.0 + len(metadata_gaps) * 2.0 + len(empty_sections) * 1.5
         score = max(0.0, min(100.0, 100.0 - penalty))
 
         if score >= 90.0:
@@ -202,13 +195,9 @@ class ObsidianLintService:
                 f"Connect {len(orphan_notes)} orphan notes into thematic MOCs (Maps of Content) or tag clusters."
             )
         if metadata_gaps:
-            suggestions.append(
-                f"Backfill missing YAML frontmatter metadata across {len(metadata_gaps)} notes."
-            )
+            suggestions.append(f"Backfill missing YAML frontmatter metadata across {len(metadata_gaps)} notes.")
         if empty_sections:
-            suggestions.append(
-                f"Populate or clean up {len(empty_sections)} empty header sections across notes."
-            )
+            suggestions.append(f"Populate or clean up {len(empty_sections)} empty header sections across notes.")
         if not suggestions:
             suggestions.append("Vault is in pristine condition! All links, metadata, and sections are validated.")
 

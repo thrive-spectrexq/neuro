@@ -4,8 +4,6 @@ Comprehensive Unit Tests for Obsidian Intelligence, Linting, Canvas Generation, 
 
 from __future__ import annotations
 
-import pytest
-
 from app.services.agent.intent_parser import intent_parser
 from app.services.obsidian_canvas_service import ObsidianCanvasService
 from app.services.obsidian_lint_service import ObsidianLintService
@@ -126,9 +124,24 @@ def test_obsidian_mode_service_routing():
 
 def test_obsidian_retrieval_bm25():
     notes = [
-        {"id": "1", "title": "Graph Theory", "content": "Nodes, edges, topological sort, Dijkstra shortest path algorithm.", "tags": ["algorithms"]},
-        {"id": "2", "title": "Database Indexing", "content": "B-Tree, LSM-Tree, and inverted indexes for query speed.", "tags": ["db"]},
-        {"id": "3", "title": "Transformer Attention", "content": "Self-attention and multi-head attention mechanisms in LLMs.", "tags": ["ai"]},
+        {
+            "id": "1",
+            "title": "Graph Theory",
+            "content": "Nodes, edges, topological sort, Dijkstra shortest path algorithm.",
+            "tags": ["algorithms"],
+        },
+        {
+            "id": "2",
+            "title": "Database Indexing",
+            "content": "B-Tree, LSM-Tree, and inverted indexes for query speed.",
+            "tags": ["db"],
+        },
+        {
+            "id": "3",
+            "title": "Transformer Attention",
+            "content": "Self-attention and multi-head attention mechanisms in LLMs.",
+            "tags": ["ai"],
+        },
     ]
 
     # Query matching note 1

@@ -521,7 +521,10 @@ async def handle_create_canvas(arguments: dict[str, Any]) -> str:
         links = links_res.scalars().all()
 
         notes_data = [{"id": str(n.id), "title": n.title, "content": n.content, "tags": []} for n in notes]
-        links_data = [{"source": str(l.source_id), "target": str(l.target_id), "relation": "links_to"} for l in links]
+        links_data = [
+            {"source": str(link_item.source_id), "target": str(link_item.target_id), "relation": "links_to"}
+            for link_item in links
+        ]
 
         canvas_doc = ObsidianCanvasService.create_canvas_from_notes(notes_data, links_data, title=title)
         return json.dumps(canvas_doc.model_dump(), indent=2)
@@ -551,4 +554,3 @@ async def handle_route_note(arguments: dict[str, Any]) -> str:
 
     suggestion = ObsidianModeService.route_note(title=title, content=content, mode=mode)
     return json.dumps(suggestion.model_dump(), indent=2)
-
