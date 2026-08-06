@@ -333,6 +333,57 @@ class AgentToolsRegistry:
             self._handle_play_spotify,
         )
 
+        # 10. Generative Learning Roadmap
+        self.register(
+            Tool(
+                name="generate_roadmap",
+                description="Synthesizes a structured prerequisite learning dependency graph for any topic or goal",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(name="goal", type="string", description="Learning goal or subject"),
+                    ToolParameter(name="depth", type="string", description="Depth: beginner, intermediate, advanced", required=False, default="intermediate"),
+                ],
+            ),
+            self._handle_generate_roadmap,
+        )
+
+        # 11. Prerequisite & Dependency Chain Lookup
+        self.register(
+            Tool(
+                name="get_prerequisites",
+                description="Calculates the prerequisite dependency chain for any topic",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(name="topic", type="string", description="Subject or topic to query prerequisites for"),
+                ],
+            ),
+            self._handle_get_prerequisites,
+        )
+
+        # 12. Topic Comprehension Quiz
+        self.register(
+            Tool(
+                name="topic_quiz",
+                description="Generates an interactive verification quiz for a topic",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(name="topic", type="string", description="Subject or note topic to quiz on"),
+                ],
+            ),
+            self._handle_topic_quiz,
+        )
+
+        # 13. Obsidian Vault Export
+        self.register(
+            Tool(
+                name="export_obsidian",
+                description="Exports the Second Brain into an Obsidian-compatible vault structure",
+                category="productivity",
+                parameters=[],
+            ),
+            self._handle_export_obsidian,
+        )
+
         # 3. Web Search & Maps & Lookups
         self.register(
             Tool(
@@ -1088,6 +1139,89 @@ class AgentToolsRegistry:
                 voice_feedback=f"System action {action} completed.",
             )
 
+    async def _handle_generate_roadmap(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.roadmap_service import RoadmapService
+
+        goal = args.get("goal", "Fullstack Development")
+        depth = args.get("depth", "intermediate")
+        roadmap = RoadmapService.generate_roadmap(goal=goal, depth=depth)
+
+        summary = f"Generated {len(roadmap.nodes)}-stage roadmap for {roadmap.subject} with {len(roadmap.edges)} prerequisite links (~{roadmap.total_estimated_hours} hours total)."
+        voice = f"I've generated a {len(roadmap.nodes)} step learning roadmap for {roadmap.subject}. You can inspect the full dependency graph and prerequisites on your workspace."
+
+        return ToolResult(
+            success=True,
+            tool_name="generate_roadmap",
+            message=summary,
+            data=roadmap.model_dump(),
+            voice_feedback=voice,
+        )
+
+    async def _handle_get_prerequisites(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.roadmap_service import RoadmapService
+
+        topic = args.get("topic", "")
+        # Generate or fetch graph context
+        roadmap = RoadmapService.generate_roadmap(goal=topic)
+        nodes_dict = [n.model_dump() for n in roadmap.nodes]
+        edges_dict = [e.model_dump() for e in roadmap.edges]
+
+        target_node = nodes_dict[-1] if nodes_dict else {"id": topic, "title": topic}
+        res = RoadmapService.get_prerequisite_path(target_node["id"], nodes_dict, edges_dict)
+
+        if res.prerequisites:
+            prereq_names = ", ".join(p["title"] for p in res.prerequisites[:3])
+            voice = f"To learn {res.target_title}, you should first complete: {prereq_names}."
+        else:
+            voice = f"{res.target_title} is a foundational topic with no prior prerequisites needed."
+
+        return ToolResult(
+            success=True,
+            tool_name="get_prerequisites",
+            message=f"Found {len(res.prerequisites)} prerequisites for {res.target_title}",
+            data=res.model_dump(),
+            voice_feedback=voice,
+        )
+
+    async def _handle_topic_quiz(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.roadmap_service import RoadmapService
+
+        topic = args.get("topic", "System Architecture")
+        quiz = RoadmapService.generate_topic_quiz(topic_id="q-1", topic_title=topic)
+        first_q = quiz.questions[0] if quiz.questions else None
+
+        voice = f"Here is a test question for {topic}: {first_q.question if first_q else 'Ready for quiz.'}"
+
+        return ToolResult(
+            success=True,
+            tool_name="topic_quiz",
+            message=f"Generated verification quiz for {topic}",
+            data=quiz.model_dump(),
+            voice_feedback=voice,
+        )
+
+    async def _handle_export_obsidian(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        return ToolResult(
+            success=True,
+            tool_name="export_obsidian",
+            message="Obsidian vault export package ready for download.",
+            data={"export_url": "/api/v1/obsidian/export/zip"},
+            voice_feedback="Your Second Brain knowledge base has been packaged for Obsidian. You can download the vault archive from the top bar.",
+        )
+
+    async def execute_intent(self, intent: Any) -> dict[str, Any]:
+        if not getattr(intent, "is_matched", False) or not getattr(intent, "tool_name", None):
+            return {
+                "success": False,
+                "tool_name": "unknown",
+                "message": "No command matched",
+                "voice_feedback": "I didn't catch that command. You can ask me to open apps, play music, generate a roadmap, or check prerequisites.",
+            }
+        res = await self.execute(intent.tool_name, intent.parameters)
+        return res.model_dump()
+
 
 # Global singleton registry instance
 agent_tools_registry = AgentToolsRegistry()
+ToolRegistry = agent_tools_registry
+

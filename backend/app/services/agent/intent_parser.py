@@ -584,6 +584,70 @@ class IntentParser:
                 cleaned_command=cleaned,
             )
 
+        # 13. Generative Roadmaps & Dependency Learning Path Intents
+        roadmap_match = re.match(
+            r"^(?:generate|create|build|make|show)(?:\s+me)?\s+(?:a\s+)?(?:learning\s+)?(?:roadmap|dependency\s+graph|study\s+plan)\s+(?:for|on|about)\s+(?P<goal>.+)$",
+            lower,
+        )
+        if roadmap_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="generate_roadmap",
+                parameters={"goal": roadmap_match.group("goal").strip()},
+                confidence=0.98,
+                matched_pattern="generate_roadmap",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 14. Prerequisite & Dependency Chain Lookups
+        prereq_match = re.match(
+            r"^(?:what\s+are\s+the\s+)?prerequisites\s+(?:for|of)\s+(?P<topic>.+)$",
+            lower,
+        ) or re.match(
+            r"^(?:what\s+do\s+i\s+need\s+to\s+learn\s+before|what\s+unlocks)\s+(?P<topic>.+)$",
+            lower,
+        )
+        if prereq_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="get_prerequisites",
+                parameters={"topic": prereq_match.group("topic").strip()},
+                confidence=0.96,
+                matched_pattern="get_prerequisites",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 15. Topic Quizzes & Comprehension Verification
+        quiz_match = re.match(
+            r"^(?:quiz\s+me\s+on|take\s+quiz\s+on|test\s+my\s+knowledge\s+on|test\s+me\s+on)\s+(?P<topic>.+)$",
+            lower,
+        )
+        if quiz_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="topic_quiz",
+                parameters={"topic": quiz_match.group("topic").strip()},
+                confidence=0.96,
+                matched_pattern="topic_quiz",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 16. Obsidian Vault Export & Sync
+        if re.search(r"\b(export\s+(?:(?:all\s+|my\s+)?(?:notes|graph|vault|second\s+brain|knowledge\s+base)\s+)?(?:to\s+)?obsidian|export\s+vault|sync\s+(?:notes\s+)?(?:to\s+)?obsidian|obsidian\s+export)\b", lower):
+            return ParsedIntent(
+
+                is_matched=True,
+                tool_name="export_obsidian",
+                parameters={},
+                confidence=0.98,
+                matched_pattern="export_obsidian",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
         # No deterministic intent matched
         return ParsedIntent(is_matched=False, confidence=0.0, raw_command=text, cleaned_command=cleaned)
 

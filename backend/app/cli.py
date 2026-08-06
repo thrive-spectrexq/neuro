@@ -265,5 +265,38 @@ def system_stats():
         typer.echo(f" - Stats: Could not retrieve stats (DB might not be initialized). Error: {e}")
 
 
+@app.command("mcp")
+def run_mcp_server():
+    """Start the Model Context Protocol (MCP) stdio server for Claude Desktop, Cursor, and other AI clients."""
+    from app.mcp_server.server import main as run_mcp
+
+    run_mcp()
+
+
+@app.command("roadmap")
+def cli_generate_roadmap(
+    goal: str = typer.Argument(..., help="Subject or learning goal (e.g. 'Rust Async', 'Machine Learning')"),
+    depth: str = typer.Option("intermediate", help="Depth level: beginner, intermediate, advanced"),
+):
+    """Generate a structured prerequisite learning roadmap DAG for any topic."""
+    from app.services.roadmap_service import RoadmapService
+
+    roadmap = RoadmapService.generate_roadmap(goal=goal, depth=depth)
+    typer.echo(f"\n=======================================================")
+    typer.echo(f"🎯 Roadmap: {roadmap.subject}")
+    typer.echo(f"📖 Description: {roadmap.description}")
+    typer.echo(f"⏱️ Total Estimated Hours: {roadmap.total_estimated_hours}h")
+    typer.echo(f"=======================================================\n")
+    typer.echo("📚 TOPIC NODES:")
+    for idx, node in enumerate(roadmap.nodes, 1):
+        typer.echo(f" {idx}. [{node.zone}] {node.title} ({node.difficulty.capitalize()}, ~{node.estimated_hours}h)")
+        typer.echo(f"    - {node.description}")
+    typer.echo("\n🔗 PREREQUISITE DEPENDENCIES:")
+    for edge in roadmap.edges:
+        typer.echo(f" - {edge.source} -> ({edge.type}) -> {edge.target}")
+    typer.echo(f"\n🚀 Critical Path: {' -> '.join(roadmap.critical_path)}\n")
+
+
 if __name__ == "__main__":
     app()
+

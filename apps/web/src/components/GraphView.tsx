@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useGraph } from '../hooks/useGraph';
-import { Network, ZoomIn, ZoomOut, RefreshCw, Download, Search } from 'lucide-react';
+import { Network, ZoomIn, ZoomOut, RefreshCw, Download, Search, Map, FileCode, Sparkles, X } from 'lucide-react';
 
 export default function GraphView() {
   const { data, isPending, error } = useGraph();
@@ -12,6 +12,10 @@ export default function GraphView() {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'note' | 'tag' | 'entity'>('all');
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
+  const [roadmapGoal, setRoadmapGoal] = useState('');
+  const [roadmapData, setRoadmapData] = useState<any>(null);
+  const [isGeneratingRoadmap, setIsGeneratingRoadmap] = useState(false);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -44,13 +48,42 @@ export default function GraphView() {
   };
 
   const handleExportSnapshot = () => {
-    const canvas = containerRef.current?.querySelector('canvas');
-    if (canvas) {
+    if (containerRef.current) {
+      const canvas = containerRef.current.querySelector('canvas');
+      if (!canvas) return;
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `neuro-knowledge-graph-${Date.now()}.png`;
       link.href = image;
       link.click();
+    }
+  };
+
+  const handleExportObsidian = () => {
+    const link = document.createElement('a');
+    link.href = 'http://localhost:8000/api/v1/obsidian/export/zip';
+    link.download = `neuro-vault-export.zip`;
+    link.target = '_blank';
+    link.click();
+  };
+
+  const handleGenerateRoadmap = async () => {
+    if (!roadmapGoal.trim()) return;
+    setIsGeneratingRoadmap(true);
+    try {
+      const res = await fetch('http://localhost:8000/api/v1/roadmap/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal: roadmapGoal, depth: 'intermediate' }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setRoadmapData(json);
+      }
+    } catch (err) {
+      console.error('Failed to generate roadmap', err);
+    } finally {
+      setIsGeneratingRoadmap(false);
     }
   };
 
@@ -146,6 +179,26 @@ export default function GraphView() {
             </button>
           ))}
         </div>
+
+        <div className="h-4 w-px bg-white/10 hidden md:block" />
+
+        {/* Roadmap & Obsidian Action Buttons */}
+        <button
+          onClick={() => setShowRoadmapModal(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-medium transition-all"
+        >
+          <Map className="w-3 h-3 text-indigo-400" />
+          Roadmap DAG
+        </button>
+
+        <button
+          onClick={handleExportObsidian}
+          className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-medium transition-all"
+          title="Export vault to Obsidian markdown archive"
+        >
+          <FileCode className="w-3 h-3 text-purple-400" />
+          Export Obsidian
+        </button>
       </div>
 
       {/* Control Buttons Overlay */}
@@ -190,6 +243,88 @@ export default function GraphView() {
           </div>
           <p className="text-[11px] text-indigo-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
           <p className="text-[11px] text-slate-400">Neighborhood isolated ({activeNeighbors.size} connected elements)</p>
+        </div>
+      )}
+
+      {/* Roadmap Generator Modal */}
+      {showRoadmapModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="glass-panel w-full max-w-2xl max-h-[85vh] rounded-2xl border border-indigo-500/30 overflow-hidden flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-400" />
+                <h3 className="font-bold text-white text-sm">Learning Path & Prerequisite DAG Generator</h3>
+              </div>
+              <button onClick={() => setShowRoadmapModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 overflow-y-auto">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter topic or goal (e.g. Distributed Systems, Rust, Machine Learning)..."
+                  value={roadmapGoal}
+                  onChange={(e) => setRoadmapGoal(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleGenerateRoadmap()}
+                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+                />
+                <button
+                  onClick={handleGenerateRoadmap}
+                  disabled={isGeneratingRoadmap || !roadmapGoal.trim()}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
+                >
+                  {isGeneratingRoadmap ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  Generate DAG
+                </button>
+              </div>
+
+              {roadmapData && (
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between bg-indigo-950/40 border border-indigo-500/20 p-3 rounded-xl">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">{roadmapData.subject}</h4>
+                      <p className="text-xs text-slate-400">Total estimated completion: ~{roadmapData.total_estimated_hours} hours</p>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
+                      {roadmapData.nodes.length} Stages · {roadmapData.edges.length} Dependencies
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Sequential Learning Sequence</h5>
+                    <div className="space-y-2">
+                      {roadmapData.nodes.map((node: any, idx: number) => (
+                        <div key={node.id} className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-1 hover:border-indigo-500/30 transition-all">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold flex items-center justify-center">
+                                {idx + 1}
+                              </span>
+                              <span className="text-xs font-bold text-white">{node.title}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-mono">~{node.estimated_hours}h</span>
+                          </div>
+                          <p className="text-[11px] text-slate-300 pl-7">{node.summary}</p>
+                          {node.prerequisites && node.prerequisites.length > 0 && (
+                            <div className="flex items-center gap-1 pl-7 pt-1">
+                              <span className="text-[10px] text-slate-500">Requires:</span>
+                              {node.prerequisites.map((pId: string) => (
+                                <span key={pId} className="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">
+                                  {pId}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -264,4 +399,3 @@ export default function GraphView() {
     </div>
   );
 }
-

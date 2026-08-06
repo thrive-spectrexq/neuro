@@ -10,7 +10,9 @@ from app.api.routes import (
     graph,
     ingest,
     notes,
+    obsidian,
     projects,
+    roadmap,
     search,
     sync,
     tags,
@@ -29,8 +31,11 @@ api_router.include_router(search.router, prefix="/search", tags=["search"])
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(ingest.router, prefix="/ingest", tags=["ingest"])
 api_router.include_router(graph.router, prefix="/graph", tags=["graph"])
+api_router.include_router(roadmap.router, prefix="/roadmap", tags=["roadmap"])
+api_router.include_router(obsidian.router, prefix="/obsidian", tags=["obsidian"])
 api_router.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
 api_router.include_router(sync.router, prefix="/sync", tags=["sync"])
 api_router.include_router(automations.router, prefix="/automations", tags=["automations"])
 api_router.include_router(tags.router, prefix="/tags", tags=["tags"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+
