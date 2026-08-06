@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,7 +76,10 @@ async def get_prerequisite_path(
         nodes = [{"id": str(n.id), "title": n.title, "name": n.title, "status": "in_progress"} for n in all_notes]
 
         links_res = await session.execute(select(NoteLink))
-        edges = [{"source": str(l.source_id), "target": str(l.target_id), "type": "requires"} for l in links_res.scalars().all()]
+        edges = [
+            {"source": str(link.source_id), "target": str(link.target_id), "type": "requires"}
+            for link in links_res.scalars().all()
+        ]
 
     return RoadmapService.get_prerequisite_path(request.target_id, nodes, edges)
 

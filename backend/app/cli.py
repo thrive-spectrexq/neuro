@@ -282,11 +282,11 @@ def cli_generate_roadmap(
     from app.services.roadmap_service import RoadmapService
 
     roadmap = RoadmapService.generate_roadmap(goal=goal, depth=depth)
-    typer.echo(f"\n=======================================================")
+    typer.echo("\n=======================================================")
     typer.echo(f"🎯 Roadmap: {roadmap.subject}")
     typer.echo(f"📖 Description: {roadmap.description}")
     typer.echo(f"⏱️ Total Estimated Hours: {roadmap.total_estimated_hours}h")
-    typer.echo(f"=======================================================\n")
+    typer.echo("=======================================================\n")
     typer.echo("📚 TOPIC NODES:")
     for idx, node in enumerate(roadmap.nodes, 1):
         typer.echo(f" {idx}. [{node.zone}] {node.title} ({node.difficulty.capitalize()}, ~{node.estimated_hours}h)")
@@ -297,6 +297,91 @@ def cli_generate_roadmap(
     typer.echo(f"\n🚀 Critical Path: {' -> '.join(roadmap.critical_path)}\n")
 
 
+graph_app = typer.Typer()
+app.add_typer(graph_app, name="graph", help="Codebase Knowledge Graph & Architecture Intelligence")
+
+
+@graph_app.command("extract")
+def cli_extract_graph(
+    path: str = typer.Option(".", help="Root directory path to scan"),
+    max_files: int = typer.Option(500, help="Maximum files to scan"),
+):
+    """Scan and extract AST knowledge graph from codebase files."""
+    from app.services.graph_intelligence_service import graph_extractor
+
+    typer.echo(f"Scanning codebase at '{path}'...")
+    res = graph_extractor.extract_from_directory(path, max_files=max_files)
+    typer.echo(
+        f"Extracted {len(res['nodes'])} nodes and {len(res['edges'])} edges across {res['files_scanned']} files."
+    )
+
+
+@graph_app.command("analyze")
+def cli_analyze_graph(
+    path: str = typer.Option(".", help="Root directory path to scan"),
+):
+    """Run Louvain clustering, God node detection, and architectural diagnostics."""
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+    extracted = graph_extractor.extract_from_directory(path, max_files=500)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    analytics = graph_analytics.analyze_graph(G)
+
+    typer.echo("\n=======================================================")
+    typer.echo("📊 KNOWLEDGE GRAPH ARCHITECTURE METRICS")
+    typer.echo(
+        f"Total Nodes: {analytics.total_nodes} | Total Edges: {analytics.total_edges} | Density: {analytics.density}"
+    )
+    typer.echo(f"Communities: {analytics.communities_count}")
+    typer.echo("=======================================================\n")
+
+    typer.echo("👑 KEY ARCHITECTURAL KEYSTONES (GOD NODES):")
+    for idx, gn in enumerate(analytics.god_nodes[:8], 1):
+        typer.echo(f" {idx}. {gn['label']} ({gn['type']}) — Degree: {gn['degree']}, PageRank: {gn['pagerank']}")
+
+    typer.echo("\n🌐 SUBSYSTEM COMMUNITIES:")
+    for cid, comm in list(analytics.communities.items())[:6]:
+        typer.echo(f" - [{comm['id']}] {comm['label']} ({comm['size']} nodes, Cohesion: {comm['cohesion']})")
+
+    if analytics.circular_dependencies:
+        typer.echo(f"\n⚠️ CIRCULAR DEPENDENCIES DETECTED: {len(analytics.circular_dependencies)}")
+
+
+@graph_app.command("impact")
+def cli_blast_radius(
+    target: str = typer.Argument(..., help="Symbol, class, function, or file to test"),
+    depth: int = typer.Option(3, help="Max hop depth"),
+):
+    """Calculate blast radius and upstream/downstream impact for a code change."""
+    import os
+
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+    extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=500)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    hits = graph_analytics.compute_blast_radius(G, seed_id_or_query=target, max_depth=depth)
+
+    typer.echo(f"\n💥 BLAST RADIUS for '{target}' (Max Depth {depth}): {len(hits)} affected entities\n")
+    for hit in hits:
+        loc = f" [{hit.source_file}:{hit.source_location}]" if hit.source_file and hit.source_location else ""
+        typer.echo(f" [Hop {hit.depth}] {hit.label} (via {hit.via_relation}){loc}")
+
+
+@graph_app.command("wiki")
+def cli_generate_wiki(
+    out_dir: str = typer.Option("./wiki", help="Output directory for generated markdown files"),
+):
+    """Generate Wikipedia-style Markdown documentation from codebase graph."""
+    import os
+
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_extractor, graph_wiki_gen
+
+    typer.echo(f"Generating wiki documentation to '{out_dir}'...")
+    extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=500)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    articles = graph_wiki_gen.generate_wiki(G, out_dir=out_dir)
+    typer.echo(f"Successfully generated {len(articles)} wiki articles in '{out_dir}'.")
+
+
 if __name__ == "__main__":
     app()
-

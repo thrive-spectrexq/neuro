@@ -4,14 +4,14 @@ import json
 import logging
 from typing import Any
 
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import select
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from app.core.config import settings
 from app.models.note import Note, NoteLink
-from app.models.tag import Tag, NoteTag
-from app.services.roadmap_service import RoadmapService
+from app.models.tag import NoteTag, Tag
 from app.services.agent.tools import ToolRegistry
+from app.services.roadmap_service import RoadmapService
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +27,15 @@ MCP_TOOLS_DEFINITIONS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "query": {"type": "string", "description": "Search query or concept name to look up in the second brain"},
-                "limit": {"type": "integer", "description": "Maximum number of notes to return (default: 5)", "default": 5},
+                "query": {
+                    "type": "string",
+                    "description": "Search query or concept name to look up in the second brain",
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of notes to return (default: 5)",
+                    "default": 5,
+                },
             },
             "required": ["query"],
         },
@@ -54,7 +61,10 @@ MCP_TOOLS_DEFINITIONS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "topic_id": {"type": "string", "description": "ID or title of the topic/note to analyze for prerequisites"}
+                "topic_id": {
+                    "type": "string",
+                    "description": "ID or title of the topic/note to analyze for prerequisites",
+                }
             },
             "required": ["topic_id"],
         },
@@ -65,8 +75,15 @@ MCP_TOOLS_DEFINITIONS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "goal": {"type": "string", "description": "Learning goal or subject (e.g., 'Rust Async', 'Machine Learning Math', 'Distributed Systems')"},
-                "depth": {"type": "string", "description": "Depth level: 'beginner', 'intermediate', or 'advanced'", "default": "intermediate"},
+                "goal": {
+                    "type": "string",
+                    "description": "Learning goal or subject (e.g., 'Rust Async', 'Machine Learning Math', 'Distributed Systems')",
+                },
+                "depth": {
+                    "type": "string",
+                    "description": "Depth level: 'beginner', 'intermediate', or 'advanced'",
+                    "default": "intermediate",
+                },
             },
             "required": ["goal"],
         },
@@ -79,7 +96,12 @@ MCP_TOOLS_DEFINITIONS = [
             "properties": {
                 "title": {"type": "string", "description": "Title of the note"},
                 "content": {"type": "string", "description": "Markdown body of the note"},
-                "tags": {"type": "array", "items": {"type": "string"}, "description": "List of tags (without # prefix)", "default": []},
+                "tags": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of tags (without # prefix)",
+                    "default": [],
+                },
             },
             "required": ["title", "content"],
         },
@@ -101,6 +123,41 @@ MCP_TOOLS_DEFINITIONS = [
         "inputSchema": {
             "type": "object",
             "properties": {},
+        },
+    },
+    {
+        "name": "neuro_calculate_blast_radius",
+        "description": "Calculates upstream callers and downstream dependencies impacted by changing a symbol, class, function, or file in a codebase.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "target": {"type": "string", "description": "Symbol name or file path to evaluate blast radius for"},
+                "max_depth": {"type": "integer", "description": "Maximum BFS traversal depth", "default": 3},
+            },
+            "required": ["target"],
+        },
+    },
+    {
+        "name": "neuro_analyze_codebase_graph",
+        "description": "Performs Louvain community clustering, God node centrality ranking, and architectural diagnostic checks on a codebase.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "root_path": {
+                    "type": "string",
+                    "description": "Root directory path to scan (defaults to current project root)",
+                },
+            },
+        },
+    },
+    {
+        "name": "neuro_generate_graph_wiki",
+        "description": "Generates Wikipedia-style Markdown documentation with cross-links from the codebase knowledge graph.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "out_dir": {"type": "string", "description": "Output directory for markdown files"},
+            },
         },
     },
 ]
@@ -132,12 +189,14 @@ async def handle_search_notes(arguments: dict[str, Any]) -> str:
 
         output = []
         for n in top_notes:
-            output.append({
-                "id": str(n.id),
-                "title": n.title,
-                "content_preview": (n.content[:300] + "...") if n.content and len(n.content) > 300 else n.content,
-                "created_at": n.created_at.isoformat() if hasattr(n, "created_at") and n.created_at else None,
-            })
+            output.append(
+                {
+                    "id": str(n.id),
+                    "title": n.title,
+                    "content_preview": (n.content[:300] + "...") if n.content and len(n.content) > 300 else n.content,
+                    "created_at": n.created_at.isoformat() if hasattr(n, "created_at") and n.created_at else None,
+                }
+            )
 
         return json.dumps({"status": "success", "query": query, "count": len(output), "results": output}, indent=2)
 
@@ -182,7 +241,9 @@ async def handle_get_graph(arguments: dict[str, Any]) -> str:
                         if s_id in seen_ids and t_id in seen_ids:
                             links.append({"source": s_id, "target": t_id, "type": "tag"})
 
-        return json.dumps({"nodes": nodes, "links": links, "total_nodes": len(nodes), "total_links": len(links)}, indent=2)
+        return json.dumps(
+            {"nodes": nodes, "links": links, "total_nodes": len(nodes), "total_links": len(links)}, indent=2
+        )
 
 
 async def handle_get_prerequisite_path(arguments: dict[str, Any]) -> str:
@@ -193,7 +254,10 @@ async def handle_get_prerequisite_path(arguments: dict[str, Any]) -> str:
 
         nodes = [{"id": str(n.id), "title": n.title, "name": n.title, "status": "in_progress"} for n in notes]
         links_res = await session.execute(select(NoteLink))
-        edges = [{"source": str(l.source_id), "target": str(l.target_id), "type": "requires"} for l in links_res.scalars().all()]
+        edges = [
+            {"source": str(link.source_id), "target": str(link.target_id), "type": "requires"}
+            for link in links_res.scalars().all()
+        ]
 
         result = RoadmapService.get_prerequisite_path(topic_id, nodes, edges)
         return json.dumps(result.model_dump(), indent=2)
@@ -232,11 +296,14 @@ async def handle_create_note(arguments: dict[str, Any]) -> str:
             session.add(NoteTag(note_id=new_note.id, tag_id=tag_obj.id))
         await session.commit()
 
-        return json.dumps({
-            "status": "success",
-            "message": f"Note '{title}' created successfully",
-            "note_id": str(new_note.id),
-        }, indent=2)
+        return json.dumps(
+            {
+                "status": "success",
+                "message": f"Note '{title}' created successfully",
+                "note_id": str(new_note.id),
+            },
+            indent=2,
+        )
 
 
 async def handle_execute_system_command(arguments: dict[str, Any]) -> str:
@@ -253,20 +320,100 @@ async def handle_get_system_status(_arguments: dict[str, Any]) -> str:
         notes_count = len((await session.execute(select(Note))).scalars().all())
         tags_count = len((await session.execute(select(Tag))).scalars().all())
 
-    return json.dumps({
-        "status": "online",
-        "agent": "Neuro Autonomous Voice & Second-Brain Agent",
-        "version": "0.1.1",
-        "database": {
-            "type": "SQLite / SQLModel",
-            "notes_count": notes_count,
-            "tags_count": tags_count,
+    return json.dumps(
+        {
+            "status": "online",
+            "agent": "Neuro Autonomous Voice & Second-Brain Agent",
+            "version": "0.1.1",
+            "database": {
+                "type": "SQLite / SQLModel",
+                "notes_count": notes_count,
+                "tags_count": tags_count,
+            },
+            "capabilities": [
+                "Generative Roadmaps & Prerequisite Dependency Graphs",
+                "Model Context Protocol (MCP) Bridge",
+                "High-Fidelity Obsidian Vault Two-Way Sync",
+                "Deterministic OS-Level Tool Execution",
+                "Interactive Topic Knowledge Quizzes",
+                "AST Codebase Knowledge Graph Extraction",
+                "Louvain Community Detection & God Node Centrality",
+                "Blast Radius & Change Impact Analysis",
+                "Wikipedia-Style Markdown Documentation Generation",
+            ],
         },
-        "capabilities": [
-            "Generative Roadmaps & Prerequisite Dependency Graphs",
-            "Model Context Protocol (MCP) Bridge",
-            "High-Fidelity Obsidian Vault Two-Way Sync",
-            "Deterministic OS-Level Tool Execution",
-            "Interactive Topic Knowledge Quizzes",
-        ],
-    }, indent=2)
+        indent=2,
+    )
+
+
+async def handle_calculate_blast_radius(arguments: dict[str, Any]) -> str:
+    import os
+
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+    target = arguments.get("target", "")
+    depth = int(arguments.get("max_depth", 3))
+    extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=400)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    hits = graph_analytics.compute_blast_radius(G, seed_id_or_query=target, max_depth=depth)
+    return json.dumps(
+        {
+            "target": target,
+            "total_impacted": len(hits),
+            "impacted": [
+                {
+                    "node_id": h.node_id,
+                    "label": h.label,
+                    "depth": h.depth,
+                    "via_relation": h.via_relation,
+                    "source_file": h.source_file,
+                    "source_location": h.source_location,
+                }
+                for h in hits
+            ],
+        },
+        indent=2,
+    )
+
+
+async def handle_analyze_codebase_graph(arguments: dict[str, Any]) -> str:
+    import os
+
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+    root_path = arguments.get("root_path") or os.getcwd()
+    extracted = graph_extractor.extract_from_directory(root_path, max_files=400)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    result = graph_analytics.analyze_graph(G)
+    return json.dumps(
+        {
+            "total_nodes": result.total_nodes,
+            "total_edges": result.total_edges,
+            "density": result.density,
+            "communities_count": result.communities_count,
+            "communities": result.communities,
+            "god_nodes": result.god_nodes,
+            "circular_dependencies": result.circular_dependencies,
+            "bridge_nodes": result.bridge_nodes,
+        },
+        indent=2,
+    )
+
+
+async def handle_generate_graph_wiki(arguments: dict[str, Any]) -> str:
+    import os
+
+    from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_extractor, graph_wiki_gen
+
+    out_dir = arguments.get("out_dir")
+    extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=400)
+    G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+    articles = graph_wiki_gen.generate_wiki(G, out_dir=out_dir)
+    return json.dumps(
+        {
+            "article_count": len(articles),
+            "articles": list(articles.keys()),
+            "index_preview": articles.get("INDEX.md", "")[:500],
+        },
+        indent=2,
+    )

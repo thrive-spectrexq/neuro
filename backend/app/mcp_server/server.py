@@ -7,12 +7,15 @@ from typing import Any
 
 from app.mcp_server.tools import (
     MCP_TOOLS_DEFINITIONS,
+    handle_analyze_codebase_graph,
+    handle_calculate_blast_radius,
     handle_create_note,
     handle_execute_system_command,
+    handle_generate_graph_wiki,
+    handle_generate_roadmap,
     handle_get_graph,
     handle_get_prerequisite_path,
     handle_get_system_status,
-    handle_generate_roadmap,
     handle_search_notes,
 )
 
@@ -79,6 +82,12 @@ async def process_jsonrpc_request(request: dict[str, Any]) -> dict[str, Any] | N
                 result_text = await handle_execute_system_command(arguments)
             elif tool_name == "neuro_get_system_status":
                 result_text = await handle_get_system_status(arguments)
+            elif tool_name == "neuro_calculate_blast_radius":
+                result_text = await handle_calculate_blast_radius(arguments)
+            elif tool_name == "neuro_analyze_codebase_graph":
+                result_text = await handle_analyze_codebase_graph(arguments)
+            elif tool_name == "neuro_generate_graph_wiki":
+                result_text = await handle_generate_graph_wiki(arguments)
             else:
                 return {
                     "jsonrpc": "2.0",

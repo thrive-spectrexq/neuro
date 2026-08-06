@@ -1,8 +1,9 @@
 import pytest
-from app.services.roadmap_service import RoadmapService
-from app.services.obsidian_service import ObsidianService
+
 from app.services.agent.intent_parser import intent_parser
 from app.services.agent.tools import ToolRegistry
+from app.services.obsidian_service import ObsidianService
+from app.services.roadmap_service import RoadmapService
 
 
 def test_roadmap_generation_fullstack():
@@ -12,7 +13,6 @@ def test_roadmap_generation_fullstack():
     assert len(roadmap.edges) > 0
     assert roadmap.total_estimated_hours > 0
     assert roadmap.nodes[0].title != ""
-
 
 
 def test_roadmap_prerequisites_calculation():
@@ -32,7 +32,6 @@ def test_topic_quiz_generation():
     assert quiz.topic_title == "Concurrency & Multithreading"
     assert len(quiz.questions[0].options) == 4
     assert 0 <= quiz.questions[0].correct_index < 4
-
 
 
 def test_obsidian_markdown_export():
@@ -71,7 +70,6 @@ def test_obsidian_markdown_export():
     qubit_file = next(f for f in files if f.path == "Qubits.md")
     assert "## Linked Mentions" in qubit_file.content
     assert "[[Quantum Computing]]" in qubit_file.content
-
 
 
 def test_obsidian_markdown_import():
@@ -113,7 +111,6 @@ def test_intent_parser_roadmap_and_obsidian():
     res4 = intent_parser.parse("export notes to obsidian vault")
     assert res4.is_matched is True
     assert res4.tool_name == "export_obsidian"
-
 
 
 @pytest.mark.asyncio

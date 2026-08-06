@@ -8,6 +8,7 @@ from app.api.routes import (
     automations,
     comments,
     graph,
+    graph_intelligence,
     ingest,
     notes,
     obsidian,
@@ -38,4 +39,4 @@ api_router.include_router(sync.router, prefix="/sync", tags=["sync"])
 api_router.include_router(automations.router, prefix="/automations", tags=["automations"])
 api_router.include_router(tags.router, prefix="/tags", tags=["tags"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
-
+api_router.include_router(graph_intelligence.router, prefix="/graph-intel", tags=["graph-intelligence"])

@@ -48,6 +48,7 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 
 ### 1. OS-Native Agent (Zero API Key Needed)
 - **Voice Wake-Word:** Speak *"Hey Neuro"* to activate listening mode.
+
 - **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*, *"Open Notepad"*, *"Open Calculator"*.
 - **Spotify Music Controller:** *"Play Bohemian Rhapsody on Spotify"*, *"Play Drake in Spotify"*, *"Spotify play lofi beats"*.
 - **Quick Second Brain Capture:** *"Add this to note: Project roadmap specs"*, *"Take a note meeting summary"*.
@@ -55,7 +56,18 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 - **Web Research Automation:** *"Search quantum computing on Google"*, *"Search YouTube for jazz"*, *"Search GitHub for FastAPI"*.
 - **Local Fallback:** Runs instantly with deterministic regex parsing even if disconnected from the internet or without AI keys.
 
-### 2. Single-Command Launch (Silent Background Supervisor)
+### 2. Codebase Knowledge Graph & Architecture Intelligence
+- **AST Multi-Language Extraction:** Analyzes Python, TypeScript, JavaScript, Rust, Go, and Markdown into unified semantic entities and dependency edges.
+- **Louvain Community Detection:** Discovers functional subsystem clusters and computes cohesion & modularity metrics.
+- **Keystones & God Node Centrality:** Identifies high-degree architectural keystones, bottleneck components, and bridge nodes.
+- **Blast Radius & Impact Simulator:** Simulates changes to any function, class, or module and computes upstream and downstream impact trees.
+- **Wikipedia-Style Markdown Wiki Generator:** Automatically converts your codebase into structured, cross-linked documentation.
+
+### 3. Model Context Protocol (MCP) Server
+- Turn your entire Neuro second-brain and knowledge graph into an MCP tool provider for **Cursor**, **Windsurf**, and **Claude Desktop**.
+- Built-in tools: `neuro_search_notes`, `neuro_get_graph`, `neuro_calculate_blast_radius`, `neuro_analyze_codebase_graph`, `neuro_generate_graph_wiki`, `neuro_create_note`, `neuro_execute_system_command`, `neuro_generate_roadmap`.
+
+### 4. Single-Command Launch (Silent Background Supervisor)
 - Launch the entire system with **one single command**:
   ```bash
   pnpm start
@@ -63,78 +75,97 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 - **Hides backend logs completely:** The FastAPI backend starts silently in the background, supervised by Electron. No separate terminal windows or log spam.
 - Logs are cleanly preserved in `.neuro/logs/backend.log` for inspection whenever needed.
 
-### 3. Tactical HUD
+### 5. Tactical HUD & Second Brain
 - Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the HUD.
 - Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with sound responses.
-
-### 4. Second Brain & Knowledge Graph
-- Markdown-first note editor with bi-directional wiki links (`[[Note Title]]`).
-- Dynamic interactive force-directed graph view (D3.js).
-- Hybrid search combining SQLite FTS5 full-text indexing and ChromaDB vector embeddings.
-- Retrieval-Augmented Generation (RAG) using local Ollama models or OpenAI/Anthropic cloud keys when configured.
+- Dynamic interactive force-directed graph view (D3.js) and Obsidian vault bidirectional export/import.
 
 ---
 
-## Getting Started
+## ⚡ Quick Start / Installation
 
-### Prerequisites
-- **Node.js** >= 20.0.0
-- **pnpm** >= 9.0.0 (`npm install -g pnpm`)
-- **Python** >= 3.12 (or [uv](https://docs.astral.sh/uv/) package manager)
-
-### Installation & Setup
+### 📦 Quick Install (One-Liner Setup)
 
 ```bash
-# 1. Clone the repository
+# 1. Clone repository
 git clone https://github.com/thrive-spectrexq/neuro.git
 cd neuro
 
-# 2. Install monorepo dependencies
+# 2. Install dependencies & initialize backend (Automatic)
 pnpm install
+pnpm build:packages
 
 # 3. Setup Python Backend Environment
-# Using uv (Recommended - ultra fast):
-cd backend
-uv venv
-uv pip install -e .
-cd ..
-
-# Or using standard python & pip:
 cd backend
 python -m venv .venv
-# On Windows (PowerShell):
+
+# On Windows:
 .\.venv\Scripts\activate
 # On macOS / Linux:
 source .venv/bin/activate
+
 pip install -e .
 cd ..
+
+# 4. Launch Neuro Desktop App
+pnpm start
 ```
 
 ---
 
-## Launch (One Command)
+## 🚀 Running Neuro
 
-### Windows
-```powershell
-# PowerShell:
-./neuro.ps1
-# or
-pnpm start
-```
-
-### macOS / Linux
+### 🖥️ Desktop Application (Vite + Electron + Silent FastAPI)
 ```bash
-chmod +x ./neuro.sh
-./neuro.sh
-# or
+# Windows / macOS / Linux:
 pnpm start
 ```
 
-Neuro will automatically boot the background FastAPI engine silently, link the native OS hooks, launch the Vite renderer, and open the desktop application with active voice listening and global hotkeys (<kbd>Ctrl + Space</kbd>).
+### 🧠 Neuro CLI Commands
+Neuro includes a powerful local CLI for database management, learning roadmaps, graph intelligence, and MCP hosting:
+
+```bash
+# Start MCP server for AI clients (Cursor, Claude Desktop, Windsurf)
+neuro mcp
+
+# Analyze codebase knowledge graph & discover God nodes / communities
+neuro graph analyze --path .
+
+# Compute change blast radius for a class or function
+neuro graph impact RoadmapService --depth 3
+
+# Generate Wikipedia-style Markdown documentation from codebase
+neuro graph wiki --out-dir ./wiki
+
+# Generate interactive prerequisite DAG roadmap for learning goals
+neuro roadmap "Deep Learning & Transformers" --depth advanced
+
+# Initialize or seed database
+neuro db init
+neuro db seed
+```
 
 ---
 
-## Voice & Agent Command Reference
+## 🔌 Model Context Protocol (MCP) Setup
+
+Add Neuro to your `claude_desktop_config.json` or Cursor MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "neuro": {
+      "command": "python",
+      "args": ["-m", "app.mcp_server.server"],
+      "cwd": "/path/to/neuro/backend"
+    }
+  }
+}
+```
+
+---
+
+## 🎙️ Voice & Agent Command Reference
 
 | Spoken Voice / Written Command | Action Triggered | OS / App Target |
 |---|---|---|
@@ -147,6 +178,10 @@ Neuro will automatically boot the background FastAPI engine silently, link the n
 | *"Take a screenshot"* / *"Capture screen"* | Captures display and saves to desktop | OS Display |
 | *"Lock screen"* / *"Lock my PC"* | Immediately locks the workstation | Security / OS |
 | *"Empty recycle bin"* / *"Clean trash"* | Empties deleted files safely | System Storage |
+| *"What is the blast radius for [Symbol]"* | Calculates upstream/downstream dependency impact | Graph Intelligence |
+| *"Show god nodes / architectural keystones"* | Analyzes structural bottlenecks and central hubs | Graph Intelligence |
+| *"Analyze codebase graph"* | Performs Louvain community clustering & metrics | Graph Intelligence |
+| *"Generate markdown wiki"* | Creates Wikipedia-style docs in markdown | Graph Intelligence |
 | *"Add this to note: [Text]"* | Creates a new note in your second brain | SQLite / Markdown |
 | *"Set a reminder in [X] mins to [Task]"* | Schedules a notification alert | Task System |
 | *"Search [Query] on Google"* | Opens browser with targeted search | Google Search |
@@ -158,8 +193,7 @@ Neuro will automatically boot the background FastAPI engine silently, link the n
 
 ---
 
-
-## Configuration & Environment
+## ⚙️ Configuration & Environment
 
 Neuro works completely offline by default. To optionally enable cloud AI models or custom storage, configure `.env`:
 
@@ -184,17 +218,18 @@ OLLAMA_MODEL=llama3.2
 
 ---
 
-## Testing
+## 🧪 Testing
 
-Run backend tests for the agent and intent parser:
+Run backend tests for the agent, intent parser, and graph intelligence:
 
 ```bash
 cd backend
-python -m pytest tests/test_intent_parser.py tests/test_agent_tools.py -v
+python -m pytest tests/ -v
 ```
 
 ---
 
-## License
+## 📄 License
 
 Neuro is open-source software licensed under the [MIT License](LICENSE).
+

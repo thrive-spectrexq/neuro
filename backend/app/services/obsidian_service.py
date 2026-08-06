@@ -4,9 +4,10 @@ import io
 import logging
 import re
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,6 @@ class ObsidianService:
         """Alias for parse_obsidian_markdown accepting (filename, raw_content) or (raw_content, filename)."""
         return ObsidianService.parse_obsidian_markdown(raw_content=raw_content, filename=filename)
 
-
-
     @staticmethod
     def export_vault(
         notes: list[Any],
@@ -63,6 +62,7 @@ class ObsidianService:
         """
         Exports the Second Brain knowledge base into an Obsidian-ready vault package.
         """
+
         def _get(obj: Any, key: str, default: Any = "") -> Any:
             if isinstance(obj, dict):
                 return obj.get(key, default)
@@ -98,13 +98,12 @@ class ObsidianService:
 
         files: list[ObsidianExportFile] = []
 
-
         # 1. Generate Index / Dashboard
         index_content = [
             f"# {vault_name}",
             "",
             "> 🧠 Exported from **Neuro Voice Agent & Second Brain**.",
-            f"> Synchronized at: `{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%SZ')}`",
+            f"> Synchronized at: `{datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%SZ')}`",
             "",
             "## Knowledge Graph Summary",
             f"- **Total Notes**: {len(notes)}",
@@ -141,7 +140,7 @@ class ObsidianService:
             elif isinstance(created_val, str) and created_val:
                 created_iso = created_val
             else:
-                created_iso = datetime.now(timezone.utc).isoformat()
+                created_iso = datetime.now(UTC).isoformat()
 
             updated_val = _get(note, "updated_at")
             if hasattr(updated_val, "isoformat"):
@@ -164,12 +163,14 @@ class ObsidianService:
             else:
                 frontmatter_lines.append("tags: [neuro, second-brain]")
 
-            frontmatter_lines.extend([
-                f'created: "{created_iso}"',
-                f'updated: "{updated_iso}"',
-                "---",
-                "",
-            ])
+            frontmatter_lines.extend(
+                [
+                    f'created: "{created_iso}"',
+                    f'updated: "{updated_iso}"',
+                    "---",
+                    "",
+                ]
+            )
 
             content_val = _get(note, "content") or "*No content*"
             body_lines = [
@@ -181,11 +182,13 @@ class ObsidianService:
 
             # Append backlinks if available
             if note_backlinks:
-                body_lines.extend([
-                    "---",
-                    "## Linked Mentions",
-                    "",
-                ])
+                body_lines.extend(
+                    [
+                        "---",
+                        "## Linked Mentions",
+                        "",
+                    ]
+                )
                 for bl in sorted(note_backlinks):
                     body_lines.append(f"- [[{bl}]]")
                 body_lines.append("")
@@ -198,7 +201,7 @@ class ObsidianService:
             )
 
         return ObsidianExportPackage(
-            exported_at=datetime.now(timezone.utc).isoformat(),
+            exported_at=datetime.now(UTC).isoformat(),
             vault_name=vault_name,
             file_count=len(files),
             files=files,
@@ -224,30 +227,29 @@ class ObsidianService:
         fm_match = YAML_FRONTMATTER_RE.match(raw_content)
         if fm_match:
             fm_text = fm_match.group(1)
-            body = raw_content[fm_match.end():]
+            body = raw_content[fm_match.end() :]
             current_key = None
             for line in fm_text.split("\n"):
                 stripped = line.strip()
                 if not stripped:
                     continue
                 if stripped.startswith("- ") and current_key:
-                    item_val = stripped[2:].strip().strip('"\'')
+                    item_val = stripped[2:].strip().strip("\"'")
                     if current_key not in frontmatter or not isinstance(frontmatter[current_key], list):
                         frontmatter[current_key] = []
                     frontmatter[current_key].append(item_val)
                 elif ":" in line:
                     key, val = line.split(":", 1)
                     key = key.strip()
-                    val = val.strip().strip('"\'')
+                    val = val.strip().strip("\"'")
                     current_key = key
                     if val.startswith("[") and val.endswith("]"):
-                        items = [x.strip().strip('"\'') for x in val[1:-1].split(",") if x.strip()]
+                        items = [x.strip().strip("\"'") for x in val[1:-1].split(",") if x.strip()]
                         frontmatter[key] = items
                     elif val:
                         frontmatter[key] = val
                     else:
                         frontmatter[key] = []
-
 
         # Extract title
         title = frontmatter.get("title")

@@ -341,7 +341,13 @@ class AgentToolsRegistry:
                 category="knowledge",
                 parameters=[
                     ToolParameter(name="goal", type="string", description="Learning goal or subject"),
-                    ToolParameter(name="depth", type="string", description="Depth: beginner, intermediate, advanced", required=False, default="intermediate"),
+                    ToolParameter(
+                        name="depth",
+                        type="string",
+                        description="Depth: beginner, intermediate, advanced",
+                        required=False,
+                        default="intermediate",
+                    ),
                 ],
             ),
             self._handle_generate_roadmap,
@@ -354,7 +360,9 @@ class AgentToolsRegistry:
                 description="Calculates the prerequisite dependency chain for any topic",
                 category="knowledge",
                 parameters=[
-                    ToolParameter(name="topic", type="string", description="Subject or topic to query prerequisites for"),
+                    ToolParameter(
+                        name="topic", type="string", description="Subject or topic to query prerequisites for"
+                    ),
                 ],
             ),
             self._handle_get_prerequisites,
@@ -543,6 +551,81 @@ class AgentToolsRegistry:
                 ],
             ),
             self._handle_system_action,
+        )
+
+        # 11. Graph Intelligence - Blast Radius / Change Impact
+        self.register(
+            Tool(
+                name="compute_blast_radius",
+                description="Calculate upstream callers and downstream dependencies affected by modifying a symbol or file",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(
+                        name="target", type="string", description="Symbol, function, class, or file path to evaluate"
+                    ),
+                    ToolParameter(
+                        name="max_depth", type="integer", description="Max hop depth", required=False, default=3
+                    ),
+                ],
+            ),
+            self._handle_compute_blast_radius,
+        )
+
+        # 12. Graph Intelligence - God Nodes & Keystones
+        self.register(
+            Tool(
+                name="find_god_nodes",
+                description="Find central architectural keystones and high-degree modules in the knowledge graph",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(
+                        name="top_n",
+                        type="integer",
+                        description="Number of nodes to return",
+                        required=False,
+                        default=10,
+                    ),
+                ],
+            ),
+            self._handle_find_god_nodes,
+        )
+
+        # 13. Graph Intelligence - Analyze Codebase Graph
+        self.register(
+            Tool(
+                name="analyze_codebase_graph",
+                description="Extract and analyze codebase knowledge graph (clustering, communities, diagnostics)",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(
+                        name="root_path",
+                        type="string",
+                        description="Repository root directory",
+                        required=False,
+                        default=None,
+                    ),
+                ],
+            ),
+            self._handle_analyze_codebase_graph,
+        )
+
+        # 14. Graph Intelligence - Generate Markdown Wiki
+        self.register(
+            Tool(
+                name="generate_graph_wiki",
+                description="Generate Wikipedia-style documentation from the codebase knowledge graph",
+                category="knowledge",
+                parameters=[
+                    ToolParameter(
+                        name="out_dir",
+                        type="string",
+                        description="Output directory for generated markdown",
+                        required=False,
+                        default=None,
+                    ),
+                ],
+            ),
+            self._handle_generate_graph_wiki,
         )
 
     # --- Tool Execution Handlers ---
@@ -1209,6 +1292,103 @@ class AgentToolsRegistry:
             voice_feedback="Your Second Brain knowledge base has been packaged for Obsidian. You can download the vault archive from the top bar.",
         )
 
+    async def _handle_compute_blast_radius(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+        target = args.get("target", "").strip()
+        depth = int(args.get("max_depth", 3))
+        extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=400)
+        G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+        hits = graph_analytics.compute_blast_radius(G, seed_id_or_query=target, max_depth=depth)
+
+        count = len(hits)
+        top_labels = [h.label for h in hits[:3]]
+        sample_str = f" including {', '.join(top_labels)}" if top_labels else ""
+        voice = f"Impact analysis for {target} shows {count} potentially affected components{sample_str}."
+
+        return ToolResult(
+            success=True,
+            tool_name="compute_blast_radius",
+            message=f"Calculated blast radius for '{target}': {count} affected entities.",
+            data={
+                "target": target,
+                "count": count,
+                "hits": [
+                    {
+                        "node_id": h.node_id,
+                        "label": h.label,
+                        "depth": h.depth,
+                        "via_relation": h.via_relation,
+                        "source_file": h.source_file,
+                        "source_location": h.source_location,
+                    }
+                    for h in hits
+                ],
+            },
+            voice_feedback=voice,
+        )
+
+    async def _handle_find_god_nodes(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+        top_n = int(args.get("top_n", 10))
+        extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=400)
+        G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+        god_nodes = graph_analytics.find_god_nodes(G, top_n=top_n)
+
+        top_names = [gn["label"] for gn in god_nodes[:3]]
+        sample_str = f" such as {', '.join(top_names)}" if top_names else ""
+        voice = f"Identified {len(god_nodes)} architectural keystones in your codebase{sample_str}."
+
+        return ToolResult(
+            success=True,
+            tool_name="find_god_nodes",
+            message=f"Found {len(god_nodes)} architectural keystones.",
+            data={"god_nodes": god_nodes},
+            voice_feedback=voice,
+        )
+
+    async def _handle_analyze_codebase_graph(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
+
+        root_path = args.get("root_path") or os.getcwd()
+        extracted = graph_extractor.extract_from_directory(root_path, max_files=400)
+        G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+        analytics = graph_analytics.analyze_graph(G)
+
+        voice = f"Analyzed codebase graph with {analytics.total_nodes} nodes and {analytics.communities_count} functional clusters."
+        return ToolResult(
+            success=True,
+            tool_name="analyze_codebase_graph",
+            message=f"Graph analysis complete: {analytics.total_nodes} entities across {analytics.communities_count} communities.",
+            data={
+                "total_nodes": analytics.total_nodes,
+                "total_edges": analytics.total_edges,
+                "communities_count": analytics.communities_count,
+                "density": analytics.density,
+                "god_nodes_count": len(analytics.god_nodes),
+                "circular_dependencies_count": len(analytics.circular_dependencies),
+            },
+            voice_feedback=voice,
+        )
+
+    async def _handle_generate_graph_wiki(self, args: dict[str, Any], context: dict[str, Any]) -> ToolResult:
+        from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_extractor, graph_wiki_gen
+
+        out_dir = args.get("out_dir")
+        extracted = graph_extractor.extract_from_directory(os.getcwd(), max_files=400)
+        G = GraphAnalyticsEngine.build_networkx_graph(extracted["nodes"], extracted["edges"])
+        articles = graph_wiki_gen.generate_wiki(G, out_dir=out_dir)
+
+        voice = f"Generated {len(articles)} Wikipedia-style markdown articles for your knowledge graph."
+        return ToolResult(
+            success=True,
+            tool_name="generate_graph_wiki",
+            message=f"Generated {len(articles)} wiki articles.",
+            data={"article_count": len(articles), "articles": list(articles.keys())},
+            voice_feedback=voice,
+        )
+
     async def execute_intent(self, intent: Any) -> dict[str, Any]:
         if not getattr(intent, "is_matched", False) or not getattr(intent, "tool_name", None):
             return {
@@ -1224,4 +1404,3 @@ class AgentToolsRegistry:
 # Global singleton registry instance
 agent_tools_registry = AgentToolsRegistry()
 ToolRegistry = agent_tools_registry
-

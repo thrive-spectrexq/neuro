@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const API_URL = 'http://localhost:8000/api/v1/ingest';
 

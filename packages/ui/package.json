@@ -5,8 +5,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --noEmit"
   },
+
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

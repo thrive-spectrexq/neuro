@@ -636,14 +636,77 @@ class IntentParser:
             )
 
         # 16. Obsidian Vault Export & Sync
-        if re.search(r"\b(export\s+(?:(?:all\s+|my\s+)?(?:notes|graph|vault|second\s+brain|knowledge\s+base)\s+)?(?:to\s+)?obsidian|export\s+vault|sync\s+(?:notes\s+)?(?:to\s+)?obsidian|obsidian\s+export)\b", lower):
+        if re.search(
+            r"\b(export\s+(?:(?:all\s+|my\s+)?(?:notes|graph|vault|second\s+brain|knowledge\s+base)\s+)?(?:to\s+)?obsidian|export\s+vault|sync\s+(?:notes\s+)?(?:to\s+)?obsidian|obsidian\s+export)\b",
+            lower,
+        ):
             return ParsedIntent(
-
                 is_matched=True,
                 tool_name="export_obsidian",
                 parameters={},
                 confidence=0.98,
                 matched_pattern="export_obsidian",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 17. Blast Radius / Change Impact Analysis
+        impact_match = re.search(
+            r"\b(?:blast\s+radius|impact\s+analysis|what\s+breaks\s+if\s+i\s+(?:change|edit|modify)|impact\s+of\s+changing)\s+(?:for\s+)?(?P<target>.+)",
+            lower,
+        )
+        if impact_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="compute_blast_radius",
+                parameters={"target": impact_match.group("target").strip()},
+                confidence=0.97,
+                matched_pattern="compute_blast_radius",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 18. God Nodes & Architectural Keystones
+        if re.search(
+            r"\b(god\s+nodes|architectural\s+keystones|central\s+modules|most\s+connected\s+(?:files|nodes|symbols))\b",
+            lower,
+        ):
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="find_god_nodes",
+                parameters={},
+                confidence=0.97,
+                matched_pattern="find_god_nodes",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 19. Graph Intelligence & Codebase Graph Scan
+        if re.search(
+            r"\b(analyze\s+(?:the\s+)?(?:codebase\s+)?graph|graph\s+intelligence|scan\s+(?:the\s+)?(?:codebase\s+)?knowledge\s+graph|find\s+communities\s+in\s+graph)\b",
+            lower,
+        ):
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="analyze_codebase_graph",
+                parameters={},
+                confidence=0.96,
+                matched_pattern="analyze_codebase_graph",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 20. Wikipedia Markdown Wiki Generation
+        if re.search(
+            r"\b(generate\s+(?:a\s+)?(?:markdown\s+)?wiki|create\s+wiki\s+documentation|export\s+(?:graph\s+)?wiki)\b",
+            lower,
+        ):
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="generate_graph_wiki",
+                parameters={},
+                confidence=0.97,
+                matched_pattern="generate_graph_wiki",
                 raw_command=text,
                 cleaned_command=cleaned,
             )

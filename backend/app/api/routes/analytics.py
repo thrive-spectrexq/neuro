@@ -92,7 +92,7 @@ async def get_recent_activity(
 
 @router.get("/audit/export")
 async def export_audit_logs(
-    format: str = Query("json", regex="^(json|csv)$"),
+    format: str = Query("json", pattern="^(json|csv)$"),
     project_id: uuid.UUID | None = Query(None),
     start_date: datetime | None = Query(None),
     end_date: datetime | None = Query(None),

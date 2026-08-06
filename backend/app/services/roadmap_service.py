@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict, deque
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -93,7 +94,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 5,
                 "zone": "Advanced Types",
                 "resources": ["Rust by Example - Traits", "Effective Rust by David Drysdale"],
-                "key_takeaways": ["Exhaustive match expressions", "Custom derive macros", "Dynamic dispatch vs monomorphization"],
+                "key_takeaways": [
+                    "Exhaustive match expressions",
+                    "Custom derive macros",
+                    "Dynamic dispatch vs monomorphization",
+                ],
             },
             {
                 "id": "smart-pointers",
@@ -103,7 +108,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 6,
                 "zone": "Memory & Ownership",
                 "resources": ["Rust Book Ch 15", "Too Many Linked Lists"],
-                "key_takeaways": ["Shared ownership with Arc", "Runtime borrow checking with RefCell", "Thread safety bounds (Send/Sync)"],
+                "key_takeaways": [
+                    "Shared ownership with Arc",
+                    "Runtime borrow checking with RefCell",
+                    "Thread safety bounds (Send/Sync)",
+                ],
             },
             {
                 "id": "async-tokio",
@@ -113,7 +122,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 8,
                 "zone": "Async & Systems",
                 "resources": ["Async Book (rust-lang)", "Tokio Tutorial (tokio.rs)"],
-                "key_takeaways": ["Zero-cost state machine futures", "Task cooperative multitasking", "MPSC/Broadcast channels"],
+                "key_takeaways": [
+                    "Zero-cost state machine futures",
+                    "Task cooperative multitasking",
+                    "MPSC/Broadcast channels",
+                ],
             },
             {
                 "id": "systems-ffi",
@@ -123,7 +136,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 10,
                 "zone": "Async & Systems",
                 "resources": ["Rust Nomicon", "Writing an OS in Rust (Philipp Oppermann)"],
-                "key_takeaways": ["Unsafe invariants & raw pointers", "extern C bindings", "Embedded hardware interaction"],
+                "key_takeaways": [
+                    "Unsafe invariants & raw pointers",
+                    "extern C bindings",
+                    "Embedded hardware interaction",
+                ],
             },
         ],
         "edges": [
@@ -147,8 +164,15 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "difficulty": "beginner",
                 "estimated_hours": 6,
                 "zone": "Mathematical Foundations",
-                "resources": ["3Blue1Brown Essence of Linear Algebra", "Matrix Calculus for Deep Learning (Parr & Howard)"],
-                "key_takeaways": ["Matrix multiplication & dot products", "Jacobians & Hessians", "Chain rule vectorization"],
+                "resources": [
+                    "3Blue1Brown Essence of Linear Algebra",
+                    "Matrix Calculus for Deep Learning (Parr & Howard)",
+                ],
+                "key_takeaways": [
+                    "Matrix multiplication & dot products",
+                    "Jacobians & Hessians",
+                    "Chain rule vectorization",
+                ],
             },
             {
                 "id": "classical-ml",
@@ -158,7 +182,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 8,
                 "zone": "Classical ML",
                 "resources": ["Scikit-Learn User Guide", "Andrew Ng Machine Learning Specialization"],
-                "key_takeaways": ["Gradient descent optimization", "Cross-validation & bias-variance tradeoff", "Precision/Recall/F1 metrics"],
+                "key_takeaways": [
+                    "Gradient descent optimization",
+                    "Cross-validation & bias-variance tradeoff",
+                    "Precision/Recall/F1 metrics",
+                ],
             },
             {
                 "id": "neural-networks-backprop",
@@ -168,7 +196,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 8,
                 "zone": "Deep Neural Networks",
                 "resources": ["Deep Learning Book (Goodfellow et al.)", "PyTorch Blitz Tutorial"],
-                "key_takeaways": ["Backprop computational graphs", "Vanishing/exploding gradients", "Optimizers: AdamW, RMSProp"],
+                "key_takeaways": [
+                    "Backprop computational graphs",
+                    "Vanishing/exploding gradients",
+                    "Optimizers: AdamW, RMSProp",
+                ],
             },
             {
                 "id": "cnns-and-embeddings",
@@ -178,7 +210,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 6,
                 "zone": "Deep Neural Networks",
                 "resources": ["Sentence-Transformers documentation", "Pinecone Vector Search Handbook"],
-                "key_takeaways": ["Dense vector representations", "Approximate Nearest Neighbors (HNSW)", "Semantic similarity search"],
+                "key_takeaways": [
+                    "Dense vector representations",
+                    "Approximate Nearest Neighbors (HNSW)",
+                    "Semantic similarity search",
+                ],
             },
             {
                 "id": "transformers-attention",
@@ -187,8 +223,15 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "difficulty": "advanced",
                 "estimated_hours": 10,
                 "zone": "Transformers & LLMs",
-                "resources": ["Attention Is All You Need (Vaswani et al.)", "The Illustrated Transformer (Jay Alammar)"],
-                "key_takeaways": ["Query-Key-Value projection matrices", "Causal masking in auto-regressive models", "Feed-forward expansion"],
+                "resources": [
+                    "Attention Is All You Need (Vaswani et al.)",
+                    "The Illustrated Transformer (Jay Alammar)",
+                ],
+                "key_takeaways": [
+                    "Query-Key-Value projection matrices",
+                    "Causal masking in auto-regressive models",
+                    "Feed-forward expansion",
+                ],
             },
             {
                 "id": "rag-and-agents",
@@ -197,8 +240,15 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "difficulty": "advanced",
                 "estimated_hours": 10,
                 "zone": "Transformers & LLMs",
-                "resources": ["LangChain / LlamaIndex Architecture Guides", "ReAct: Synergizing Reasoning and Acting in LLMs"],
-                "key_takeaways": ["Context window optimization", "Structured function/tool schema calling", "Hallucination mitigation via retrieval"],
+                "resources": [
+                    "LangChain / LlamaIndex Architecture Guides",
+                    "ReAct: Synergizing Reasoning and Acting in LLMs",
+                ],
+                "key_takeaways": [
+                    "Context window optimization",
+                    "Structured function/tool schema calling",
+                    "Hallucination mitigation via retrieval",
+                ],
             },
         ],
         "edges": [
@@ -223,7 +273,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 5,
                 "zone": "Networking & IPC",
                 "resources": ["Designing Data-Intensive Applications Ch 4", "gRPC Core Concepts Guide"],
-                "key_takeaways": ["Binary serialization vs JSON", "Streaming RPC lifecycles", "Connection pooling & timeouts"],
+                "key_takeaways": [
+                    "Binary serialization vs JSON",
+                    "Streaming RPC lifecycles",
+                    "Connection pooling & timeouts",
+                ],
             },
             {
                 "id": "cap-pacelc-consistency",
@@ -232,8 +286,15 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "difficulty": "intermediate",
                 "estimated_hours": 6,
                 "zone": "Storage & Concurrency",
-                "resources": ["Designing Data-Intensive Applications Ch 7-9", "Martin Kleppmann Distributed Systems Course"],
-                "key_takeaways": ["Partition tolerance realities", "Strong vs eventual consistency trade-offs", "Causal ordering with vector clocks"],
+                "resources": [
+                    "Designing Data-Intensive Applications Ch 7-9",
+                    "Martin Kleppmann Distributed Systems Course",
+                ],
+                "key_takeaways": [
+                    "Partition tolerance realities",
+                    "Strong vs eventual consistency trade-offs",
+                    "Causal ordering with vector clocks",
+                ],
             },
             {
                 "id": "raft-consensus",
@@ -242,8 +303,15 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "difficulty": "advanced",
                 "estimated_hours": 10,
                 "zone": "Consensus & Coordination",
-                "resources": ["In Search of an Understandable Consensus Algorithm (Ongaro & Ousterhout)", "The Secret Lives of Data (Raft visualization)"],
-                "key_takeaways": ["Heartbeats & randomized election timeouts", "Committed index progression", "Byzantine vs crash-fault models"],
+                "resources": [
+                    "In Search of an Understandable Consensus Algorithm (Ongaro & Ousterhout)",
+                    "The Secret Lives of Data (Raft visualization)",
+                ],
+                "key_takeaways": [
+                    "Heartbeats & randomized election timeouts",
+                    "Committed index progression",
+                    "Byzantine vs crash-fault models",
+                ],
             },
             {
                 "id": "event-streaming-kafka",
@@ -253,7 +321,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 7,
                 "zone": "Storage & Concurrency",
                 "resources": ["Kafka: The Definitive Guide", "Building Event-Driven Microservices"],
-                "key_takeaways": ["Append-only partition logs", "Consumer group rebalancing", "Idempotent producer semantics"],
+                "key_takeaways": [
+                    "Append-only partition logs",
+                    "Consumer group rebalancing",
+                    "Idempotent producer semantics",
+                ],
             },
             {
                 "id": "distributed-caching-sharding",
@@ -263,7 +335,11 @@ CURATED_ROADMAP_TEMPLATES: dict[str, dict[str, Any]] = {
                 "estimated_hours": 6,
                 "zone": "Cloud Scale",
                 "resources": ["Dynamo: Amazon's Highly Available Key-value Store", "Redis Cluster Specification"],
-                "key_takeaways": ["Minimal key reassignment on topology changes", "Thundering herd mitigation", "Two-phase commit vs Saga pattern"],
+                "key_takeaways": [
+                    "Minimal key reassignment on topology changes",
+                    "Thundering herd mitigation",
+                    "Two-phase commit vs Saga pattern",
+                ],
             },
         ],
         "edges": [
@@ -291,8 +367,28 @@ class RoadmapService:
             if (
                 key in goal_lower
                 or (key == "rust" and ("rust" in goal_lower or "cargo" in goal_lower))
-                or (key == "machine-learning" and ("machine learning" in goal_lower or "ai" in goal_lower or "deep learning" in goal_lower or "rag" in goal_lower or "llm" in goal_lower or "python" in goal_lower))
-                or (key == "distributed-systems" and ("distributed" in goal_lower or "cloud" in goal_lower or "microservice" in goal_lower or "backend" in goal_lower or "kafka" in goal_lower or "grpc" in goal_lower))
+                or (
+                    key == "machine-learning"
+                    and (
+                        "machine learning" in goal_lower
+                        or "ai" in goal_lower
+                        or "deep learning" in goal_lower
+                        or "rag" in goal_lower
+                        or "llm" in goal_lower
+                        or "python" in goal_lower
+                    )
+                )
+                or (
+                    key == "distributed-systems"
+                    and (
+                        "distributed" in goal_lower
+                        or "cloud" in goal_lower
+                        or "microservice" in goal_lower
+                        or "backend" in goal_lower
+                        or "kafka" in goal_lower
+                        or "grpc" in goal_lower
+                    )
+                )
             ):
                 nodes = [RoadmapNode(**n) for n in template["nodes"]]
                 edges = [RoadmapEdge(**e) for e in template["edges"]]
@@ -311,7 +407,6 @@ class RoadmapService:
         # Dynamic synthesis for general goals
         clean_goal = goal.strip().title()
         zones = ["Foundations", "Core Principles", "Practical Application", "Advanced Mastery"]
-
 
         nodes = [
             RoadmapNode(
@@ -376,7 +471,9 @@ class RoadmapService:
         )
 
     @staticmethod
-    def get_prerequisite_path(target_id: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> PrerequisitePathResult:
+    def get_prerequisite_path(
+        target_id: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]
+    ) -> PrerequisitePathResult:
         """
         Calculates the complete prerequisite ancestor tree and downstream unlocked topics for a specific node.
         """
@@ -413,13 +510,15 @@ class RoadmapService:
                     parent_node = node_map.get(parent_id, {"id": parent_id, "title": parent_id, "name": parent_id})
                     p_title = parent_node.get("title") or parent_node.get("name") or parent_id
                     p_status = parent_node.get("status", "not_started")
-                    prereq_list.append({
-                        "id": parent_id,
-                        "title": p_title,
-                        "status": p_status,
-                        "depth": depth + 1,
-                        "zone": parent_node.get("zone", "Foundations"),
-                    })
+                    prereq_list.append(
+                        {
+                            "id": parent_id,
+                            "title": p_title,
+                            "status": p_status,
+                            "depth": depth + 1,
+                            "zone": parent_node.get("zone", "Foundations"),
+                        }
+                    )
                     max_depth = max(max_depth, depth + 1)
                     queue.append((parent_id, depth + 1))
 
@@ -435,12 +534,14 @@ class RoadmapService:
                     visited_unlocks.add(child_id)
                     child_node = node_map.get(child_id, {"id": child_id, "title": child_id, "name": child_id})
                     c_title = child_node.get("title") or child_node.get("name") or child_id
-                    unlock_list.append({
-                        "id": child_id,
-                        "title": c_title,
-                        "status": child_node.get("status", "not_started"),
-                        "zone": child_node.get("zone", "Advanced"),
-                    })
+                    unlock_list.append(
+                        {
+                            "id": child_id,
+                            "title": c_title,
+                            "status": child_node.get("status", "not_started"),
+                            "zone": child_node.get("zone", "Advanced"),
+                        }
+                    )
                     queue.append(child_id)
 
         # Check if ready to learn (all direct prerequisites are completed or no prerequisites exist)
@@ -475,9 +576,9 @@ class RoadmapService:
                     question=f"What is the primary foundation and core purpose of {title_clean}?",
                     options=[
                         f"Establishing deterministic invariants and foundational patterns in {title_clean}",
-                        f"Replacing standard compiler optimizations with runtime heuristics",
-                        f"Disabling type verification for performance benefits",
-                        f"Bypassing architectural separation of concerns",
+                        "Replacing standard compiler optimizations with runtime heuristics",
+                        "Disabling type verification for performance benefits",
+                        "Bypassing architectural separation of concerns",
                     ],
                     correct_index=0,
                     explanation=f"{title_clean} provides structured architectural guarantees and predictable execution flow.",
@@ -486,7 +587,7 @@ class RoadmapService:
                     question=f"When implementing {title_clean}, which prerequisite pattern must be verified first?",
                     options=[
                         "Arbitrary memory allocation without bounds checking",
-                        f"Input validation, dependency integrity, and interface contracts",
+                        "Input validation, dependency integrity, and interface contracts",
                         "Suppressing all runtime exceptions silently",
                         "Hardcoding absolute local filesystem paths",
                     ],
@@ -497,7 +598,7 @@ class RoadmapService:
                     question=f"What is the most effective way to validate mastery in {title_clean}?",
                     options=[
                         "Memorizing syntax without testing edge cases",
-                        f"Building end-to-end practical artifacts and validating failure cases",
+                        "Building end-to-end practical artifacts and validating failure cases",
                         "Ignoring benchmark metrics and resource constraints",
                         "Relying entirely on remote cloud APIs without offline fallbacks",
                     ],

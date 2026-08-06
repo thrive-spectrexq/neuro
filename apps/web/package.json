@@ -6,8 +6,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "test": "tsc --noEmit"
   },
+
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.1",
     "@codemirror/language-data": "^6.5.2",

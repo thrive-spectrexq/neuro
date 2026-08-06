@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'extract_content') {
     // Attempt to find the main article content, fallback to body text
     const article = document.querySelector('article');
