@@ -82,9 +82,9 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 
 ---
 
-## ⚡ Quick Start / Installation
+## Quick Start / Installation
 
-### 📦 Quick Install (One-Liner Setup)
+### Quick Install (One-Liner Setup)
 
 ```bash
 # 1. Clone repository
@@ -113,15 +113,15 @@ pnpm start
 
 ---
 
-## 🚀 Running Neuro
+## Running Neuro
 
-### 🖥️ Desktop Application (Vite + Electron + Silent FastAPI)
+### Desktop Application (Vite + Electron + Silent FastAPI)
 ```bash
 # Windows / macOS / Linux:
 pnpm start
 ```
 
-### 🧠 Neuro CLI Commands
+### Neuro CLI Commands
 Neuro includes a powerful local CLI for database management, learning roadmaps, graph intelligence, and MCP hosting:
 
 ```bash
@@ -147,7 +147,7 @@ neuro db seed
 
 ---
 
-## 🔌 Model Context Protocol (MCP) Setup
+## Model Context Protocol (MCP) Setup
 
 Add Neuro to your `claude_desktop_config.json` or Cursor MCP settings:
 
@@ -165,7 +165,7 @@ Add Neuro to your `claude_desktop_config.json` or Cursor MCP settings:
 
 ---
 
-## 🎙️ Voice & Agent Command Reference
+## Voice & Agent Command Reference
 
 | Spoken Voice / Written Command | Action Triggered | OS / App Target |
 |---|---|---|
@@ -193,7 +193,7 @@ Add Neuro to your `claude_desktop_config.json` or Cursor MCP settings:
 
 ---
 
-## ⚙️ Configuration & Environment
+## Configuration & Environment
 
 Neuro works completely offline by default. To optionally enable cloud AI models or custom storage, configure `.env`:
 
@@ -218,7 +218,7 @@ OLLAMA_MODEL=llama3.2
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Run backend tests for the agent, intent parser, and graph intelligence:
 
@@ -229,7 +229,7 @@ python -m pytest tests/ -v
 
 ---
 
-## 📄 License
+## License
 
 Neuro is open-source software licensed under the [MIT License](LICENSE).
 
