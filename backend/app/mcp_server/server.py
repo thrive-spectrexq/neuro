@@ -9,6 +9,7 @@ from app.mcp_server.tools import (
     MCP_TOOLS_DEFINITIONS,
     handle_analyze_codebase_graph,
     handle_calculate_blast_radius,
+    handle_create_canvas,
     handle_create_note,
     handle_execute_system_command,
     handle_generate_graph_wiki,
@@ -16,6 +17,9 @@ from app.mcp_server.tools import (
     handle_get_graph,
     handle_get_prerequisite_path,
     handle_get_system_status,
+    handle_lint_vault,
+    handle_retrieve_vault_bm25,
+    handle_route_note,
     handle_search_notes,
 )
 
@@ -88,6 +92,14 @@ async def process_jsonrpc_request(request: dict[str, Any]) -> dict[str, Any] | N
                 result_text = await handle_analyze_codebase_graph(arguments)
             elif tool_name == "neuro_generate_graph_wiki":
                 result_text = await handle_generate_graph_wiki(arguments)
+            elif tool_name == "neuro_lint_vault":
+                result_text = await handle_lint_vault(arguments)
+            elif tool_name == "neuro_create_canvas":
+                result_text = await handle_create_canvas(arguments)
+            elif tool_name == "neuro_retrieve_vault_bm25":
+                result_text = await handle_retrieve_vault_bm25(arguments)
+            elif tool_name == "neuro_route_note":
+                result_text = await handle_route_note(arguments)
             else:
                 return {
                     "jsonrpc": "2.0",

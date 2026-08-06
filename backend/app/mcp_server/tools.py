@@ -160,6 +160,64 @@ MCP_TOOLS_DEFINITIONS = [
             },
         },
     },
+    {
+        "name": "neuro_lint_vault",
+        "description": "Runs deterministic health diagnostics across the Obsidian vault (detects dead links, orphans, metadata gaps, empty sections, and calculates health score).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "vault_path": {
+                    "type": "string",
+                    "description": "Optional path to local Obsidian vault directory on disk. If omitted, lints current database notes.",
+                }
+            },
+        },
+    },
+    {
+        "name": "neuro_create_canvas",
+        "description": "Generates a native Obsidian .canvas (JSON Canvas 1.0) spatial map from notes or target learning roadmaps.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string", "description": "Canvas title", "default": "Knowledge Canvas"},
+                "note_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Optional list of note IDs to include in the visual canvas",
+                },
+            },
+        },
+    },
+    {
+        "name": "neuro_retrieve_vault_bm25",
+        "description": "Executes Okapi BM25 contextual keyword retrieval across notes with snippet extraction and relevance scoring.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "Search query terms"},
+                "top_k": {"type": "integer", "description": "Max results to return", "default": 5},
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "neuro_route_note",
+        "description": "Calculates optimal note destination folder, filename, and tags according to PARA, LYT, Zettelkasten, or Generic methodology.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string", "description": "Title of the note to file"},
+                "content": {"type": "string", "description": "Content of the note", "default": ""},
+                "mode": {
+                    "type": "string",
+                    "description": "Methodology mode: 'generic', 'lyt', 'para', or 'zettelkasten'",
+                    "enum": ["generic", "lyt", "para", "zettelkasten"],
+                    "default": "generic",
+                },
+            },
+            "required": ["title"],
+        },
+    },
 ]
 
 
@@ -417,3 +475,80 @@ async def handle_generate_graph_wiki(arguments: dict[str, Any]) -> str:
         },
         indent=2,
     )
+
+
+async def handle_lint_vault(arguments: dict[str, Any]) -> str:
+    from app.services.obsidian_lint_service import ObsidianLintService
+
+    vault_path = arguments.get("vault_path")
+    if vault_path:
+        report = ObsidianLintService.lint_filesystem_vault(vault_path)
+        return json.dumps(report.model_dump(), indent=2)
+
+    async with AsyncSessionLocal() as session:
+        notes_res = await session.execute(select(Note))
+        notes = notes_res.scalars().all()
+        notes_data = [
+            {
+                "id": str(n.id),
+                "title": n.title,
+                "content": n.content,
+                "created_at": str(n.created_at) if hasattr(n, "created_at") else "now",
+                "tags": [],
+            }
+            for n in notes
+        ]
+        report = ObsidianLintService.lint_notes(notes_data, vault_name="Neuro-Database-Vault")
+        return json.dumps(report.model_dump(), indent=2)
+
+
+async def handle_create_canvas(arguments: dict[str, Any]) -> str:
+    from app.services.obsidian_canvas_service import ObsidianCanvasService
+
+    title = arguments.get("title", "Knowledge Canvas")
+    note_ids = arguments.get("note_ids")
+
+    async with AsyncSessionLocal() as session:
+        notes_res = await session.execute(select(Note))
+        notes = notes_res.scalars().all()
+        if note_ids:
+            notes = [n for n in notes if str(n.id) in note_ids]
+
+        n_ids = [n.id for n in notes]
+        links_res = await session.execute(
+            select(NoteLink).where(NoteLink.source_id.in_(n_ids), NoteLink.target_id.in_(n_ids))
+        )
+        links = links_res.scalars().all()
+
+        notes_data = [{"id": str(n.id), "title": n.title, "content": n.content, "tags": []} for n in notes]
+        links_data = [{"source": str(l.source_id), "target": str(l.target_id), "relation": "links_to"} for l in links]
+
+        canvas_doc = ObsidianCanvasService.create_canvas_from_notes(notes_data, links_data, title=title)
+        return json.dumps(canvas_doc.model_dump(), indent=2)
+
+
+async def handle_retrieve_vault_bm25(arguments: dict[str, Any]) -> str:
+    from app.services.obsidian_retrieval_service import ObsidianRetrievalService
+
+    query = arguments.get("query", "")
+    top_k = int(arguments.get("top_k", 5))
+
+    async with AsyncSessionLocal() as session:
+        notes_res = await session.execute(select(Note))
+        notes = notes_res.scalars().all()
+        notes_data = [{"id": str(n.id), "title": n.title, "content": n.content, "tags": []} for n in notes]
+
+        retrieval = ObsidianRetrievalService.search_bm25(query, notes_data, top_k=top_k)
+        return json.dumps(retrieval.model_dump(), indent=2)
+
+
+async def handle_route_note(arguments: dict[str, Any]) -> str:
+    from app.services.obsidian_mode_service import ObsidianModeService
+
+    title = arguments.get("title", "")
+    content = arguments.get("content", "")
+    mode = arguments.get("mode", "generic")
+
+    suggestion = ObsidianModeService.route_note(title=title, content=content, mode=mode)
+    return json.dumps(suggestion.model_dump(), indent=2)
+

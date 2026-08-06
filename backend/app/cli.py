@@ -383,5 +383,94 @@ def cli_generate_wiki(
     typer.echo(f"Successfully generated {len(articles)} wiki articles in '{out_dir}'.")
 
 
+obsidian_app = typer.Typer()
+app.add_typer(obsidian_app, name="obsidian", help="Obsidian Vault Intelligence, Diagnostics & Canvas Generation")
+
+
+@obsidian_app.command("lint")
+def cli_obsidian_lint(
+    path: str = typer.Option(".", help="Path to local Obsidian vault directory to lint"),
+):
+    """Lint an Obsidian vault for dead links, orphans, metadata gaps, and health diagnostics."""
+    from app.services.obsidian_lint_service import ObsidianLintService
+
+    typer.echo(f"🔍 Linting Obsidian vault at: {path}...\n")
+    report = ObsidianLintService.lint_filesystem_vault(path)
+
+    typer.echo("=======================================================")
+    typer.echo(f"🛡️  VAULT HEALTH REPORT: {report.vault_name}")
+    typer.echo(f"Scanned Notes: {report.total_notes_scanned} | Health Score: {report.health_score}% ({report.status})")
+    typer.echo("=======================================================\n")
+
+    if report.dead_links:
+        typer.echo(f"❌ DEAD / BROKEN LINKS ({len(report.dead_links)}):")
+        for dl in report.dead_links[:10]:
+            typer.echo(f"  - [{dl.source_file}:L{dl.line_number}] -> {dl.raw_wikilink}")
+        if len(report.dead_links) > 10:
+            typer.echo(f"  ... and {len(report.dead_links) - 10} more.")
+
+    if report.orphan_notes:
+        typer.echo(f"\n🏝️  ORPHAN NOTES ({len(report.orphan_notes)}):")
+        for orphan in report.orphan_notes[:10]:
+            typer.echo(f"  - {orphan}")
+        if len(report.orphan_notes) > 10:
+            typer.echo(f"  ... and {len(report.orphan_notes) - 10} more.")
+
+    if report.metadata_gaps:
+        typer.echo(f"\n📋 METADATA GAPS ({len(report.metadata_gaps)}):")
+        for mg in report.metadata_gaps[:6]:
+            typer.echo(f"  - {mg.file}: missing {', '.join(mg.missing_fields)}")
+
+    typer.echo("\n💡 ACTIONABLE REPAIR SUGGESTIONS:")
+    for sugg in report.actionable_suggestions:
+        typer.echo(f"  • {sugg}")
+
+
+@obsidian_app.command("canvas")
+def cli_obsidian_canvas(
+    title: str = typer.Option("Neuro Knowledge Canvas", help="Title for the canvas"),
+    out: str = typer.Option("knowledge.canvas", help="Output .canvas file path"),
+):
+    """Generate an Obsidian JSON Canvas 1.0 spatial visual map."""
+    from pathlib import Path
+
+    from app.services.obsidian_canvas_service import ObsidianCanvasService
+    from app.services.obsidian_lint_service import ObsidianLintService
+
+    report = ObsidianLintService.lint_filesystem_vault(".")
+    notes_data = [{"id": str(idx), "title": Path(file).stem, "content": file} for idx, file in enumerate(report.orphan_notes)]
+    canvas_doc = ObsidianCanvasService.create_canvas_from_notes(notes_data, title=title)
+    json_str = ObsidianCanvasService.to_json(canvas_doc)
+
+    Path(out).write_text(json_str, encoding="utf-8")
+    typer.echo(f"✅ Generated native Obsidian Canvas file: {out} ({len(canvas_doc.nodes)} nodes, {len(canvas_doc.edges)} edges)")
+
+
+@obsidian_app.command("route")
+def cli_obsidian_route(
+    title: str = typer.Argument(..., help="Note title to route"),
+    content: str = typer.Option("", help="Optional note content snippet"),
+    mode: str = typer.Option("generic", help="Methodology mode: generic, lyt, para, zettelkasten"),
+):
+    """Calculate the optimal destination folder, filename, and tags according to PARA/LYT/Zettelkasten."""
+    from app.services.obsidian_mode_service import ObsidianModeService
+
+    suggestion = ObsidianModeService.route_note(title=title, content=content, mode=mode)
+    typer.echo("\n=======================================================")
+    typer.echo(f"📂 NOTE ROUTING: {title} (Mode: {suggestion.mode.upper()})")
+    typer.echo(f"Destination Path: {suggestion.suggested_rel_path}")
+    typer.echo(f"Target Folder:    {suggestion.suggested_folder}")
+    typer.echo(f"Target Filename:  {suggestion.suggested_filename}")
+    if suggestion.suggested_tags:
+        typer.echo(f"Tags:             {', '.join(['#' + t for t in suggestion.suggested_tags])}")
+    if suggestion.moc_recommendation:
+        typer.echo(f"MOC Link:         {suggestion.moc_recommendation}")
+    if suggestion.zettelkasten_uid:
+        typer.echo(f"Zettelkasten UID: {suggestion.zettelkasten_uid}")
+    typer.echo(f"Reasoning:        {suggestion.reasoning}")
+    typer.echo("=======================================================\n")
+
+
 if __name__ == "__main__":
     app()
+

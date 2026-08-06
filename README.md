@@ -48,7 +48,6 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 
 ### 1. OS-Native Agent (Zero API Key Needed)
 - **Voice Wake-Word:** Speak *"Hey Neuro"* to activate listening mode.
-
 - **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*, *"Open Notepad"*, *"Open Calculator"*.
 - **Spotify Music Controller:** *"Play Bohemian Rhapsody on Spotify"*, *"Play Drake in Spotify"*, *"Spotify play lofi beats"*.
 - **Quick Second Brain Capture:** *"Add this to note: Project roadmap specs"*, *"Take a note meeting summary"*.
@@ -56,18 +55,31 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 - **Web Research Automation:** *"Search quantum computing on Google"*, *"Search YouTube for jazz"*, *"Search GitHub for FastAPI"*.
 - **Local Fallback:** Runs instantly with deterministic regex parsing even if disconnected from the internet or without AI keys.
 
-### 2. Codebase Knowledge Graph & Architecture Intelligence
+### 2. Knowledge Vault Intelligence & Diagnostics Engine
+- **Broken Wikilink Scanner & Auto-Healer:** Automatically parses all `[[wikilinks]]`, detects broken references, suggests close match targets, and auto-heals links.
+- **Orphan Note & Structure Linter:** Identifies disconnected leaf notes with 0 connections, detects empty section headings, and checks frontmatter metadata.
+- **Deterministic Okapi BM25 Retrieval:** Term-weighted retrieval (k1=1.5, b=0.75) scoring across note titles, tags, and body content without requiring an external vector database.
+- **Methodology Note Router:** Classifies and suggests standardized folder paths, filenames, and parent MOCs for PARA (Projects, Areas, Resources, Archives), LYT (Linking Your Thinking), and Zettelkasten systems.
+- **Recoverable Plan/Apply Transactions:** Atomic file mutation operations with pre-mutation snapshots, SHA-256 checksum tracking, unified diff previews, and zero-loss rollback.
+- **Vault Boundary Sandboxing:** Path traversal protection ensuring all operations strictly adhere to the designated vault root boundary.
+
+### 3. Spatial JSON Canvas 1.0 Studio
+- **Visual Mindmap & Roadmap Studio:** Infinite 2D grid viewport with pan, zoom, custom node creation (Notes, Floating Text, Concept Groups), and connection edges.
+- **Native JSON Canvas Interoperability:** Export and import compliant `.canvas` files compatible with Obsidian and standard visual tools.
+- **AI Roadmap Synthesis:** Automatically transforms learning goals and project milestones into visual, connected canvas dependency graphs.
+
+### 4. Codebase Knowledge Graph & Architecture Intelligence
 - **AST Multi-Language Extraction:** Analyzes Python, TypeScript, JavaScript, Rust, Go, and Markdown into unified semantic entities and dependency edges.
-- **Louvain Community Detection:** Discovers functional subsystem clusters and computes cohesion & modularity metrics.
+- **Louvain Community Detection:** Discovers functional subsystem clusters and computes cohesion and modularity metrics.
 - **Keystones & God Node Centrality:** Identifies high-degree architectural keystones, bottleneck components, and bridge nodes.
 - **Blast Radius & Impact Simulator:** Simulates changes to any function, class, or module and computes upstream and downstream impact trees.
 - **Wikipedia-Style Markdown Wiki Generator:** Automatically converts your codebase into structured, cross-linked documentation.
 
-### 3. Model Context Protocol (MCP) Server
+### 5. Model Context Protocol (MCP) Server
 - Turn your entire Neuro second-brain and knowledge graph into an MCP tool provider for **Cursor**, **Windsurf**, and **Claude Desktop**.
-- Built-in tools: `neuro_search_notes`, `neuro_get_graph`, `neuro_calculate_blast_radius`, `neuro_analyze_codebase_graph`, `neuro_generate_graph_wiki`, `neuro_create_note`, `neuro_execute_system_command`, `neuro_generate_roadmap`.
+- Built-in tools: `neuro_search_notes`, `neuro_get_graph`, `neuro_calculate_blast_radius`, `neuro_analyze_codebase_graph`, `neuro_generate_graph_wiki`, `neuro_create_note`, `neuro_execute_system_command`, `neuro_generate_roadmap`, `neuro_obsidian_lint`, `neuro_obsidian_search_bm25`, `neuro_obsidian_create_canvas`.
 
-### 4. Single-Command Launch (Silent Background Supervisor)
+### 6. Single-Command Launch (Silent Background Supervisor)
 - Launch the entire system with **one single command**:
   ```bash
   pnpm start
@@ -75,10 +87,10 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 - **Hides backend logs completely:** The FastAPI backend starts silently in the background, supervised by Electron. No separate terminal windows or log spam.
 - Logs are cleanly preserved in `.neuro/logs/backend.log` for inspection whenever needed.
 
-### 5. Tactical HUD & Second Brain
+### 7. Tactical HUD & Glassmorphic Second Brain
 - Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the HUD.
 - Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with sound responses.
-- Dynamic interactive force-directed graph view (D3.js) and Obsidian vault bidirectional export/import.
+- Interactive force-directed graph view (D3.js), Task Kanban board, Vault Diagnostics studio, and Spatial Canvas studio.
 
 ---
 
@@ -122,22 +134,24 @@ pnpm start
 ```
 
 ### Neuro CLI Commands
-Neuro includes a powerful local CLI for database management, learning roadmaps, graph intelligence, and MCP hosting:
+Neuro includes a local CLI for database management, learning roadmaps, graph intelligence, vault diagnostics, and MCP hosting:
 
 ```bash
 # Start MCP server for AI clients (Cursor, Claude Desktop, Windsurf)
 neuro mcp
 
-# Analyze codebase knowledge graph & discover God nodes / communities
+# Vault Intelligence & Linting
+neuro obsidian lint --path .
+neuro obsidian search "vector BM25 retrieval" --top-k 5
+neuro obsidian route "Engineering OKRs" --mode para
+neuro obsidian canvas create --title "System Architecture"
+
+# Codebase Knowledge Graph & Community Analysis
 neuro graph analyze --path .
-
-# Compute change blast radius for a class or function
 neuro graph impact RoadmapService --depth 3
-
-# Generate Wikipedia-style Markdown documentation from codebase
 neuro graph wiki --out-dir ./wiki
 
-# Generate interactive prerequisite DAG roadmap for learning goals
+# Interactive Prerequisite DAG Roadmap
 neuro roadmap "Deep Learning & Transformers" --depth advanced
 
 # Initialize or seed database
@@ -220,7 +234,7 @@ OLLAMA_MODEL=llama3.2
 
 ## Testing
 
-Run backend tests for the agent, intent parser, and graph intelligence:
+Run backend tests for the agent, intent parser, graph intelligence, vault transactions, and diagnostics:
 
 ```bash
 cd backend
@@ -232,4 +246,3 @@ python -m pytest tests/ -v
 ## License
 
 Neuro is open-source software licensed under the [MIT License](LICENSE).
-

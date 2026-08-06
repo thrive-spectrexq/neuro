@@ -711,6 +711,73 @@ class IntentParser:
                 cleaned_command=cleaned,
             )
 
+        # 21. Obsidian Vault Linting & Health Diagnostics
+        if re.search(
+            r"\b(lint\s+(?:the\s+)?(?:obsidian\s+)?vault|vault\s+health(?:\s+check)?|find\s+(?:all\s+)?(?:dead|broken)\s+links|find\s+orphan\s+notes)\b",
+            lower,
+        ):
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="lint_vault",
+                parameters={},
+                confidence=0.97,
+                matched_pattern="lint_vault",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 22. Obsidian JSON Canvas 1.0 Generation
+        canvas_match = re.search(
+            r"\b(?:create|generate|export)\s+(?:an?\s+)?(?:obsidian\s+)?canvas(?:\s+for\s+(?P<title>.+))?",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        if canvas_match:
+            title_arg = canvas_match.group("title").strip() if canvas_match.group("title") else "Knowledge Canvas"
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="create_canvas",
+                parameters={"title": title_arg},
+                confidence=0.96,
+                matched_pattern="create_canvas",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 23. Contextual BM25 Vault Retrieval
+        bm25_match = re.search(
+            r"\b(?:bm25\s+search|search\s+vault\s+for|retrieve\s+from\s+vault|find\s+in\s+vault)\s+(?P<query>.+)",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        if bm25_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="retrieve_vault_bm25",
+                parameters={"query": bm25_match.group("query").strip()},
+                confidence=0.96,
+                matched_pattern="retrieve_vault_bm25",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
+        # 24. Smart Methodology Note Routing (PARA, LYT, Zettelkasten)
+        route_match = re.search(
+            r"\b(?:where\s+should\s+i\s+file|route\s+note|organize\s+note)\s+(?P<title>[^?]+)",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        if route_match:
+            return ParsedIntent(
+                is_matched=True,
+                tool_name="route_note",
+                parameters={"title": route_match.group("title").strip()},
+                confidence=0.95,
+                matched_pattern="route_note",
+                raw_command=text,
+                cleaned_command=cleaned,
+            )
+
         # No deterministic intent matched
         return ParsedIntent(is_matched=False, confidence=0.0, raw_command=text, cleaned_command=cleaned)
 
