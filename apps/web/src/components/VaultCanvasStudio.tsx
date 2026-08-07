@@ -9,7 +9,6 @@ import {
   RotateCcw, 
   Type, 
   Trash2,
-  Palette,
   Edit3,
   Check
 } from 'lucide-react';

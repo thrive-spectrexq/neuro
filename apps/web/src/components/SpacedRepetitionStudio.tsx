@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Sparkles, 
   RotateCw, 
@@ -12,10 +13,18 @@ import {
   HelpCircle, 
   Check, 
   Flame,
-  ArrowRight,
-  RefreshCw
+  ArrowRight
 } from 'lucide-react';
-import { useNoteStore } from '../stores/noteStore';
+import { useAuthStore } from '../stores/authStore';
+
+export interface NoteItem {
+  id: string;
+  title: string;
+  content: string;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface Flashcard {
   id: string;
@@ -32,7 +41,24 @@ export interface Flashcard {
 }
 
 export function SpacedRepetitionStudio() {
-  const notes = useNoteStore((state) => state.notes);
+  const token = useAuthStore((state) => state.token);
+
+  // Fetch real vault notes from backend
+  const { data: notes = [] } = useQuery<NoteItem[]>({
+    queryKey: ['notes'],
+    queryFn: async () => {
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const res = await fetch('/api/v1/notes', { headers });
+      if (!res.ok) {
+        throw new Error('Failed to fetch notes');
+      }
+      return res.json();
+    },
+  });
+
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -50,16 +76,16 @@ export function SpacedRepetitionStudio() {
     const extracted: Flashcard[] = [];
     const now = new Date().toISOString();
 
-    notes.forEach((note) => {
+    notes.forEach((note: NoteItem) => {
       const content = note.content || '';
       const lines = content.split('\n');
 
       // 1. Parse inline Q::A
-      lines.forEach((line, idx) => {
+      lines.forEach((line: string, idx: number) => {
         const trimmed = line.trim();
         if (trimmed.includes('::') && !trimmed.startsWith('#')) {
           const parts = trimmed.split('::');
-          if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
+          if (parts.length >= 2 && parts[0]?.trim() && parts[1]?.trim()) {
             extracted.push({
               id: `${note.id}_qa_${idx}`,
               noteId: note.id,
@@ -78,11 +104,11 @@ export function SpacedRepetitionStudio() {
 
       // 2. Parse Cloze highlights ==answer==
       const clozeRegex = /([^\n.!?]*==([^=]+)==[^\n.!?]*)/g;
-      let match;
+      let match: RegExpExecArray | null;
       let clozeIdx = 0;
       while ((match = clozeRegex.exec(content)) !== null) {
-        const fullSentence = match[1].trim();
-        const answer = match[2].trim();
+        const fullSentence = (match[1] || '').trim();
+        const answer = (match[2] || '').trim();
         if (answer && fullSentence.length > answer.length) {
           const clozeFront = fullSentence.replace(`==${answer}==`, '[ ... ]');
           extracted.push({
@@ -103,7 +129,7 @@ export function SpacedRepetitionStudio() {
 
     // If no explicit syntax is present in notes yet, generate default study deck
     if (extracted.length === 0) {
-      notes.slice(0, 5).forEach((n, i) => {
+      notes.slice(0, 5).forEach((n: NoteItem, i: number) => {
         extracted.push({
           id: `sample_${i}`,
           noteId: n.id,
@@ -219,7 +245,7 @@ export function SpacedRepetitionStudio() {
   // Handle manual card addition
   const handleAddManualCard = () => {
     if (!newFront.trim() || !newBack.trim()) return;
-    const note = notes.find((n) => n.id === selectedNoteId) || notes[0];
+    const note = notes.find((n: NoteItem) => n.id === selectedNoteId) || notes[0];
 
     const newCard: Flashcard = {
       id: `manual_${Date.now()}`,
@@ -576,7 +602,7 @@ export function SpacedRepetitionStudio() {
                 onChange={(e) => setSelectedNoteId(e.target.value)}
                 className="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
               >
-                {notes.map((n) => (
+                {notes.map((n: NoteItem) => (
                   <option key={n.id} value={n.id}>
                     {n.title}
                   </option>
