@@ -44,16 +44,18 @@ function createWindow() {
 }
 
 function createNeonOrbWindow() {
-  if (orbWindow) return;
+  if (orbWindow && !orbWindow.isDestroyed()) return;
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
 
+  const initialSize = 130;
+
   orbWindow = new BrowserWindow({
-    width: 120,
-    height: 120,
-    x: width - 130,
-    y: height - 130,
+    width: initialSize,
+    height: initialSize,
+    x: width - initialSize - 30,
+    y: height - initialSize - 30,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -66,6 +68,8 @@ function createNeonOrbWindow() {
       contextIsolation: true,
     },
   });
+
+  orbWindow.setAlwaysOnTop(true, 'screen-saver');
 
   const orbUrl = app.isPackaged
     ? `file://${path.join(__dirname, '../renderer/index.html')}?mode=orb`
@@ -84,10 +88,13 @@ app.whenReady().then(async () => {
     console.error('[Neuro] Backend silent launch error:', err);
   });
 
-  // 2. Create Electron Main Window
+  // 2. Create Electron Main Workstation Window
   createWindow();
 
-  // 3. Register global hotkey for JARVIS Voice/HUD (Ctrl+Space / Cmd+Space / Alt+Space)
+  // 3. Launch Floating Neon Voice Agent Orb directly on the PC Desktop Screen
+  createNeonOrbWindow();
+
+  // 4. Register global hotkeys for JARVIS Voice/HUD (Ctrl+Space / Cmd+Space / Alt+Space)
   try {
     globalShortcut.register('CommandOrControl+Space', () => {
       if (mainWindow) {
@@ -109,7 +116,10 @@ app.whenReady().then(async () => {
   }
 
   app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+      createNeonOrbWindow();
+    }
   });
 });
 
@@ -167,10 +177,41 @@ ipcMain.handle('orb:close', () => {
   return true;
 });
 
+ipcMain.handle('orb:resize', (_, { width, height }: { width: number; height: number }) => {
+  if (orbWindow && !orbWindow.isDestroyed()) {
+    const [currentX, currentY] = orbWindow.getPosition();
+    const [currentW, currentH] = orbWindow.getSize();
+    // Expand upwards & leftwards to keep anchor steady at bottom-right
+    const deltaW = width - currentW;
+    const deltaH = height - currentH;
+    orbWindow.setBounds({
+      x: currentX - deltaW,
+      y: currentY - deltaH,
+      width,
+      height,
+    });
+  }
+  return true;
+});
+
 ipcMain.handle('window:focus-main', () => {
-  if (mainWindow) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.focus();
+  } else {
+    createWindow();
+  }
+  return true;
+});
+
+ipcMain.handle('window:toggle-main', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isVisible() && !mainWindow.isMinimized()) {
+      mainWindow.minimize();
+    } else {
+      mainWindow.restore();
+      mainWindow.focus();
+    }
   } else {
     createWindow();
   }

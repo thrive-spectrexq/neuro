@@ -12,6 +12,15 @@
     letter-spacing: -0.011em;
   }
 
+  html.mode-orb,
+  body.mode-orb,
+  body.mode-orb #root {
+    background: transparent !important;
+    background-color: transparent !important;
+    overflow: hidden !important;
+    user-select: none;
+  }
+
   input, textarea {
     @apply select-text;
   }

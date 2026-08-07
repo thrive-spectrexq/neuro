@@ -8,7 +8,9 @@ export interface ElectronAPI {
   getBackendStatus: () => Promise<{ healthy: boolean; url: string }>;
   createOrbWindow: () => Promise<boolean>;
   closeOrbWindow: () => Promise<boolean>;
+  resizeOrbWindow: (width: number, height: number) => Promise<boolean>;
   focusMainWindow: () => Promise<boolean>;
+  toggleMainWindow: () => Promise<boolean>;
   onToggleJarvisHUD: (callback: () => void) => () => void;
 }
 

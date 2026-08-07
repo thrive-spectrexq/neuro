@@ -16,6 +16,13 @@ export default function App() {
 
   const isOrbOnlyMode = typeof window !== 'undefined' && window.location.search.includes('mode=orb');
 
+  useEffect(() => {
+    if (isOrbOnlyMode) {
+      document.documentElement.classList.add('mode-orb');
+      document.body.classList.add('mode-orb');
+    }
+  }, [isOrbOnlyMode]);
+
   // Close HUD on Esc key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -31,6 +38,7 @@ export default function App() {
     return (
       <div className="w-full h-full bg-transparent overflow-hidden flex items-center justify-center">
         <DesktopNeonOrb
+          standaloneMode={true}
           onOpenJarvis={() => {
             window.electronAPI?.focusMainWindow();
           }}
@@ -65,9 +73,6 @@ export default function App() {
         isOpen={isJarvisOpen}
         onClose={() => setIsJarvisOpen(false)}
       />
-
-      {/* Floating Desktop Neon Voice Agent Orb */}
-      <DesktopNeonOrb onOpenJarvis={() => setIsJarvisOpen(true)} />
     </>
   );
 }

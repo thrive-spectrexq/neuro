@@ -10,6 +10,7 @@ import {
   Activity,
   ChevronRight,
   HelpCircle,
+  Radio,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -112,7 +113,16 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
           </div>
 
           {/* Engine Status & Telemetry Pill */}
-          <div className="no-drag flex items-center gap-3 text-[11px] text-zinc-500">
+          <div className="no-drag flex items-center gap-2 text-[11px] text-zinc-500">
+            <button
+              onClick={() => window.electronAPI?.createOrbWindow()}
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-400 text-[10px] font-mono hover:bg-cyan-900/40 transition-colors"
+              title="Spawn Floating Neon Desktop Screen Orb"
+            >
+              <Radio size={10} className="text-cyan-400 animate-pulse" />
+              <span>Desktop Orb</span>
+            </button>
+
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Offline Ready</span>
