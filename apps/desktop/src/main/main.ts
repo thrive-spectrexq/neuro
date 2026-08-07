@@ -27,11 +27,24 @@ function createWindow() {
     },
   });
 
+  const mainUrl = app.isPackaged
+    ? path.join(__dirname, '../renderer/index.html')
+    : 'http://localhost:3000';
+
   if (app.isPackaged) {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(mainUrl);
   } else {
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL(mainUrl);
   }
+
+  mainWindow.webContents.on('did-fail-load', () => {
+    setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        if (app.isPackaged) mainWindow.loadFile(mainUrl);
+        else mainWindow.loadURL(mainUrl);
+      }
+    }, 1200);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -46,21 +59,23 @@ function createNeonOrbWindow() {
   }
 
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { width, height } = primaryDisplay.workAreaSize;
+  const { x, y, width, height } = primaryDisplay.workArea;
 
-  const initialSize = 140;
+  const initialSize = 150;
+  const initialX = Math.round(x + width - initialSize - 24);
+  const initialY = Math.round(y + height - initialSize - 24);
 
   orbWindow = new BrowserWindow({
     width: initialSize,
     height: initialSize,
-    x: Math.max(10, width - initialSize - 30),
-    y: Math.max(10, height - initialSize - 30),
+    x: initialX,
+    y: initialY,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
     resizable: false,
     hasShadow: false,
-    skipTaskbar: true,
+    skipTaskbar: false,
     show: true,
     backgroundColor: '#00000000',
     webPreferences: {
@@ -70,14 +85,28 @@ function createNeonOrbWindow() {
     },
   });
 
-  orbWindow.setAlwaysOnTop(true, 'screen-saver');
-  orbWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  orbWindow.setAlwaysOnTop(true, 'screen-saver', 1);
 
   const orbUrl = app.isPackaged
     ? `file://${path.join(__dirname, '../renderer/index.html')}?mode=orb`
-    : 'http://localhost:3000?mode=orb';
+    : 'http://localhost:3000/?mode=orb';
 
   orbWindow.loadURL(orbUrl);
+
+  orbWindow.once('ready-to-show', () => {
+    if (orbWindow && !orbWindow.isDestroyed()) {
+      orbWindow.show();
+      orbWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+    }
+  });
+
+  orbWindow.webContents.on('did-fail-load', () => {
+    setTimeout(() => {
+      if (orbWindow && !orbWindow.isDestroyed()) {
+        orbWindow.loadURL(orbUrl);
+      }
+    }, 1200);
+  });
 
   orbWindow.on('closed', () => {
     orbWindow = null;

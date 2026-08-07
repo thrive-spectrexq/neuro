@@ -43,9 +43,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
     if (!standaloneMode || !window.electronAPI?.resizeOrbWindow) return;
 
     if (isHovered || transcript || lastResult) {
-      window.electronAPI.resizeOrbWindow(280, 220);
+      window.electronAPI.resizeOrbWindow(300, 230);
     } else {
-      window.electronAPI.resizeOrbWindow(130, 130);
+      window.electronAPI.resizeOrbWindow(150, 150);
     }
   }, [standaloneMode, isHovered, transcript, lastResult]);
 

@@ -7,8 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      try {
+        if (window.location.search.includes('mode=orb')) {
+          document.documentElement.classList.add('mode-orb');
+        }
+      } catch (e) {}
+    </script>
   </head>
-  <body class="bg-background text-zinc-100 font-sans antialiased overflow-hidden selection:bg-brand-primary/30 selection:text-white">
+  <body class="text-zinc-100 font-sans antialiased overflow-hidden selection:bg-brand-primary/30 selection:text-white">
     <div id="root" class="h-screen w-screen"></div>
     <script type="module" src="./main.tsx"></script>
   </body>

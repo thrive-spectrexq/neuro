@@ -7,8 +7,12 @@
     border-color: rgba(255, 255, 255, 0.08);
   }
 
+  body:not(.mode-orb) {
+    background-color: #07080c;
+  }
+
   body {
-    @apply bg-background text-zinc-100 font-sans select-none antialiased;
+    @apply text-zinc-100 font-sans select-none antialiased;
     letter-spacing: -0.011em;
   }
 
@@ -17,8 +21,10 @@
   body.mode-orb #root {
     background: transparent !important;
     background-color: transparent !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     user-select: none;
+    width: 100vw !important;
+    height: 100vh !important;
   }
 
   input, textarea {
