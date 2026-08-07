@@ -87,10 +87,10 @@ Open Apps (Brave/Code)       Spotify Controller          Instant Notes & Tasks
 - **Hides backend logs completely:** The FastAPI backend starts silently in the background, supervised by Electron. No separate terminal windows or log spam.
 - Logs are cleanly preserved in `.neuro/logs/backend.log` for inspection whenever needed.
 
-### 7. Tactical HUD & Glassmorphic Second Brain
-- Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the HUD.
-- Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with sound responses.
-- Interactive force-directed graph view (D3.js), Task Kanban board, Vault Diagnostics studio, and Spatial Canvas studio.
+### 7. Tactical HUD & Pro Dark Workstation
+- Global hotkey <kbd>Ctrl + Space</kbd> or <kbd>Alt + Space</kbd> instantly summons the tactical HUD.
+- Live audio visualizer reactor, speech-to-text live ticker, and real-time action feedback cards with voice responses.
+- Interactive force-directed graph view (D3.js), Task Kanban board, Vault Diagnostics studio, and Spatial Canvas studio built on a solid `#090A0F` dark engineering surface.
 
 ---
 

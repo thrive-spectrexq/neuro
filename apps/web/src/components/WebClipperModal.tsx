@@ -59,52 +59,52 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="glass-panel w-full max-w-md p-6 rounded-2xl border border-white/15 shadow-2xl space-y-4">
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+      <div className="bg-[#0F1117] w-full max-w-md p-5 rounded-lg border border-[#242A3C] shadow-2xl space-y-3.5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-sky-500/20 border border-sky-500/30 rounded-xl">
-              <Globe className="w-5 h-5 text-sky-400" />
+        <div className="flex items-center justify-between border-b border-[#1F2433] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-[#121E2E] border border-[#1B324D] rounded-md text-sky-400">
+              <Globe className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Web Research Clipper</h3>
-              <p className="text-xs text-slate-400">Capture & summarize web pages into your vault</p>
+              <h3 className="text-xs font-bold text-white font-mono">Web Research Clipper</h3>
+              <p className="text-[10px] text-[#64748B]">Synthesize external articles directly into your vault</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            className="p-1 text-[#64748B] hover:text-white hover:bg-[#141722] rounded transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <form onSubmit={handleClip} className="space-y-4">
+        <form onSubmit={handleClip} className="space-y-3">
           {/* URL Input */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Target Page URL</label>
-            <div className="flex items-center gap-2 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-xs text-white">
-              <Link2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
+            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Target Page URL</label>
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white">
+              <Link2 className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
               <input
                 type="url"
                 required
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com/research-article"
-                className="w-full bg-transparent outline-none text-xs text-white placeholder-slate-500"
+                placeholder="https://example.com/research-paper"
+                className="w-full bg-transparent outline-none text-xs text-white placeholder-[#475569] font-mono"
               />
             </div>
           </div>
 
           {/* Clip Mode selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Capture Mode</label>
+            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Extraction Strategy</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { id: 'summary', label: 'AI Summary', icon: Sparkles },
-                { id: 'full', label: 'Full Article', icon: FileText },
-                { id: 'bookmark', label: 'Bookmark Only', icon: Bookmark },
+                { id: 'full', label: 'Full Text', icon: FileText },
+                { id: 'bookmark', label: 'Metadata Only', icon: Bookmark },
               ].map((m) => {
                 const Icon = m.icon;
                 return (
@@ -112,14 +112,14 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
                     key={m.id}
                     type="button"
                     onClick={() => setClipMode(m.id as any)}
-                    className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
+                    className={`p-2 rounded-md border text-xs font-mono flex flex-col items-center gap-1 transition-colors ${
                       clipMode === m.id
-                        ? 'bg-sky-500/20 border-sky-500 text-white shadow-md'
-                        : 'bg-black/40 border-white/10 text-slate-400 hover:text-white'
+                        ? 'bg-[#121E2E] border-sky-500 text-white shadow-sm'
+                        : 'bg-[#090A0F] border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#141722]'
                     }`}
                   >
-                    <Icon className="w-4 h-4 text-sky-400" />
-                    {m.label}
+                    <Icon className="w-3.5 h-3.5 text-sky-400" />
+                    <span className="text-[10px]">{m.label}</span>
                   </button>
                 );
               })}
@@ -128,32 +128,32 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
 
           {/* Status Messages */}
           {error && (
-            <div className="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <div className="p-2.5 bg-[#2B1215] border border-[#521C24] rounded-md text-rose-300 text-xs font-mono flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
               {error}
             </div>
           )}
 
           {success && (
-            <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              Web article clipped & saved to vault!
+            <div className="p-2.5 bg-[#102319] border border-[#1B432C] rounded-md text-emerald-300 text-xs font-mono flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+              Page clipped and integrated into local knowledge graph.
             </div>
           )}
 
           {/* Footer Actions */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-[#1F2433]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-all"
+              className="px-3 py-1 text-xs font-mono text-[#94A3B8] hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!url.trim() || isClipping}
-              className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white rounded-xl text-xs font-semibold shadow-lg hover:brightness-110 disabled:opacity-50 transition-all"
+              className="px-3.5 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium disabled:opacity-50 transition-colors shadow-sm"
             >
               {isClipping ? 'Clipping Page...' : 'Clip to Vault'}
             </button>

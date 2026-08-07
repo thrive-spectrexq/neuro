@@ -70,7 +70,6 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
       setSelectedIndex((prev) => (prev - 1 + results.length + 3) % (results.length + 3));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      // Handle action based on selectedIndex
       if (selectedIndex === 0) {
         onSelectTab('graph');
         onClose();
@@ -88,43 +87,43 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/80"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl glass-panel rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col transform animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl bg-[#0F1117] rounded-lg border border-[#242A3C] shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         {/* Search Header */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/10 bg-black/30">
-          <Search className="w-5 h-5 text-indigo-400 flex-shrink-0" />
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-[#1F2433] bg-[#090A0F]">
+          <Search className="w-4 h-4 text-indigo-400 flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
             placeholder="Type a command or search notes (e.g. 'Quantum', 'Tasks')..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-transparent text-sm text-white placeholder-slate-400 outline-none font-sans"
+            className="w-full bg-transparent text-xs text-white placeholder-[#475569] outline-none font-mono"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 text-slate-400 hover:text-white rounded"
+              className="p-1 text-[#64748B] hover:text-white rounded"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <span className="px-2 py-0.5 text-[10px] font-semibold text-slate-400 bg-white/5 border border-white/10 rounded">
+          <span className="px-1.5 py-0.5 text-[9px] font-mono text-[#64748B] bg-[#141722] border border-[#242A3C] rounded">
             ESC
           </span>
         </div>
 
         {/* Search Results / Navigation Options */}
-        <div className="max-h-96 overflow-y-auto p-2 space-y-1">
+        <div className="max-h-80 overflow-y-auto p-1.5 space-y-1">
           {/* Quick Actions */}
           {!query && (
-            <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            <div className="px-2 py-1 text-[9px] font-mono font-bold uppercase tracking-wider text-[#64748B]">
               Quick Navigation
             </div>
           )}
@@ -134,15 +133,15 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onSelectTab('graph');
               onClose();
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-              selectedIndex === 0 ? 'bg-indigo-600/30 text-white border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'
+            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
+              selectedIndex === 0 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <FileText className="w-4 h-4 text-indigo-400" />
+            <div className="flex items-center gap-2.5">
+              <FileText className="w-3.5 h-3.5 text-indigo-400" />
               <span>Knowledge Graph & Notes</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+            <ArrowRight className="w-3 h-3 text-[#475569]" />
           </button>
 
           <button
@@ -150,15 +149,15 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onSelectTab('tasks');
               onClose();
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-              selectedIndex === 1 ? 'bg-indigo-600/30 text-white border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'
+            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
+              selectedIndex === 1 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <CheckSquare className="w-4 h-4 text-sky-400" />
+            <div className="flex items-center gap-2.5">
+              <CheckSquare className="w-3.5 h-3.5 text-sky-400" />
               <span>Task Kanban Board</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+            <ArrowRight className="w-3 h-3 text-[#475569]" />
           </button>
 
           <button
@@ -166,26 +165,26 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onSelectTab('audit');
               onClose();
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-              selectedIndex === 2 ? 'bg-indigo-600/30 text-white border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'
+            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
+              selectedIndex === 2 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <Shield className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2.5">
+              <Shield className="w-3.5 h-3.5 text-emerald-400" />
               <span>Security Audit Logs</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+            <ArrowRight className="w-3 h-3 text-[#475569]" />
           </button>
 
           {/* Live Search Results */}
           {query && (
-            <div className="mt-2">
-              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <div className="mt-1">
+              <div className="px-2 py-1 text-[9px] font-mono font-bold uppercase tracking-wider text-[#64748B] flex items-center justify-between">
                 <span>Notes Search</span>
                 {isLoading && <Sparkles className="w-3 h-3 text-indigo-400 animate-spin" />}
               </div>
               {results.length === 0 && !isLoading && (
-                <div className="px-4 py-6 text-center text-xs text-slate-500">
+                <div className="px-3 py-4 text-center text-xs font-mono text-[#64748B]">
                   No notes found matching "{query}"
                 </div>
               )}
@@ -196,13 +195,13 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
                     onSelectTab('graph');
                     onClose();
                   }}
-                  className="px-3.5 py-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-all flex flex-col gap-1 border border-transparent hover:border-white/10"
+                  className="px-2.5 py-2 rounded-md hover:bg-[#141722] cursor-pointer transition-colors flex flex-col gap-0.5 border border-transparent hover:border-[#242A3C]"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-white">{item.title}</span>
-                    <span className="text-[10px] text-slate-400 font-mono">Note</span>
+                    <span className="text-xs font-bold text-white font-mono">{item.title}</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">Note</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-1">{item.content}</p>
+                  <p className="text-[10px] text-[#94A3B8] line-clamp-1 font-mono">{item.content}</p>
                 </div>
               ))}
             </div>
@@ -210,12 +209,12 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-white/5 bg-black/20 text-[10px] text-slate-400 flex justify-between items-center">
+        <div className="px-3 py-1.5 border-t border-[#1F2433] bg-[#090A0F] text-[9px] font-mono text-[#64748B] flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span>Use <kbd className="px-1 py-0.5 bg-white/10 rounded text-slate-300">↑</kbd> <kbd className="px-1 py-0.5 bg-white/10 rounded text-slate-300">↓</kbd> to navigate</span>
-            <span><kbd className="px-1 py-0.5 bg-white/10 rounded text-slate-300">↵</kbd> to select</span>
+            <span>Navigate: <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↑</kbd> <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↓</kbd></span>
+            <span>Select: <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↵</kbd></span>
           </div>
-          <span>Neuro Command Engine v0.1</span>
+          <span>Neuro Command Palette</span>
         </div>
       </div>
     </div>

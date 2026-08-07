@@ -140,94 +140,96 @@ export default function GraphView() {
   return (
     <div ref={containerRef} className="w-full h-full bg-[#090A0F] overflow-hidden flex-grow relative">
       {/* Header & Filter Controls Overlay */}
-      <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-3 glass-panel px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
+      <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2 bg-[#0F1117] px-3 py-1.5 rounded-lg border border-[#1F2433] shadow-md">
         <div className="flex items-center gap-2">
-          <Network className="w-4 h-4 text-indigo-400" />
+          <Network className="w-3.5 h-3.5 text-indigo-400" />
           <div>
-            <h2 className="text-xs font-bold text-white tracking-wide">Knowledge Graph</h2>
-            <p className="text-[10px] text-slate-400 font-mono">
+            <h2 className="text-xs font-bold text-white tracking-wide font-mono">Vault Graph</h2>
+            <p className="text-[10px] text-[#64748B] font-mono">
               {filteredData.nodes.length} Nodes · {filteredData.links.length} Links
             </p>
           </div>
         </div>
 
-        <div className="h-4 w-px bg-white/10 hidden sm:block" />
+        <div className="h-4 w-px bg-[#202636] hidden sm:block" />
 
         {/* Node Search Bar */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/40 border border-white/10 rounded-lg text-xs text-slate-300">
-          <Search className="w-3 h-3 text-slate-400" />
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-[#CBD5E1]">
+          <Search className="w-3 h-3 text-[#64748B]" />
           <input
             type="text"
-            placeholder="Search graph..."
+            placeholder="Filter nodes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent outline-none text-xs text-white placeholder-slate-500 w-24 sm:w-32"
+            className="bg-transparent text-xs text-white focus:outline-none placeholder-[#475569] w-24 sm:w-32 font-mono"
           />
         </div>
 
-        {/* Node Type Selector */}
-        <div className="flex items-center gap-1 p-0.5 bg-black/40 border border-white/10 rounded-lg">
-          {(['all', 'note', 'tag', 'entity'] as const).map((t) => (
+        {/* Node Type Filter */}
+        <div className="flex items-center gap-0.5 p-0.5 bg-[#090A0F] border border-[#1F2433] rounded-md">
+          {(['all', 'note', 'tag', 'entity'] as const).map((filter) => (
             <button
-              key={t}
-              onClick={() => setTypeFilter(t)}
-              className={`px-2 py-0.5 text-[10px] font-semibold capitalize rounded transition-all ${
-                typeFilter === t ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              key={filter}
+              onClick={() => setTypeFilter(filter)}
+              className={`px-2 py-0.5 text-[10px] font-mono rounded capitalize transition-colors ${
+                typeFilter === filter
+                  ? 'bg-[#242A3C] text-white'
+                  : 'text-[#64748B] hover:text-[#CBD5E1]'
               }`}
             >
-              {t}
+              {filter}
             </button>
           ))}
         </div>
 
-        <div className="h-4 w-px bg-white/10 hidden md:block" />
-
-        {/* Roadmap & Obsidian Action Buttons */}
+        {/* Prerequisite Roadmap Generator Button */}
         <button
           onClick={() => setShowRoadmapModal(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-medium transition-all"
+          className="flex items-center gap-1 px-2.5 py-1 bg-[#181C28] hover:bg-[#202638] text-indigo-300 border border-indigo-500/30 rounded-md text-xs font-medium transition-colors"
+          title="Generate Learning Roadmap DAG"
         >
           <Map className="w-3 h-3 text-indigo-400" />
-          Roadmap DAG
+          <span>Roadmap</span>
         </button>
 
+        {/* Export Obsidian Markdown Links */}
         <button
           onClick={handleExportObsidian}
-          className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-medium transition-all"
-          title="Export vault to Obsidian markdown archive"
+          className="flex items-center gap-1 px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-[#94A3B8] hover:text-white border border-[#242A3C] rounded-md text-xs font-medium transition-colors"
+          title="Export Obsidian Links"
         >
-          <FileCode className="w-3 h-3 text-purple-400" />
-          Export Obsidian
+          <FileCode className="w-3 h-3 text-[#64748B]" />
+          <span>Export</span>
         </button>
       </div>
 
       {/* Control Buttons Overlay */}
-      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-1.5 glass-panel p-1 rounded-xl border border-white/10 shadow-lg">
+      <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 bg-[#0F1117] p-1 rounded-lg border border-[#1F2433] shadow-md">
         <button
           onClick={handleExportSnapshot}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-          title="Export Image Snapshot"
+          className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
+          title="Export Snapshot Image"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-3.5 h-3.5" />
         </button>
-        <div className="h-4 w-px bg-white/10" />
+        <div className="h-3 w-px bg-[#202636]" />
         <button
           onClick={() => fgRef.current?.zoom(fgRef.current.zoom() * 1.3, 400)}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+          className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
           title="Zoom In"
         >
-          <ZoomIn className="w-4 h-4" />
+          <ZoomIn className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={() => fgRef.current?.zoom(fgRef.current.zoom() / 1.3, 400)}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+          className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
           title="Zoom Out"
         >
-          <ZoomOut className="w-4 h-4" />
+          <ZoomOut className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={handleResetZoom}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+          className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
           title="Reset View"
         >
           <RefreshCw className="w-3.5 h-3.5" />
@@ -236,31 +238,33 @@ export default function GraphView() {
 
       {/* Selected Node Inspector Drawer */}
       {selectedNode && (
-        <div className="absolute bottom-4 left-4 z-10 glass-panel p-3.5 rounded-xl border border-indigo-500/30 max-w-xs text-xs space-y-1.5 shadow-2xl">
+        <div className="absolute bottom-3 left-3 z-10 bg-[#0F1117] p-3 rounded-lg border border-indigo-500/40 max-w-xs text-xs space-y-1 shadow-xl">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-extrabold text-white text-sm truncate">{selectedNode.name}</span>
-            <button onClick={() => setSelectedNode(null)} className="text-slate-400 hover:text-white font-bold">&times;</button>
+            <span className="font-bold text-white text-xs truncate font-mono">{selectedNode.name}</span>
+            <button onClick={() => setSelectedNode(null)} className="text-[#64748B] hover:text-white font-bold">&times;</button>
           </div>
-          <p className="text-[11px] text-indigo-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
-          <p className="text-[11px] text-slate-400">Neighborhood isolated ({activeNeighbors.size} connected elements)</p>
+          <p className="text-[10px] text-indigo-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
+          <p className="text-[10px] text-[#64748B]">Isolated subgraph ({activeNeighbors.size} connections)</p>
         </div>
       )}
 
       {/* Roadmap Generator Modal */}
       {showRoadmapModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="glass-panel w-full max-w-2xl max-h-[85vh] rounded-2xl border border-indigo-500/30 overflow-hidden flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="bg-[#0F1117] w-full max-w-2xl max-h-[85vh] rounded-lg border border-[#1F2433] overflow-hidden flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#1F2433] bg-[#090A0F]">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-400" />
-                <h3 className="font-bold text-white text-sm">Learning Path & Prerequisite DAG Generator</h3>
+                <div className="p-1 bg-[#18162B] border border-[#302856] rounded text-indigo-400">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <h3 className="font-bold text-white text-xs font-mono">Learning Path & Prerequisite DAG Generator</h3>
               </div>
-              <button onClick={() => setShowRoadmapModal(false)} className="text-slate-400 hover:text-white">
-                <X className="w-4 h-4" />
+              <button onClick={() => setShowRoadmapModal(false)} className="text-[#64748B] hover:text-white font-mono text-xs">
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="p-5 space-y-4 overflow-y-auto">
+            <div className="p-4 space-y-3 overflow-y-auto font-mono">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -268,50 +272,50 @@ export default function GraphView() {
                   value={roadmapGoal}
                   onChange={(e) => setRoadmapGoal(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleGenerateRoadmap()}
-                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+                  className="flex-1 bg-[#090A0F] border border-[#1F2433] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
                 />
                 <button
                   onClick={handleGenerateRoadmap}
                   disabled={isGeneratingRoadmap || !roadmapGoal.trim()}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
+                  className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-50 text-white rounded-md text-xs font-mono font-medium flex items-center gap-1.5 transition-colors shadow-sm"
                 >
-                  {isGeneratingRoadmap ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  {isGeneratingRoadmap ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                   Generate DAG
                 </button>
               </div>
 
               {roadmapData && (
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between bg-indigo-950/40 border border-indigo-500/20 p-3 rounded-xl">
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center justify-between bg-[#090A0F] border border-[#1F2433] p-3 rounded-md">
                     <div>
-                      <h4 className="text-sm font-bold text-white">{roadmapData.subject}</h4>
-                      <p className="text-xs text-slate-400">Total estimated completion: ~{roadmapData.total_estimated_hours} hours</p>
+                      <h4 className="text-xs font-bold text-white font-mono">{roadmapData.subject}</h4>
+                      <p className="text-[10px] text-[#64748B] font-mono">Total estimated duration: ~{roadmapData.total_estimated_hours} hours</p>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-[#18162B] text-indigo-300 rounded border border-[#302856]">
                       {roadmapData.nodes.length} Stages · {roadmapData.edges.length} Dependencies
                     </span>
                   </div>
 
                   <div className="space-y-2">
-                    <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Sequential Learning Sequence</h5>
+                    <h5 className="text-[10px] font-mono uppercase tracking-wider text-[#64748B]">Sequential Learning Sequence</h5>
                     <div className="space-y-2">
                       {roadmapData.nodes.map((node: any, idx: number) => (
-                        <div key={node.id} className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-1 hover:border-indigo-500/30 transition-all">
+                        <div key={node.id} className="p-3 bg-[#090A0F] border border-[#1F2433] rounded-md space-y-1 hover:border-[#2E364B] transition-colors">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold flex items-center justify-center">
+                              <span className="w-4 h-4 rounded bg-[#18162B] border border-[#302856] text-indigo-300 text-[9px] font-bold flex items-center justify-center font-mono">
                                 {idx + 1}
                               </span>
-                              <span className="text-xs font-bold text-white">{node.title}</span>
+                              <span className="text-xs font-bold text-white font-mono">{node.title}</span>
                             </div>
-                            <span className="text-[10px] text-slate-400 font-mono">~{node.estimated_hours}h</span>
+                            <span className="text-[10px] text-[#64748B] font-mono">~{node.estimated_hours}h</span>
                           </div>
-                          <p className="text-[11px] text-slate-300 pl-7">{node.summary}</p>
+                          <p className="text-[11px] text-[#CBD5E1] pl-6">{node.summary}</p>
                           {node.prerequisites && node.prerequisites.length > 0 && (
-                            <div className="flex items-center gap-1 pl-7 pt-1">
-                              <span className="text-[10px] text-slate-500">Requires:</span>
+                            <div className="flex items-center gap-1 pl-6 pt-1">
+                              <span className="text-[9px] text-[#64748B] font-mono">Requires:</span>
                               {node.prerequisites.map((pId: string) => (
-                                <span key={pId} className="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">
+                                <span key={pId} className="text-[9px] px-1.5 py-0.2 bg-[#141722] text-[#94A3B8] border border-[#1F2433] rounded font-mono">
                                   {pId}
                                 </span>
                               ))}

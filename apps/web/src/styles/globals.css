@@ -3,160 +3,207 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-root: #090A0F;
+    --bg-surface-1: #0F1117;
+    --bg-surface-2: #151821;
+    --bg-surface-3: #1D212D;
+    --bg-surface-hover: #242938;
+    --bg-surface-active: #2D3345;
+    
+    --border-subtle: #1C202C;
+    --border-default: #262B3B;
+    --border-focus: #434B63;
+    --border-accent: #6366F1;
+
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --text-dim: #475569;
+  }
+
   body {
-    @apply bg-[#07080C] text-slate-100 font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200;
+    background-color: var(--bg-root);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+  }
+
+  code, kbd, pre, samp {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 }
 
-/* Background Gradients & Ambient Effects */
-.neuro-backdrop {
-  background-color: #07080C;
-  background-image: 
-    radial-gradient(at 20% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.04) 0px, transparent 60%);
+/* Professional Solid Surfaces (No Blur, High Precision) */
+.pro-surface-1 {
+  background-color: #0F1117;
+  border: 1px solid #1F2433;
 }
 
-.neuro-grid-pattern {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+.pro-surface-2 {
+  background-color: #151821;
+  border: 1px solid #242A3C;
 }
 
-.neuro-dots-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 20px 20px;
+.pro-surface-3 {
+  background-color: #1D212D;
+  border: 1px solid #2C3349;
 }
 
-/* Glassmorphism & Surface Tokens */
-.glass-panel {
-  background: rgba(14, 17, 26, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 12px 32px -8px rgba(0, 0, 0, 0.6);
+.pro-card {
+  background-color: #12151D;
+  border: 1px solid #202636;
+  border-radius: 10px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.glass-panel-elevated {
-  background: rgba(18, 22, 34, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 20px 48px -12px rgba(0, 0, 0, 0.8);
+.pro-card:hover {
+  background-color: #161A24;
+  border-color: #2F374E;
 }
 
-.neuro-card {
-  background: #0D101A;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.4);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.pro-card-active {
+  background-color: #181C28;
+  border-color: #6366F1;
 }
 
-.neuro-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 28px -4px rgba(99, 102, 241, 0.15);
-}
-
-/* Button Tokens */
-.neuro-button-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 4px 16px rgba(99, 102, 241, 0.35);
-  color: #ffffff;
-  font-weight: 600;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.neuro-button-primary:hover {
-  filter: brightness(1.12);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3), 0 6px 24px rgba(99, 102, 241, 0.5);
-  transform: translateY(-1px);
-}
-
-.neuro-button-primary:active {
-  transform: translateY(0);
-}
-
-.neuro-button-secondary {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: #cbd5e1;
+/* Crisp Button Hierarchy */
+.pro-button-primary {
+  background-color: #4F46E5;
+  color: #FFFFFF;
+  border: 1px solid #6366F1;
   font-weight: 500;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 8px;
+  padding: 6px 14px;
+  transition: all 0.12s ease;
 }
 
-.neuro-button-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  transform: translateY(-1px);
+.pro-button-primary:hover {
+  background-color: #4338CA;
+  border-color: #818CF8;
 }
 
-.neuro-button-secondary:active {
-  transform: translateY(0);
+.pro-button-primary:active {
+  background-color: #3730A3;
+  transform: translateY(0.5px);
 }
 
-.neuro-button-danger {
-  background: rgba(244, 63, 94, 0.1);
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  color: #fb7185;
-  transition: all 0.15s ease;
+.pro-button-secondary {
+  background-color: #151822;
+  color: #CBD5E1;
+  border: 1px solid #262C3E;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: all 0.12s ease;
 }
 
-.neuro-button-danger:hover {
-  background: rgba(244, 63, 94, 0.2);
-  border-color: rgba(244, 63, 94, 0.5);
-  color: #ffffff;
+.pro-button-secondary:hover {
+  background-color: #1D2230;
+  border-color: #38415C;
+  color: #FFFFFF;
 }
 
-/* Inputs & Forms */
-.neuro-input {
-  background: rgba(8, 10, 16, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: #f8fafc;
-  transition: all 0.15s ease;
+.pro-button-secondary:active {
+  background-color: #242A3C;
 }
 
-.neuro-input:focus {
-  border-color: rgba(99, 102, 241, 0.7);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+.pro-button-ghost {
+  background-color: transparent;
+  color: #94A3B8;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 10px;
+  transition: all 0.12s ease;
+}
+
+.pro-button-ghost:hover {
+  background-color: #181C26;
+  color: #F1F5F9;
+  border-color: #262B3A;
+}
+
+.pro-button-danger {
+  background-color: #2D141A;
+  border: 1px solid #4D1D28;
+  color: #FB7185;
+  border-radius: 8px;
+  transition: all 0.12s ease;
+}
+
+.pro-button-danger:hover {
+  background-color: #3B1822;
+  border-color: #6E2637;
+  color: #FFE4E6;
+}
+
+/* Professional Input Fields */
+.pro-input {
+  background-color: #0E1017;
+  border: 1px solid #232838;
+  color: #F1F5F9;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.pro-input:focus {
   outline: none;
-  background: rgba(10, 12, 20, 0.8);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 1px #6366F1;
+  background-color: #12151E;
 }
 
-/* Glow effects */
-.glow-cyan {
-  box-shadow: 0 0 20px -2px rgba(6, 182, 212, 0.35);
+.pro-input::placeholder {
+  color: #64748B;
 }
 
-.glow-indigo {
-  box-shadow: 0 0 20px -2px rgba(99, 102, 241, 0.35);
+/* Precision Badges & Keyboard Tags */
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1px solid #282E40;
+  background-color: #131620;
+  color: #94A3B8;
 }
 
-.glow-emerald {
-  box-shadow: 0 0 20px -2px rgba(16, 185, 129, 0.35);
+.pro-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid #2C3347;
+  background-color: #161A24;
+  color: #94A3B8;
+  box-shadow: 0 1px 0 0 #090A0F;
 }
 
-/* Scrollbars */
+/* Clean Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #090A0F;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
+  background: #202636;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: #313A52;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -167,12 +214,17 @@
   scrollbar-width: none;
 }
 
-/* Animations */
-@keyframes pulseGlow {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+/* Grid & Canvas Backgrounds */
+.pro-dot-grid {
+  background-color: #090A0F;
+  background-image: radial-gradient(#1E2333 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 3s infinite ease-in-out;
+.pro-line-grid {
+  background-color: #090A0F;
+  background-image: 
+    linear-gradient(to right, #141722 1px, transparent 1px),
+    linear-gradient(to bottom, #141722 1px, transparent 1px);
+  background-size: 24px 24px;
 }

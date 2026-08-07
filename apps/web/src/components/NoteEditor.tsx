@@ -18,7 +18,9 @@ import {
   Heading2, 
   CheckSquare, 
   Code, 
-  Clock 
+  Clock,
+  Sparkles,
+  X
 } from 'lucide-react';
 
 interface NoteEditorProps {
@@ -122,38 +124,49 @@ export function NoteEditor({
   const renderPreview = () => {
     if (!content.trim()) {
       return (
-        <div className="flex flex-col items-center justify-center h-64 text-slate-500 text-xs italic">
-          <FileText className="w-8 h-8 mb-2 opacity-40 text-indigo-400" />
-          Type markdown on the left to preview rich rendering & [[Wikilinks]]...
+        <div className="flex flex-col items-center justify-center h-64 text-[#64748B] text-xs font-mono">
+          <FileText className="w-8 h-8 mb-2 opacity-30 text-indigo-400" />
+          Markdown live preview will appear here...
         </div>
       );
     }
 
     const lines = content.split('\n');
     return (
-      <div className="p-6 space-y-3 text-slate-200 text-sm font-sans leading-relaxed">
+      <div className="p-4 space-y-2 text-[#CBD5E1] text-xs font-sans leading-relaxed">
         {lines.map((line, i) => {
-          if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-black text-white border-b border-white/10 pb-2 my-3 tracking-tight">{line.slice(2)}</h1>;
-          if (line.startsWith('## ')) return <h2 key={i} className="text-lg font-bold text-indigo-300 border-b border-white/5 pb-1 my-2 tracking-tight">{line.slice(3)}</h2>;
-          if (line.startsWith('### ')) return <h3 key={i} className="text-sm font-bold text-sky-300 my-1">{line.slice(4)}</h3>;
+          if (line.startsWith('# ')) return <h1 key={i} className="text-base font-bold text-white border-b border-[#242A3C] pb-1 my-2 font-mono">{line.slice(2)}</h1>;
+          if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-semibold text-indigo-300 border-b border-[#1E2333] pb-0.5 my-1.5 font-mono">{line.slice(3)}</h2>;
+          if (line.startsWith('### ')) return <h3 key={i} className="text-xs font-semibold text-sky-300 my-1 font-mono">{line.slice(4)}</h3>;
           if (line.startsWith('- [ ] ')) return (
-            <div key={i} className="flex items-center gap-2 text-slate-300">
-              <input type="checkbox" disabled className="rounded border-slate-700 bg-black/40 text-indigo-500" />
+            <div key={i} className="flex items-center gap-2 text-[#CBD5E1]">
+              <input type="checkbox" disabled className="rounded border-[#2E354A] bg-[#090A0F] text-indigo-500" />
               <span>{line.slice(6)}</span>
             </div>
           );
           if (line.startsWith('- [x] ')) return (
-            <div key={i} className="flex items-center gap-2 text-slate-500 line-through">
-              <input type="checkbox" checked disabled className="rounded border-slate-700 bg-black/40 text-indigo-500" />
+            <div key={i} className="flex items-center gap-2 text-[#64748B] line-through">
+              <input type="checkbox" checked disabled className="rounded border-[#2E354A] bg-[#090A0F] text-indigo-500" />
               <span>{line.slice(6)}</span>
             </div>
           );
-          if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 list-disc text-slate-300">{line.slice(2)}</li>;
+          if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 list-disc text-[#CBD5E1]">{line.slice(2)}</li>;
           if (line.startsWith('> ')) return (
-            <blockquote key={i} className="border-l-2 border-indigo-500 pl-3 py-1 text-slate-400 italic bg-indigo-950/20 rounded-r-lg">
+            <blockquote key={i} className="border-l-2 border-indigo-500 pl-2.5 py-0.5 text-[#94A3B8] italic bg-[#131622] rounded-r">
               {line.slice(2)}
             </blockquote>
           );
+
+          // Inline Q::A highlight
+          if (line.includes('::')) {
+            const parts = line.split('::');
+            return (
+              <div key={i} className="p-2 my-1 bg-[#161A28] border border-purple-500/30 rounded text-xs">
+                <span className="text-purple-300 font-semibold font-mono">Q: {parts[0]}</span>
+                <div className="text-slate-300 mt-0.5">A: {parts.slice(1).join('::')}</div>
+              </div>
+            );
+          }
 
           // WikiLink replacement in text
           const parts = line.split(/(\[\[.*?\]\])/g);
@@ -165,10 +178,10 @@ export function NoteEditor({
                   return (
                     <span
                       key={pIdx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 mx-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold cursor-pointer hover:bg-indigo-500/30 transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.2 mx-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 text-[11px] font-mono cursor-pointer hover:bg-indigo-500/25"
                       title={`Jump to [[${target}]]`}
                     >
-                      <Link2 className="w-3 h-3 text-indigo-400" />
+                      <Link2 className="w-2.5 h-2.5 text-indigo-400" />
                       {target}
                     </span>
                   );
@@ -183,211 +196,246 @@ export function NoteEditor({
   };
 
   return (
-    <div className="h-full w-full flex flex-col glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-      {/* Top Title & Action Header */}
-      <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between gap-4 bg-[#0A0C14]/80 backdrop-blur-md">
-        <div className="flex items-center gap-3 flex-1">
-          <div className="p-2 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-indigo-400">
-            <FileText className="w-4 h-4" />
-          </div>
+    <div className="h-full w-full flex flex-col bg-[#0F1117] border border-[#1F2433] rounded-lg overflow-hidden">
+      {/* 1. Header Toolbar */}
+      <div className="h-11 px-3 border-b border-[#1F2433] flex items-center justify-between gap-3 bg-[#12151E]">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <FileText className="w-4 h-4 text-indigo-400 flex-shrink-0" />
           <input
             type="text"
             placeholder="Untitled Note..."
             value={title}
             onChange={handleTitleChange}
-            className="bg-transparent text-base font-extrabold text-white outline-none w-full placeholder-slate-500 tracking-tight"
+            className="bg-transparent text-xs font-bold text-white outline-none w-full placeholder-[#64748B] font-mono"
           />
         </div>
 
-        {/* View Mode Toggle Controls */}
-        <div className="flex items-center gap-1 p-1 bg-black/40 border border-white/10 rounded-xl">
+        {/* View Mode Switcher */}
+        <div className="flex items-center gap-0.5 p-0.5 bg-[#090A0F] border border-[#1F2433] rounded-md">
           <button
             onClick={() => setViewMode('edit')}
-            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-              viewMode === 'edit' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`p-1 rounded text-xs transition-colors ${
+              viewMode === 'edit' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
-            title="Edit Mode"
+            title="Editor Only"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setViewMode('split')}
-            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-              viewMode === 'split' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`p-1 rounded text-xs transition-colors ${
+              viewMode === 'split' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
-            title="Split Mode"
+            title="Split Editor & Preview"
           >
             <Columns className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setViewMode('preview')}
-            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-              viewMode === 'preview' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`p-1 rounded text-xs transition-colors ${
+              viewMode === 'preview' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
-            title="Preview Mode"
+            title="Rendered Preview"
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Outline Drawer Toggle */}
+        {/* Outline Toggle */}
         <button
           onClick={() => setShowOutline(!showOutline)}
-          className={`p-1.5 rounded-xl border border-white/10 text-xs font-semibold transition-all ${
-            showOutline ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/40' : 'text-slate-400 hover:text-white hover:bg-white/5'
+          className={`p-1.5 rounded-md border text-xs transition-colors ${
+            showOutline ? 'bg-[#1D2230] text-indigo-300 border-indigo-500/40' : 'border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#181C26]'
           }`}
           title="Document Outline"
         >
-          <List className="w-4 h-4" />
+          <List className="w-3.5 h-3.5" />
         </button>
 
-        {/* Save Button & Status */}
+        {/* Save Button */}
         <button
           onClick={handleSave}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all shadow-lg active:scale-95 ${
+          className={`h-7 px-3 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors ${
             isSaved
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-              : 'neuro-button-primary'
+              ? 'bg-[#131E1B] text-emerald-300 border border-emerald-500/30'
+              : 'pro-button-primary'
           }`}
         >
-          {isSaved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
-          {isSaved ? 'Saved' : 'Save Note'}
+          {isSaved ? (
+            <>
+              <Check className="w-3 h-3 text-emerald-400" />
+              <span>Saved</span>
+            </>
+          ) : (
+            <>
+              <Save className="w-3 h-3" />
+              <span>Save Note</span>
+            </>
+          )}
         </button>
       </div>
 
-      {/* Formatting & Tags Sub-Toolbar */}
-      <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between gap-3 bg-black/20 text-xs overflow-x-auto">
-        {/* Quick Markdown Formats */}
+      {/* 2. Formatting Snippet Helper Bar */}
+      <div className="h-8 px-3 border-b border-[#1A1F2C] bg-[#0E1017] flex items-center justify-between text-[11px] font-mono text-[#94A3B8]">
         <div className="flex items-center gap-1">
           <button
+            onClick={() => insertFormatting('##', '')}
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
+            title="Heading 2"
+          >
+            <Heading2 className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => insertFormatting('**bold text**')}
-            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white"
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
             title="Bold"
           >
             <Bold className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => insertFormatting('*italic text*')}
-            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white"
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
             title="Italic"
           >
             <Italic className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => insertFormatting('## Section Heading')}
-            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white"
-            title="Heading"
+            onClick={() => insertFormatting('[[Linked Note]]')}
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
+            title="WikiLink [[Page]]"
           >
-            <Heading2 className="w-3.5 h-3.5" />
+            <Link2 className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => insertFormatting('- [ ] Task item')}
-            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white"
-            title="Checkbox"
+            onClick={() => insertFormatting('- [ ] ')}
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
+            title="Task Checkbox"
           >
             <CheckSquare className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => insertFormatting('```typescript\n// code here\n```')}
-            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white"
+            onClick={() => insertFormatting('```ts\n// Code snippet\n```')}
+            className="p-1 hover:bg-[#181C26] rounded text-[#64748B] hover:text-white"
             title="Code Block"
           >
             <Code className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => insertFormatting('[[Target Note]]')}
-            className="p-1 hover:bg-white/10 rounded text-indigo-400 hover:text-indigo-300"
-            title="Wikilink"
+            onClick={() => insertFormatting('Question::Answer')}
+            className="p-1 hover:bg-[#181C26] rounded text-purple-400 hover:text-purple-300"
+            title="Spaced Repetition Q::A Flashcard"
           >
-            <Link2 className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Tags Section */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <Tag className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
-          <div className="flex items-center gap-1 flex-wrap">
-            {tags.map((t) => (
-              <span
-                key={t}
-                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30"
-              >
-                #{t}
-                <button onClick={() => handleRemoveTag(t)} className="hover:text-white font-bold ml-0.5">&times;</button>
-              </span>
-            ))}
-            <input
-              type="text"
-              placeholder="+tag"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleAddTag}
-              className="bg-transparent text-[11px] text-slate-300 outline-none w-16 placeholder-slate-600 font-mono"
-            />
-          </div>
+        {/* Analytics stats */}
+        <div className="flex items-center gap-3 text-[10px] text-[#64748B]">
+          <span>{stats.words} words</span>
+          <span>•</span>
+          <span>{stats.chars} chars</span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-2.5 h-2.5" />
+            {stats.readMinutes} min
+          </span>
         </div>
       </div>
 
-      {/* Main Workspace Area (Edit / Preview / Split + Optional Outline Sidebar) */}
+      {/* 3. Tags Bar */}
+      <div className="px-3 py-1.5 border-b border-[#1A1F2C] bg-[#0B0C12] flex items-center gap-2 flex-wrap text-xs">
+        <Tag className="w-3 h-3 text-[#64748B]" />
+        {tags.map((t) => (
+          <span
+            key={t}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#161A24] border border-[#242A3C] text-[11px] font-mono text-indigo-300"
+          >
+            #{t}
+            <button
+              onClick={() => handleRemoveTag(t)}
+              className="text-[#64748B] hover:text-rose-400 ml-0.5"
+            >
+              <X className="w-2.5 h-2.5" />
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          placeholder="Add #tag (Enter)..."
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={handleAddTag}
+          className="bg-transparent text-xs text-[#CBD5E1] outline-none placeholder-[#475569] font-mono w-28"
+        />
+      </div>
+
+      {/* 4. Editor / Preview Workspace */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Document Outline Drawer */}
-        {showOutline && (
-          <div className="w-52 border-r border-white/10 bg-[#080A10]/95 p-3 overflow-y-auto flex-shrink-0">
-            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 font-mono">
-              <List className="w-3 h-3" /> Outline
-            </h4>
-            {headings.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">No headings in note</p>
-            ) : (
-              <div className="space-y-1">
-                {headings.map((h, idx) => (
-                  <div
-                    key={idx}
-                    className="text-xs text-slate-300 hover:text-indigo-400 cursor-pointer truncate py-1 transition-colors font-sans"
-                    style={{ paddingLeft: `${(h.level - 1) * 10}px` }}
-                  >
-                    {h.text}
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Editor Pane */}
+        {(viewMode === 'edit' || viewMode === 'split') && (
+          <div className="flex-1 h-full overflow-auto bg-[#090A0F]">
+            <CodeMirror
+              value={content}
+              height="100%"
+              theme={oneDark}
+              extensions={[markdown({ base: markdownLanguage, codeLanguages: languages })]}
+              onChange={handleContentChange}
+              className="text-xs font-mono h-full"
+              basicSetup={{
+                lineNumbers: true,
+                foldGutter: false,
+                dropCursor: true,
+                allowMultipleSelections: true,
+                indentOnInput: true,
+              }}
+            />
           </div>
         )}
 
-        {/* Editor and Preview Containers */}
-        <div className="flex-1 flex overflow-hidden">
-          {(viewMode === 'edit' || viewMode === 'split') && (
-            <div className={`h-full overflow-auto bg-black/40 ${viewMode === 'split' ? 'w-1/2 border-r border-white/10' : 'w-full'}`}>
-              <CodeMirror
-                value={content}
-                height="100%"
-                theme={oneDark}
-                extensions={[markdown({ base: markdownLanguage, codeLanguages: languages })]}
-                onChange={handleContentChange}
-                className="h-full text-xs [&_.cm-editor]:h-full [&_.cm-scroller]:font-mono [&_.cm-gutters]:bg-black/20 [&_.cm-gutters]:border-r-white/5"
-              />
-            </div>
-          )}
+        {/* Live Preview Pane */}
+        {(viewMode === 'preview' || viewMode === 'split') && (
+          <div className="flex-1 h-full overflow-y-auto bg-[#0C0E14] border-l border-[#1A1F2C]">
+            {renderPreview()}
+          </div>
+        )}
 
-          {(viewMode === 'preview' || viewMode === 'split') && (
-            <div className={`h-full overflow-y-auto bg-[#090B12]/80 ${viewMode === 'split' ? 'w-1/2' : 'w-full'}`}>
-              {renderPreview()}
-            </div>
-          )}
-        </div>
-      </div>
+        {/* Outline Sidebar Drawer */}
+        {showOutline && (
+          <div className="w-52 h-full border-l border-[#1F2433] bg-[#0E1017] p-3 overflow-y-auto z-20 flex flex-col gap-2">
+            <h4 className="text-[11px] font-bold font-mono text-[#94A3B8] uppercase tracking-wider">
+              Outline
+            </h4>
+            {headings.length === 0 ? (
+              <p className="text-[10px] text-[#64748B] italic">No headings found.</p>
+            ) : (
+              <div className="space-y-1">
+                {headings.map((h, idx) => (
+                  <button
+                    key={idx}
+                    className="w-full text-left truncate text-[11px] text-[#94A3B8] hover:text-white hover:bg-[#161A24] px-1.5 py-1 rounded font-mono"
+                    style={{ paddingLeft: `${(h.level - 1) * 8 + 6}px` }}
+                  >
+                    {h.text}
+                  </button>
+                ))}
+              </div>
+            )}
 
-      {/* Bottom Status Bar */}
-      <div className="px-4 py-1.5 border-t border-white/5 bg-[#08090F]/90 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-        <div className="flex items-center gap-3">
-          <span>{stats.words} words</span>
-          <span>{stats.chars} chars</span>
-          <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-slate-500" /> ~{stats.readMinutes} min read</span>
-        </div>
-        {wikiLinks.length > 0 && (
-          <div className="flex items-center gap-1 text-indigo-400">
-            <Link2 className="w-3 h-3" />
-            <span>{wikiLinks.length} [[wikilinks]] detected</span>
+            {wikiLinks.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-[#1F2433]">
+                <h4 className="text-[11px] font-bold font-mono text-[#94A3B8] uppercase tracking-wider mb-1.5">
+                  Links ({wikiLinks.length})
+                </h4>
+                <div className="space-y-1">
+                  {wikiLinks.map((link) => (
+                    <div key={link} className="flex items-center gap-1 text-[11px] font-mono text-indigo-300 truncate">
+                      <Link2 className="w-2.5 h-2.5 text-indigo-400" />
+                      <span>{link}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

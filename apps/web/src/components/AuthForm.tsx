@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { Lock, User, Mail, Brain } from 'lucide-react';
+import { Lock, User, Mail, Brain, ShieldCheck } from 'lucide-react';
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -78,79 +78,77 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full relative bg-background overflow-hidden text-white">
-      {/* Background Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent-purple/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent-blue/20 rounded-full blur-[120px] pointer-events-none" style={{ animationDelay: '1s' }} />
-
-      <div className="relative z-10 w-full max-w-md p-10 space-y-8 glass-panel rounded-2xl">
-        <div className="text-center flex flex-col items-center">
-          <div className="p-3 bg-gradient-to-br from-accent-purple to-accent-blue rounded-2xl shadow-xl shadow-accent-purple/20 mb-4">
-            <Brain className="w-10 h-10 text-white" />
+    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#090A0F] text-white p-4">
+      <div className="w-full max-w-sm p-6 bg-[#0F1117] border border-[#1F2433] rounded-lg shadow-2xl space-y-5">
+        <div className="flex items-center gap-3 border-b border-[#1F2433] pb-4">
+          <div className="p-2 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+            <Brain className="w-5 h-5" />
           </div>
-          <h2 className="text-3xl font-extrabold text-white">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
-          </h2>
-          <p className="mt-2 text-sm text-gray-400 font-medium">
-            {isLogin ? 'Sign in to access your second brain' : 'Join Neuro and map your mind'}
-          </p>
+          <div>
+            <h2 className="text-sm font-bold text-white font-mono tracking-wide">
+              {isLogin ? 'Neuro Workstation Authentication' : 'Create Vault Identity'}
+            </h2>
+            <p className="text-[10px] text-[#64748B] font-mono">
+              {isLogin ? 'Sign in to access your local neural vault' : 'Establish local encryption & identity'}
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-900/30 border border-red-900/50 rounded-xl backdrop-blur-sm">
+          <div className="p-2.5 text-xs font-mono text-rose-300 bg-[#2B1215] border border-[#521C24] rounded-md">
             {error}
           </div>
         )}
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           {!isLogin && (
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-accent-purple transition-colors" />
+              <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Email</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Mail className="h-3.5 w-3.5 text-[#64748B]" />
                 </div>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-purple transition-all"
-                  placeholder="you@example.com"
+                  className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                  placeholder="operator@neuro.local"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Username</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-500 group-focus-within:text-accent-purple transition-colors" />
+            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Username</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                <User className="h-3.5 w-3.5 text-[#64748B]" />
               </div>
               <input
                 type="text"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-purple transition-all"
-                placeholder="username"
+                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                placeholder="root"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Password</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-accent-purple transition-colors" />
+            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Secret Key / Password</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                <Lock className="h-3.5 w-3.5 text-[#64748B]" />
               </div>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-purple transition-all"
+                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
                 placeholder="••••••••"
               />
             </div>
@@ -159,22 +157,23 @@ export default function AuthForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-3.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-accent-purple to-accent-blue hover:opacity-90 shadow-lg hover:shadow-accent-purple/25 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-6"
+            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-xs font-medium text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors shadow-sm disabled:opacity-50 mt-4"
           >
-            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>{loading ? 'Authenticating...' : (isLogin ? 'Sign In to Vault' : 'Initialize Vault')}</span>
           </button>
         </form>
 
-        <div className="text-center mt-6">
+        <div className="text-center pt-2 border-t border-[#1F2433]">
           <button
             type="button"
             onClick={() => {
               setIsLogin(!isLogin);
               setError('');
             }}
-            className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+            className="text-[11px] font-mono text-[#94A3B8] hover:text-white transition-colors"
           >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            {isLogin ? "Don't have a vault profile? Create one" : 'Already have a profile? Sign in'}
           </button>
         </div>
       </div>

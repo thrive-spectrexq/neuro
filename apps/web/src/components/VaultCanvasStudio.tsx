@@ -308,21 +308,21 @@ export function VaultCanvasStudio() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col glass-panel rounded-2xl border border-white/10 overflow-hidden select-none relative">
+    <div className="h-full w-full flex flex-col bg-[#090A0F] border border-[#1F2433] rounded-lg overflow-hidden select-none relative">
       {/* Canvas Top Action HUD */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08] bg-[#0A0C14]/90 backdrop-blur-md z-30">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[#1F2433] bg-[#0F1117] z-30">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-indigo-400">
-            <Network className="w-4 h-4" />
+          <div className="p-1.5 bg-[#161A24] border border-[#242A3C] rounded-lg text-indigo-400">
+            <Network className="w-3.5 h-3.5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-white tracking-tight">JSON Canvas Studio</h2>
-              <span className="px-2 py-0.5 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">
+              <h2 className="text-xs font-bold text-white tracking-wide font-mono">JSON Canvas Studio</h2>
+              <span className="px-1.5 py-0.5 text-[9px] font-mono bg-[#161A24] text-indigo-300 border border-[#282E40] rounded">
                 JSON Canvas 1.0
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Visual spatial mind-mapping & native Obsidian .canvas interoperability</p>
+            <p className="text-[10px] text-[#64748B]">Visual spatial mind-mapping & native Obsidian .canvas interoperability</p>
           </div>
         </div>
 
@@ -334,37 +334,37 @@ export function VaultCanvasStudio() {
               value={roadmapGoal}
               onChange={(e) => setRoadmapGoal(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleGenerateRoadmapCanvas()}
-              placeholder="AI Roadmap Goal (e.g. Master Rust, Launch SaaS)..."
-              className="w-72 bg-black/40 border border-white/10 rounded-xl px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-sans"
+              placeholder="Synthesize roadmap nodes (e.g. Master Rust)..."
+              className="w-64 bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
             />
           </div>
           <button
             onClick={handleGenerateRoadmapCanvas}
             disabled={isGenerating || !roadmapGoal.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-sky-600 text-white rounded-xl text-xs font-semibold hover:brightness-110 disabled:opacity-50 transition-all shadow-md active:scale-95"
+            className="flex items-center gap-1 px-3 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-medium disabled:opacity-50 transition-colors shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            {isGenerating ? 'Synthesizing...' : 'Generate Nodes'}
+            <Sparkles className="w-3 h-3 text-indigo-200" />
+            <span>{isGenerating ? 'Synthesizing...' : 'Generate'}</span>
           </button>
         </div>
 
         {/* Canvas Toolbar */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={handleAddNoteCard}
-            className="flex items-center gap-1.5 px-3 py-1.5 neuro-button-secondary rounded-xl text-xs font-semibold"
+            className="flex items-center gap-1 px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-[#CBD5E1] hover:text-white border border-[#242A3C] rounded-md text-xs font-medium transition-colors"
             title="Add Linked Note Card"
           >
-            <Plus className="w-3.5 h-3.5 text-sky-400" />
-            Add Note
+            <Plus className="w-3 h-3 text-sky-400" />
+            <span>Note</span>
           </button>
           <button
             onClick={handleAddTextCard}
-            className="flex items-center gap-1.5 px-3 py-1.5 neuro-button-secondary rounded-xl text-xs font-semibold"
+            className="flex items-center gap-1 px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-[#CBD5E1] hover:text-white border border-[#242A3C] rounded-md text-xs font-medium transition-colors"
             title="Add Sticky Text Node"
           >
-            <Type className="w-3.5 h-3.5 text-purple-400" />
-            Add Text
+            <Type className="w-3 h-3 text-purple-400" />
+            <span>Text</span>
           </button>
           {/* Node Customization Palette when a Node is Selected */}
           {selectedNodeId && (
@@ -494,27 +494,27 @@ export function VaultCanvasStudio() {
               <div
                 key={node.id}
                 onMouseDown={(e) => handleNodeMouseDown(e, node)}
-                className={`canvas-node-card absolute pointer-events-auto rounded-2xl glass-panel border transition-shadow cursor-move flex flex-col overflow-hidden ${
+                className={`canvas-node-card absolute pointer-events-auto rounded-lg border transition-all cursor-move flex flex-col overflow-hidden ${
                   isSelected
-                    ? 'border-indigo-400 ring-2 ring-indigo-500/40 shadow-2xl shadow-indigo-500/20'
-                    : 'border-white/10 hover:border-white/20'
+                    ? 'border-indigo-400 ring-1 ring-indigo-500 shadow-xl'
+                    : 'border-[#242A3C] hover:border-[#38415C]'
                 }`}
                 style={{
                   left: `${node.x}px`,
                   top: `${node.y}px`,
                   width: `${node.width}px`,
                   minHeight: `${node.height}px`,
-                  background: 'rgba(14, 18, 28, 0.9)',
+                  backgroundColor: '#12151E',
                 }}
               >
                 {/* Node Header */}
                 <div
-                  className="px-3 py-2 border-b border-white/[0.08] flex items-center justify-between"
+                  className="px-2.5 py-1.5 border-b border-[#1F2433] flex items-center justify-between"
                   style={{
-                    backgroundColor: node.color ? `${node.color}15` : 'rgba(255,255,255,0.03)',
+                    backgroundColor: node.color ? `${node.color}20` : '#161A24',
                   }}
                 >
-                  <div className="flex items-center gap-2 truncate">
+                  <div className="flex items-center gap-1.5 truncate">
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: node.color || '#6366f1' }}
@@ -523,14 +523,14 @@ export function VaultCanvasStudio() {
                       {node.file || (node.type === 'note' ? 'Vault Note' : 'Text Card')}
                     </span>
                   </div>
-                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/5 text-slate-400">
+                  <span className="text-[9px] font-mono uppercase px-1 py-0.2 rounded bg-[#090A0F] text-[#94A3B8] border border-[#242A3C]">
                     {node.type}
                   </span>
                 </div>
 
                 {/* Node Content Body */}
                 <div 
-                  className="p-3.5 text-xs text-slate-200 font-sans leading-relaxed flex-1 select-text"
+                  className="p-3 text-xs text-[#CBD5E1] font-sans leading-relaxed flex-1 select-text"
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     setEditingNodeId(node.id);
@@ -544,21 +544,21 @@ export function VaultCanvasStudio() {
                         onMouseDown={(e) => e.stopPropagation()}
                         autoFocus
                         rows={5}
-                        className="w-full p-2 bg-black/60 border border-indigo-500/50 rounded-lg text-xs text-slate-100 font-mono focus:outline-none resize-none"
+                        className="w-full p-2 bg-[#090A0F] border border-indigo-500 rounded text-xs text-white font-mono focus:outline-none resize-none"
                       />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingNodeId(null);
                         }}
-                        className="self-end px-2 py-1 bg-indigo-600 text-white text-[10px] font-semibold rounded-md flex items-center gap-1"
+                        className="self-end px-2 py-1 bg-[#4F46E5] text-white text-[10px] font-semibold rounded flex items-center gap-1"
                       >
                         <Check className="w-3 h-3" />
                         Done
                       </button>
                     </div>
                   ) : (
-                    <div className="whitespace-pre-wrap">
+                    <div className="whitespace-pre-wrap font-mono text-[11px]">
                       {node.text}
                     </div>
                   )}
@@ -569,33 +569,30 @@ export function VaultCanvasStudio() {
         </div>
 
         {/* Floating Zoom & Pan Navigation Controls */}
-        <div className="absolute bottom-6 right-6 z-30 flex items-center gap-1.5 p-1.5 bg-[#0C0E17]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
+        <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1 p-1 bg-[#0F1117] border border-[#1F2433] rounded-lg shadow-xl">
           <button
             onClick={() => setZoom((z) => Math.min(2, z + 0.15))}
-            className="p-2 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all"
+            className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
             title="Zoom In"
           >
-            <ZoomIn className="w-4 h-4" />
+            <ZoomIn className="w-3.5 h-3.5" />
           </button>
-          <span className="text-[11px] font-mono text-slate-400 px-2">
+          <span className="text-[10px] font-mono text-[#64748B] px-1.5">
             {Math.round(zoom * 100)}%
           </span>
           <button
             onClick={() => setZoom((z) => Math.max(0.4, z - 0.15))}
-            className="p-2 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all"
+            className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
             title="Zoom Out"
           >
-            <ZoomOut className="w-4 h-4" />
+            <ZoomOut className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => {
-              setZoom(1);
-              setPan({ x: 100, y: 100 });
-            }}
-            className="p-2 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all"
-            title="Reset View"
+            onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
+            className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
+            title="Reset Pan & Zoom"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

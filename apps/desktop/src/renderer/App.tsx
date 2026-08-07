@@ -6,12 +6,15 @@ import GraphPage from './pages/GraphPage';
 import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import JarvisHUD from './components/JarvisHUD';
+import DesktopNeonOrb from './components/DesktopNeonOrb';
 
 type Page = 'notes' | 'editor' | 'graph' | 'search' | 'settings';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('notes');
   const [isJarvisOpen, setIsJarvisOpen] = useState(false);
+
+  const isOrbOnlyMode = typeof window !== 'undefined' && window.location.search.includes('mode=orb');
 
   // Close HUD on Esc key press
   useEffect(() => {
@@ -23,6 +26,18 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isJarvisOpen]);
+
+  if (isOrbOnlyMode) {
+    return (
+      <div className="w-full h-full bg-transparent overflow-hidden flex items-center justify-center">
+        <DesktopNeonOrb
+          onOpenJarvis={() => {
+            window.electronAPI?.focusMainWindow();
+          }}
+        />
+      </div>
+    );
+  }
 
   const renderPage = () => {
     switch (currentPage) {
@@ -50,6 +65,9 @@ export default function App() {
         isOpen={isJarvisOpen}
         onClose={() => setIsJarvisOpen(false)}
       />
+
+      {/* Floating Desktop Neon Voice Agent Orb */}
+      <DesktopNeonOrb onOpenJarvis={() => setIsJarvisOpen(true)} />
     </>
   );
 }

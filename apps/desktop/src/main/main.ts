@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, screen } from 'electron';
 import * as path from 'path';
 import { backendProcessManager } from './backend-process';
 import {
@@ -15,6 +15,7 @@ app.commandLine.appendSwitch('disable-gpu');
 app.commandLine.appendSwitch('no-sandbox');
 
 let mainWindow: BrowserWindow | null = null;
+let orbWindow: BrowserWindow | null = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -42,16 +43,51 @@ function createWindow() {
   });
 }
 
+function createNeonOrbWindow() {
+  if (orbWindow) return;
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
+  orbWindow = new BrowserWindow({
+    width: 120,
+    height: 120,
+    x: width - 130,
+    y: height - 130,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    hasShadow: false,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  const orbUrl = app.isPackaged
+    ? `file://${path.join(__dirname, '../renderer/index.html')}?mode=orb`
+    : 'http://localhost:3000?mode=orb';
+
+  orbWindow.loadURL(orbUrl);
+
+  orbWindow.on('closed', () => {
+    orbWindow = null;
+  });
+}
+
 app.whenReady().then(async () => {
   // 1. Launch FastAPI backend silently in background
   backendProcessManager.start().catch((err) => {
     console.error('[Neuro] Backend silent launch error:', err);
   });
 
-  // 2. Create Electron Window
+  // 2. Create Electron Main Window
   createWindow();
 
-  // 3. Register global hotkey for JARVIS Voice/HUD (Ctrl+Space / Cmd+Space)
+  // 3. Register global hotkey for JARVIS Voice/HUD (Ctrl+Space / Cmd+Space / Alt+Space)
   try {
     globalShortcut.register('CommandOrControl+Space', () => {
       if (mainWindow) {
@@ -117,3 +153,27 @@ ipcMain.handle('backend:status', async () => {
   const healthy = await backendProcessManager.isBackendHealthy();
   return { healthy, url: 'http://127.0.0.1:8000' };
 });
+
+ipcMain.handle('orb:create', () => {
+  createNeonOrbWindow();
+  return true;
+});
+
+ipcMain.handle('orb:close', () => {
+  if (orbWindow) {
+    orbWindow.close();
+    orbWindow = null;
+  }
+  return true;
+});
+
+ipcMain.handle('window:focus-main', () => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  } else {
+    createWindow();
+  }
+  return true;
+});
+

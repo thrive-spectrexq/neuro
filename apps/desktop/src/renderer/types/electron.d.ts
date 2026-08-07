@@ -6,6 +6,9 @@ export interface ElectronAPI {
   writeClipboard: (text: string) => Promise<boolean>;
   readClipboard: () => Promise<string>;
   getBackendStatus: () => Promise<{ healthy: boolean; url: string }>;
+  createOrbWindow: () => Promise<boolean>;
+  closeOrbWindow: () => Promise<boolean>;
+  focusMainWindow: () => Promise<boolean>;
   onToggleJarvisHUD: (callback: () => void) => () => void;
 }
 

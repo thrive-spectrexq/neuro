@@ -272,24 +272,24 @@ export function SpacedRepetitionStudio() {
   const retentionPct = cards.length > 0 ? Math.round((masteredCount / cards.length) * 100) : 100;
 
   return (
-    <div className="h-full flex flex-col bg-[#07090E] text-slate-100 font-sans select-none overflow-y-auto">
+    <div className="h-full flex flex-col bg-[#090A0F] text-slate-100 font-sans select-none overflow-y-auto">
       {/* Top Banner & Stats Overview */}
-      <div className="p-6 border-b border-white/[0.08] bg-[#0A0C14]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-4 border-b border-[#1F2433] bg-[#0F1117]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg border border-purple-400/30">
-                <BrainCircuit className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+                <BrainCircuit className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                <h2 className="text-xs font-bold tracking-wide font-mono text-white flex items-center gap-2">
                   Spaced Repetition & Knowledge Retention
-                  <span className="px-2 py-0.5 text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full">
-                    SM-2 Algorithm
+                  <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#18162B] text-indigo-300 border border-[#302856] rounded">
+                    SM-2
                   </span>
                 </h2>
-                <p className="text-xs text-slate-400">
-                  Daily active recall deck extracted automatically from <code className="text-purple-300 bg-purple-950/40 px-1 rounded">Question::Answer</code> and <code className="text-purple-300 bg-purple-950/40 px-1 rounded">==cloze deletions==</code>.
+                <p className="text-[10px] text-[#64748B] font-mono">
+                  Active recall deck parsed from <code className="text-indigo-300 bg-[#141722] px-1 rounded">Question::Answer</code> and <code className="text-indigo-300 bg-[#141722] px-1 rounded">==cloze==</code>
                 </p>
               </div>
             </div>
@@ -297,136 +297,136 @@ export function SpacedRepetitionStudio() {
 
           {/* Quick Stat Badges */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-              <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
-              <div className="text-xs">
-                <span className="text-slate-400">Streak: </span>
-                <strong className="text-amber-300 font-mono">{streakDays} days</strong>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#2B1B10] border border-[#4D2E14] rounded-md">
+              <Flame className="w-3.5 h-3.5 text-amber-400" />
+              <div className="text-[10px] font-mono">
+                <span className="text-[#64748B]">Streak: </span>
+                <strong className="text-amber-300">{streakDays}d</strong>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-              <Trophy className="w-4 h-4 text-emerald-400" />
-              <div className="text-xs">
-                <span className="text-slate-400">Retention: </span>
-                <strong className="text-emerald-300 font-mono">{retentionPct}%</strong>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#102319] border border-[#1B432C] rounded-md">
+              <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="text-[10px] font-mono">
+                <span className="text-[#64748B]">Retention: </span>
+                <strong className="text-emerald-300">{retentionPct}%</strong>
               </div>
             </div>
 
             <button
               onClick={() => setIsAddingCard(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all"
+              className="flex items-center gap-1 px-2.5 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors shadow-sm"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3 h-3" />
               <span>Add Card</span>
             </button>
           </div>
         </div>
 
         {/* Metrics Grid */}
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-          <div className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-center justify-between">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-3">
+          <div className="p-2.5 bg-[#090A0F] border border-[#1F2433] rounded-md flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-slate-400 font-medium">Due Today</span>
-              <p className="text-lg font-mono font-bold text-amber-400">{dueCount}</p>
+              <span className="text-[9px] text-[#64748B] font-mono uppercase">Due Today</span>
+              <p className="text-sm font-mono font-bold text-amber-400">{dueCount}</p>
             </div>
-            <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
-              <RotateCw className="w-4 h-4" />
+            <div className="p-1 bg-[#2B1B10] rounded text-amber-400 border border-[#4D2E14]">
+              <RotateCw className="w-3.5 h-3.5" />
             </div>
           </div>
 
-          <div className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-center justify-between">
+          <div className="p-2.5 bg-[#090A0F] border border-[#1F2433] rounded-md flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-slate-400 font-medium">Learning Cards</span>
-              <p className="text-lg font-mono font-bold text-sky-400">{learningCount}</p>
+              <span className="text-[9px] text-[#64748B] font-mono uppercase">Learning Cards</span>
+              <p className="text-sm font-mono font-bold text-sky-400">{learningCount}</p>
             </div>
-            <div className="p-2 bg-sky-500/10 rounded-lg text-sky-400">
-              <BookOpen className="w-4 h-4" />
+            <div className="p-1 bg-[#121E2E] rounded text-sky-400 border border-[#1B324D]">
+              <BookOpen className="w-3.5 h-3.5" />
             </div>
           </div>
 
-          <div className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-center justify-between">
+          <div className="p-2.5 bg-[#090A0F] border border-[#1F2433] rounded-md flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-slate-400 font-medium">Mastered Cards</span>
-              <p className="text-lg font-mono font-bold text-emerald-400">{masteredCount}</p>
+              <span className="text-[9px] text-[#64748B] font-mono uppercase">Mastered Cards</span>
+              <p className="text-sm font-mono font-bold text-emerald-400">{masteredCount}</p>
             </div>
-            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="p-1 bg-[#102319] rounded text-emerald-400 border border-[#1B432C]">
+              <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
 
-          <div className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-center justify-between">
+          <div className="p-2.5 bg-[#090A0F] border border-[#1F2433] rounded-md flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-slate-400 font-medium">Session Reviews</span>
-              <p className="text-lg font-mono font-bold text-purple-400">{sessionReviewedCount}</p>
+              <span className="text-[9px] text-[#64748B] font-mono uppercase">Session Reviews</span>
+              <p className="text-sm font-mono font-bold text-indigo-400">{sessionReviewedCount}</p>
             </div>
-            <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
-              <Sparkles className="w-4 h-4" />
+            <div className="p-1 bg-[#18162B] rounded text-indigo-400 border border-[#302856]">
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Review Area */}
-      <div className="flex-1 max-w-4xl w-full mx-auto p-6 flex flex-col items-center justify-center">
+      <div className="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col items-center justify-center">
         {/* Deck Filter Tabs & Search */}
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-1.5 p-1 bg-white/5 border border-white/10 rounded-xl">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-2.5 mb-4">
+          <div className="flex items-center gap-1 p-0.5 bg-[#090A0F] border border-[#1F2433] rounded-md">
             <button
               onClick={() => { setFilterMode('due'); setCurrentCardIndex(0); setIsFlipped(false); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'due'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#4F46E5] text-white shadow-sm'
+                  : 'text-[#64748B] hover:text-white'
               }`}
             >
-              Due For Review ({dueCount})
+              Due ({dueCount})
             </button>
             <button
               onClick={() => { setFilterMode('all'); setCurrentCardIndex(0); setIsFlipped(false); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'all'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#4F46E5] text-white shadow-sm'
+                  : 'text-[#64748B] hover:text-white'
               }`}
             >
-              All Cards ({cards.length})
+              All ({cards.length})
             </button>
             <button
               onClick={() => { setFilterMode('mastered'); setCurrentCardIndex(0); setIsFlipped(false); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'mastered'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#4F46E5] text-white shadow-sm'
+                  : 'text-[#64748B] hover:text-white'
               }`}
             >
               Mastered ({masteredCount})
             </button>
           </div>
 
-          <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
+          <div className="relative w-full md:w-60">
+            <Search className="w-3 h-3 absolute left-2.5 top-2.5 text-[#64748B]" />
             <input
               type="text"
               placeholder="Search cards in deck..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/50"
+              className="w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#1F2433] rounded-md text-xs text-slate-200 placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
             />
           </div>
         </div>
 
         {/* 3D Flip Card Container */}
         {currentCard ? (
-          <div className="w-full flex flex-col items-center gap-6">
+          <div className="w-full flex flex-col items-center gap-4">
             {/* Card Progress Indicator */}
-            <div className="w-full flex items-center justify-between text-xs text-slate-400">
+            <div className="w-full flex items-center justify-between text-[11px] font-mono text-[#64748B]">
               <span>Card {currentCardIndex + 1} of {activeDeck.length}</span>
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-white/5 border border-white/10 rounded-md text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#090A0F] border border-[#1F2433] rounded text-slate-400">
                   Ease: {currentCard.easeFactor}x
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-white/5 border border-white/10 rounded-md text-slate-300">
+                <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#090A0F] border border-[#1F2433] rounded text-slate-400">
                   Reps: {currentCard.repetitions}
                 </span>
               </div>
@@ -435,44 +435,44 @@ export function SpacedRepetitionStudio() {
             {/* Interactive Flashcard Card */}
             <div
               onClick={() => setIsFlipped((prev) => !prev)}
-              className="w-full min-h-[320px] p-8 bg-gradient-to-b from-[#111422] to-[#0A0C14] border border-white/[0.12] hover:border-purple-500/40 rounded-2xl shadow-2xl flex flex-col justify-between cursor-pointer transition-all duration-300 relative group overflow-hidden"
+              className="w-full min-h-[280px] p-6 bg-[#0F1117] border border-[#1F2433] hover:border-[#2E364B] rounded-lg shadow-xl flex flex-col justify-between cursor-pointer transition-colors duration-200 relative group overflow-hidden"
             >
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Layers className="w-24 h-24 text-purple-400" />
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+                <Layers className="w-20 h-20 text-indigo-400" />
               </div>
 
               {/* Card Meta Header */}
               <div className="flex items-center justify-between z-10">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-lg">
-                    {currentCard.cardType === 'cloze' ? 'Cloze Deletion' : 'Q&A Prompt'}
+                  <span className="px-1.5 py-0.2 text-[9px] font-mono uppercase bg-[#18162B] text-indigo-300 border border-[#302856] rounded">
+                    {currentCard.cardType === 'cloze' ? 'Cloze' : 'Q&A'}
                   </span>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    from <strong className="text-slate-200">[[{currentCard.noteTitle}]]</strong>
+                  <span className="text-[11px] font-mono text-[#64748B] flex items-center gap-1">
+                    source: <strong className="text-slate-300">[[{currentCard.noteTitle}]]</strong>
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 italic">Click card or press Space to flip</span>
+                <span className="text-[10px] font-mono text-[#64748B]">Space to flip</span>
               </div>
 
               {/* Card Content Area */}
-              <div className="my-6 z-10">
+              <div className="my-4 z-10">
                 {!isFlipped ? (
                   <div>
-                    <span className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider block mb-2">
+                    <span className="text-[9px] font-mono uppercase text-indigo-400 block mb-1.5">
                       Prompt / Question
                     </span>
-                    <p className="text-lg md:text-xl font-medium text-slate-100 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-base md:text-lg font-mono text-slate-100 leading-relaxed whitespace-pre-wrap">
                       {currentCard.front}
                     </p>
                   </div>
                 ) : (
-                  <div className="animate-in fade-in zoom-in-95 duration-200">
-                    <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5" />
-                      Verified Recall Answer
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-emerald-400 block mb-1.5 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Verified Answer
                     </span>
-                    <div className="p-4 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
-                      <p className="text-lg md:text-xl font-semibold text-emerald-200 leading-relaxed whitespace-pre-wrap">
+                    <div className="p-3 bg-[#102319] border border-[#1B432C] rounded-md">
+                      <p className="text-base md:text-lg font-mono text-emerald-200 leading-relaxed whitespace-pre-wrap">
                         {currentCard.back}
                       </p>
                     </div>
@@ -481,72 +481,72 @@ export function SpacedRepetitionStudio() {
               </div>
 
               {/* Bottom Card Footer */}
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-4 border-t border-white/[0.06] z-10">
-                <span>Next Interval: {currentCard.intervalDays} day(s)</span>
-                <span className="flex items-center gap-1 text-purple-300 font-medium">
-                  {isFlipped ? 'Answer Revealed' : 'Click to Reveal Answer'}
-                  <ArrowRight className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-between text-[10px] font-mono text-[#64748B] pt-3 border-t border-[#1F2433] z-10">
+                <span>Interval: {currentCard.intervalDays}d</span>
+                <span className="flex items-center gap-1 text-indigo-300 font-mono">
+                  {isFlipped ? 'Answer Revealed' : 'Click to Reveal'}
+                  <ArrowRight className="w-3 h-3" />
                 </span>
               </div>
             </div>
 
             {/* SM-2 Quality Rating Buttons */}
             {isFlipped ? (
-              <div className="w-full flex flex-col items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <span className="text-xs text-slate-400 font-medium">Rate your recall strength:</span>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
+              <div className="w-full flex flex-col items-center gap-2">
+                <span className="text-[10px] font-mono text-[#64748B]">Rate recall grade:</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
                   <button
                     onClick={() => handleRating(1)}
-                    className="p-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-xl text-left transition-all group"
+                    className="p-2.5 bg-[#0F1117] hover:bg-[#181216] border border-[#1F2433] hover:border-rose-900 rounded-md text-left transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-red-400">1. Again</span>
-                      <kbd className="px-1.5 py-0.5 text-[10px] bg-red-500/20 text-red-300 rounded font-mono">1</kbd>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-bold text-rose-400 font-mono">1. Again</span>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1215] text-rose-300 rounded font-mono">1</kbd>
                     </div>
-                    <span className="text-[10px] text-slate-400">Blackout / Reset (1d)</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">Reset (1d)</span>
                   </button>
 
                   <button
                     onClick={() => handleRating(2)}
-                    className="p-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-xl text-left transition-all group"
+                    className="p-2.5 bg-[#0F1117] hover:bg-[#1C1510] border border-[#1F2433] hover:border-amber-900 rounded-md text-left transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-amber-400">2. Hard</span>
-                      <kbd className="px-1.5 py-0.5 text-[10px] bg-amber-500/20 text-amber-300 rounded font-mono">2</kbd>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-bold text-amber-400 font-mono">2. Hard</span>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1B10] text-amber-300 rounded font-mono">2</kbd>
                     </div>
-                    <span className="text-[10px] text-slate-400">Struggled to recall (1d)</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">Effort required (1d)</span>
                   </button>
 
                   <button
                     onClick={() => handleRating(4)}
-                    className="p-3 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 hover:border-sky-500/50 rounded-xl text-left transition-all group"
+                    className="p-2.5 bg-[#0F1117] hover:bg-[#121A26] border border-[#1F2433] hover:border-sky-900 rounded-md text-left transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-sky-400">3. Good</span>
-                      <kbd className="px-1.5 py-0.5 text-[10px] bg-sky-500/20 text-sky-300 rounded font-mono">3</kbd>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-bold text-sky-400 font-mono">3. Good</span>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#121E2E] text-sky-300 rounded font-mono">3</kbd>
                     </div>
-                    <span className="text-[10px] text-slate-400">Recalled with effort</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">Correct interval</span>
                   </button>
 
                   <button
                     onClick={() => handleRating(5)}
-                    className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-xl text-left transition-all group"
+                    className="p-2.5 bg-[#0F1117] hover:bg-[#101F18] border border-[#1F2433] hover:border-emerald-900 rounded-md text-left transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-emerald-400">4. Easy</span>
-                      <kbd className="px-1.5 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 rounded font-mono">4</kbd>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-bold text-emerald-400 font-mono">4. Easy</span>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#102319] text-emerald-300 rounded font-mono">4</kbd>
                     </div>
-                    <span className="text-[10px] text-slate-400">Instant mastery recall</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">Instant mastery</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsFlipped(true)}
-                  className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2"
+                  className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors shadow-sm flex items-center gap-1.5"
                 >
-                  <HelpCircle className="w-4 h-4" />
+                  <HelpCircle className="w-3.5 h-3.5" />
                   <span>Reveal Answer (Space)</span>
                 </button>
                 <button
@@ -554,7 +554,7 @@ export function SpacedRepetitionStudio() {
                     setCurrentCardIndex((prev) => (prev + 1) % activeDeck.length);
                     setIsFlipped(false);
                   }}
-                  className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all"
+                  className="px-3 py-2 bg-[#0F1117] hover:bg-[#141722] border border-[#1F2433] text-[#94A3B8] rounded-md text-xs font-mono transition-colors"
                 >
                   Skip Card
                 </button>
@@ -562,17 +562,17 @@ export function SpacedRepetitionStudio() {
             )}
           </div>
         ) : (
-          <div className="p-12 text-center bg-white/[0.02] border border-white/[0.08] rounded-2xl max-w-md w-full">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">All Caught Up!</h3>
-            <p className="text-xs text-slate-400 mb-4">
-              You have reviewed all cards due for today in this deck. Great job keeping your streak active!
+          <div className="p-8 text-center bg-[#0F1117] border border-[#1F2433] rounded-lg max-w-md w-full font-mono">
+            <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+            <h3 className="text-xs font-bold text-white mb-1">Queue Completed</h3>
+            <p className="text-[10px] text-[#64748B] mb-3">
+              All cards due for review in this deck are completed.
             </p>
             <button
               onClick={() => { setFilterMode('all'); setCurrentCardIndex(0); }}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold transition-all"
+              className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors"
             >
-              Review All Vault Cards
+              Review Full Deck
             </button>
           </div>
         )}
@@ -580,27 +580,27 @@ export function SpacedRepetitionStudio() {
 
       {/* Manual Card Creation Modal */}
       {isAddingCard && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0D101C] border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Plus className="w-4 h-4 text-purple-400" />
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#0F1117] border border-[#242A3C] rounded-lg max-w-lg w-full p-5 shadow-2xl flex flex-col gap-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#1F2433]">
+              <h3 className="text-xs font-bold text-white font-mono flex items-center gap-2">
+                <Plus className="w-3.5 h-3.5 text-indigo-400" />
                 Add Custom Flashcard
               </h3>
               <button
                 onClick={() => setIsAddingCard(false)}
-                className="text-slate-400 hover:text-white text-xs"
+                className="text-[#64748B] hover:text-white text-xs font-mono"
               >
                 ✕
               </button>
             </div>
 
             <div>
-              <label className="text-xs text-slate-400 block mb-1">Target Note</label>
+              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">Target Note</label>
               <select
                 value={selectedNoteId}
                 onChange={(e) => setSelectedNoteId(e.target.value)}
-                className="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                className="w-full p-2 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
               >
                 {notes.map((n: NoteItem) => (
                   <option key={n.id} value={n.id}>
@@ -611,37 +611,37 @@ export function SpacedRepetitionStudio() {
             </div>
 
             <div>
-              <label className="text-xs text-slate-400 block mb-1">Question / Prompt (Front)</label>
+              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">Question / Prompt (Front)</label>
               <textarea
                 value={newFront}
                 onChange={(e) => setNewFront(e.target.value)}
                 rows={3}
                 placeholder="e.g. What is the difference between synchronous and asynchronous consensus?"
-                className="w-full p-3 bg-black/40 border border-white/10 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                className="w-full p-2.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
             <div>
-              <label className="text-xs text-slate-400 block mb-1">Answer / Explanation (Back)</label>
+              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">Answer / Explanation (Back)</label>
               <textarea
                 value={newBack}
                 onChange={(e) => setNewBack(e.target.value)}
                 rows={3}
                 placeholder="e.g. Synchronous assumes bounded message delay, whereas asynchronous makes no timing assumptions."
-                className="w-full p-3 bg-black/40 border border-white/10 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                className="w-full p-2.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-2 border-t border-[#1F2433]">
               <button
                 onClick={() => setIsAddingCard(false)}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs text-slate-400"
+                className="px-3 py-1 bg-[#090A0F] hover:bg-[#141722] border border-[#242A3C] rounded-md text-xs font-mono text-[#94A3B8]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddManualCard}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold"
+                className="px-3.5 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium"
               >
                 Save Flashcard
               </button>

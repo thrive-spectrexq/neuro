@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, Plus, Trash2, Sparkles, Bot } from 'lucide-react';
+import { Zap, Plus, Trash2 } from 'lucide-react';
 
 interface AutomationRule {
   id: string;
@@ -14,14 +14,14 @@ export function AutomationBuilder() {
   const [rules, setRules] = useState<AutomationRule[]>([
     {
       id: '1',
-      name: 'Auto-Summarize Long Research Notes',
+      name: 'Auto-Summarize Research Notes',
       trigger_type: 'on_note_create',
       action_type: 'auto_summarize',
       is_active: true,
     },
     {
       id: '2',
-      name: 'Auto-Extract Pending Tasks from #project Notes',
+      name: 'Extract Pending Tasks from #project Notes',
       trigger_type: 'on_tag_add',
       trigger_value: 'project',
       action_type: 'extract_tasks',
@@ -64,53 +64,59 @@ export function AutomationBuilder() {
   };
 
   return (
-    <div className="h-full flex flex-col glass-panel rounded-2xl border border-white/10 p-6 overflow-hidden">
+    <div className="h-full flex flex-col bg-[#090A0F] border border-[#1F2433] rounded-lg p-4 overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-amber-500/20 border border-amber-500/30 rounded-xl">
-            <Zap className="w-5 h-5 text-amber-400" />
+      <div className="flex justify-between items-center mb-4 border-b border-[#1F2433] pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-[#2B1B10] border border-[#4D2E14] rounded-md text-amber-400">
+            <Zap className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h2 className="text-xl font-extrabold text-white">Workflow Automation Engine</h2>
-            <p className="text-xs text-slate-400">Automate recurring AI tasks and event-driven pipelines</p>
+            <h2 className="text-xs font-bold text-white tracking-wide font-mono">Event Automations</h2>
+            <p className="text-[10px] text-[#64748B]">Trigger-action pipelines for autonomous vault enrichment</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white rounded-xl text-xs font-semibold hover:brightness-110 transition-all shadow-lg active:scale-95"
+          className="flex items-center gap-1 px-2.5 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-medium transition-colors shadow-sm"
         >
-          <Plus className="w-4 h-4" /> Create Rule
+          <Plus className="w-3 h-3" />
+          <span>New Rule</span>
         </button>
       </div>
 
       {/* Rules List */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
         {rules.map((rule) => (
           <div
             key={rule.id}
-            className="glass-panel p-5 rounded-2xl border border-white/10 hover:border-white/20 transition-all shadow-md flex items-center justify-between gap-4 bg-[#0E1017]/60"
+            className="p-3.5 rounded-lg border border-[#1F2433] bg-[#0F1117] hover:border-[#2E364B] transition-colors flex items-center justify-between gap-3"
           >
-            <div className="flex items-start gap-4">
-              <div className={`p-2.5 rounded-xl border mt-0.5 ${rule.is_active ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
-                <Zap className="w-5 h-5" />
+            <div className="flex items-start gap-3">
+              <div className={`p-1.5 rounded-md border mt-0.5 ${rule.is_active ? 'bg-[#2B1B10] border-[#4D2E14] text-amber-400' : 'bg-[#141722] border-[#242A3C] text-[#64748B]'}`}>
+                <Zap className="w-3.5 h-3.5" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <h3 className="text-xs font-bold text-white font-mono flex items-center gap-2">
                   {rule.name}
-                  <span className={`px-2 py-0.5 text-[10px] font-mono rounded-full border uppercase ${rule.is_active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-500/20 text-slate-400 border-slate-500/30'}`}>
-                    {rule.is_active ? 'Active' : 'Paused'}
-                  </span>
+                  {rule.is_active ? (
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#102319] text-emerald-400 border border-[#1B432C]">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#141722] text-[#64748B] border border-[#242A3C]">
+                      Disabled
+                    </span>
+                  )}
                 </h3>
-                <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
-                  <span className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-indigo-400" /> Trigger: {rule.trigger_type.replace(/_/g, ' ')} {rule.trigger_value ? `(#${rule.trigger_value})` : ''}
-                  </span>
-                  <span>➔</span>
-                  <span className="flex items-center gap-1 text-sky-300">
-                    <Bot className="w-3 h-3 text-sky-400" /> Action: {rule.action_type.replace(/_/g, ' ')}
-                  </span>
+                <div className="flex items-center gap-2 text-[10px] font-mono text-[#94A3B8]">
+                  <span>Trigger: <strong className="text-sky-300">{rule.trigger_type}</strong></span>
+                  {rule.trigger_value && (
+                    <span className="bg-[#141722] px-1 py-0.2 rounded text-slate-300 border border-[#242A3C]">#{rule.trigger_value}</span>
+                  )}
+                  <span>&bull;</span>
+                  <span>Action: <strong className="text-indigo-300">{rule.action_type}</strong></span>
                 </div>
               </div>
             </div>
@@ -118,98 +124,96 @@ export function AutomationBuilder() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => toggleRule(rule.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                className={`text-[10px] font-mono px-2.5 py-1 rounded-md border transition-colors ${
                   rule.is_active
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 hover:bg-amber-500/30'
-                    : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+                    ? 'bg-[#141722] text-[#CBD5E1] border-[#242A3C] hover:bg-[#1E2435]'
+                    : 'bg-[#4F46E5] text-white border-transparent hover:bg-[#4338CA]'
                 }`}
               >
-                {rule.is_active ? 'Pause' : 'Enable'}
+                {rule.is_active ? 'Disable' : 'Enable'}
               </button>
               <button
                 onClick={() => deleteRule(rule.id)}
-                className="p-2 text-slate-500 hover:text-rose-400 rounded-xl transition-all"
-                title="Delete Rule"
+                className="p-1 text-[#64748B] hover:text-rose-400 transition-colors"
+                title="Delete rule"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Create Rule Modal */}
+      {/* Create Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-md p-6 rounded-2xl border border-white/15 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-400" /> New Automation Rule
-            </h3>
-            <form onSubmit={handleCreateRule} className="space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#0F1117] w-full max-w-md p-5 rounded-lg border border-[#242A3C] shadow-2xl space-y-3">
+            <h3 className="text-xs font-bold text-white font-mono">Create Automation Pipeline</h3>
+            <form onSubmit={handleCreateRule} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Rule Name</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Pipeline Name</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Auto-tag research documents"
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="e.g. Extract TODO tags..."
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Trigger Event</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Event Trigger</label>
                 <select
                   value={triggerType}
                   onChange={(e) => setTriggerType(e.target.value as any)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none font-mono cursor-pointer"
                 >
-                  <option value="on_note_create">On Note Created</option>
-                  <option value="on_tag_add">On Specific Tag Added</option>
-                  <option value="on_task_done">On Task Completed</option>
+                  <option value="on_note_create">When a note is created</option>
+                  <option value="on_tag_add">When a specific tag is attached</option>
+                  <option value="on_task_done">When a task is marked complete</option>
                 </select>
               </div>
 
               {triggerType === 'on_tag_add' && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Target Tag</label>
+                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Target Tag</label>
                   <input
                     type="text"
                     value={triggerValue}
                     onChange={(e) => setTriggerValue(e.target.value)}
-                    placeholder="e.g. project or research"
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    placeholder="e.g. project or urgent (without #)"
+                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Automated AI Action</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Autonomous Action</label>
                 <select
                   value={actionType}
                   onChange={(e) => setActionType(e.target.value as any)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none font-mono cursor-pointer"
                 >
-                  <option value="auto_summarize">Generate 2-Sentence Note Summary</option>
-                  <option value="extract_tasks">Extract Actionable Tasks to Kanban</option>
-                  <option value="notify">Log Audit Activity</option>
+                  <option value="auto_summarize">Auto-summarize content and append TL;DR</option>
+                  <option value="extract_tasks">Extract markdown task checkboxes to Kanban</option>
+                  <option value="notify">Push system notification</option>
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#1F2433]">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-all"
+                  className="px-3 py-1 text-xs font-mono text-[#94A3B8] hover:text-white transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white rounded-xl text-xs font-semibold shadow-lg hover:brightness-110"
+                  className="px-3 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-medium transition-colors font-mono"
                 >
-                  Create Rule
+                  Save Pipeline
                 </button>
               </div>
             </form>

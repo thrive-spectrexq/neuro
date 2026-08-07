@@ -65,30 +65,30 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="glass-panel w-full max-w-lg p-6 rounded-2xl border border-white/15 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+      <div className="bg-[#0F1117] w-full max-w-lg p-5 rounded-lg border border-[#242A3C] shadow-2xl space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl">
-              <FolderPlus className="w-5 h-5 text-indigo-400" />
+        <div className="flex items-center justify-between border-b border-[#1F2433] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+              <FolderPlus className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Knowledge Import Hub</h3>
-              <p className="text-xs text-slate-400">Import your existing notes and research archives</p>
+              <h3 className="text-xs font-bold text-white font-mono">Knowledge Import Hub</h3>
+              <p className="text-[10px] text-[#64748B]">Batch ingest markdown archives into your local vault</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            className="p-1 text-[#64748B] hover:text-white hover:bg-[#141722] rounded transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Source Provider Selector */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-2">Select Format</label>
+          <label className="block text-[10px] font-mono text-[#94A3B8] mb-1.5">Select Ingestion Format</label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: 'markdown', label: 'Markdown (.md)', icon: FileText },
@@ -100,14 +100,14 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
                 <button
                   key={item.id}
                   onClick={() => setImportType(item.id as any)}
-                  className={`p-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all ${
+                  className={`p-2.5 rounded-md border text-xs font-mono flex flex-col items-center gap-1 transition-colors ${
                     importType === item.id
-                      ? 'bg-indigo-600/30 border-indigo-500 text-white shadow-md'
-                      : 'bg-black/40 border-white/10 text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#18162B] border-[#4F46E5] text-white shadow-sm'
+                      : 'bg-[#090A0F] border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#141722]'
                   }`}
                 >
-                  <Icon className="w-4 h-4 text-indigo-400" />
-                  {item.label}
+                  <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                  <span className="text-[10px]">{item.label}</span>
                 </button>
               );
             })}
@@ -115,7 +115,7 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
         </div>
 
         {/* Drop Zone */}
-        <div className="border-2 border-dashed border-white/15 hover:border-indigo-500/50 rounded-2xl p-6 text-center bg-black/30 transition-all cursor-pointer relative">
+        <div className="border border-dashed border-[#242A3C] hover:border-indigo-500/50 rounded-lg p-5 text-center bg-[#090A0F] transition-colors cursor-pointer relative">
           <input
             type="file"
             multiple
@@ -123,12 +123,12 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
             onChange={handleFileChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          <Upload className="w-8 h-8 text-indigo-400 mx-auto mb-2 opacity-80" />
-          <p className="text-xs font-semibold text-white">Click or drag files to upload</p>
-          <p className="text-[11px] text-slate-400 mt-1">Supports .md, .txt files</p>
+          <Upload className="w-6 h-6 text-indigo-400 mx-auto mb-1.5 opacity-80" />
+          <p className="text-xs font-bold text-white font-mono">Select or drag files to ingest</p>
+          <p className="text-[10px] text-[#64748B] font-mono mt-0.5">Supports .md and .txt markdown files</p>
           {files.length > 0 && (
-            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-mono">
-              <FileText className="w-3.5 h-3.5" />
+            <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 bg-[#18162B] text-indigo-300 border border-[#302856] rounded text-[10px] font-mono">
+              <FileText className="w-3 h-3" />
               {files.length} {files.length === 1 ? 'file' : 'files'} selected
             </div>
           )}
@@ -136,32 +136,32 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
 
         {/* Status Messages */}
         {error && (
-          <div className="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="p-2.5 bg-[#2B1215] border border-[#521C24] rounded-md text-rose-300 text-xs font-mono flex items-center gap-2">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
             {error}
           </div>
         )}
 
         {successCount !== null && (
-          <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-            Successfully imported {successCount} notes into your vault!
+          <div className="p-2.5 bg-[#102319] border border-[#1B432C] rounded-md text-emerald-300 text-xs font-mono flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+            Successfully imported {successCount} notes into your vault.
           </div>
         )}
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex justify-end gap-2 pt-2 border-t border-[#1F2433]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-all"
+            className="px-3 py-1 text-xs font-mono text-[#94A3B8] hover:text-white transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleImport}
             disabled={files.length === 0 || isProcessing}
-            className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white rounded-xl text-xs font-semibold shadow-lg hover:brightness-110 disabled:opacity-50 transition-all"
+            className="px-3.5 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium disabled:opacity-50 transition-colors shadow-sm"
           >
             {isProcessing ? 'Importing...' : 'Import to Vault'}
           </button>
