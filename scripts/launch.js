@@ -99,17 +99,12 @@ async function main() {
 
     const isWindows = process.platform === 'win32';
     const npxCmd = isWindows ? 'npx.cmd' : 'npx';
-    const mainBuilt = fs.existsSync(path.join(desktopDir, 'dist', 'main', 'main.js'));
-
-    if (!mainBuilt) {
-      console.log('\x1b[34mℹ\x1b[0m Building Electron main & preload bridges...');
-      try {
-        execSync(`${npxCmd} tsc -p tsconfig.main.json`, { cwd: desktopDir, stdio: 'inherit' });
-      } catch (e) {
-        console.warn('TypeScript compile check completed.');
-      }
-    } else {
-      console.log('\x1b[32m✔\x1b[0m Electron main bridge verified.');
+    console.log('\x1b[34mℹ\x1b[0m Compiling Electron main & preload bridges...');
+    try {
+      execSync(`${npxCmd} tsc -p tsconfig.main.json`, { cwd: desktopDir, stdio: 'inherit' });
+      console.log('\x1b[32m✔\x1b[0m Electron main bridge compiled.');
+    } catch (e) {
+      console.warn('TypeScript compile warning:', e.message);
     }
 
     console.log('\x1b[34mℹ\x1b[0m Starting Vite renderer server...');

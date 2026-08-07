@@ -9,11 +9,6 @@ import {
   showDesktopNotification,
 } from './os-tools';
 
-// Enable robust software rendering if GPU context is constrained
-app.disableHardwareAcceleration();
-app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('no-sandbox');
-
 let mainWindow: BrowserWindow | null = null;
 let orbWindow: BrowserWindow | null = null;
 
@@ -44,24 +39,30 @@ function createWindow() {
 }
 
 function createNeonOrbWindow() {
-  if (orbWindow && !orbWindow.isDestroyed()) return;
+  if (orbWindow && !orbWindow.isDestroyed()) {
+    orbWindow.show();
+    orbWindow.focus();
+    return;
+  }
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
 
-  const initialSize = 130;
+  const initialSize = 140;
 
   orbWindow = new BrowserWindow({
     width: initialSize,
     height: initialSize,
-    x: width - initialSize - 30,
-    y: height - initialSize - 30,
+    x: Math.max(10, width - initialSize - 30),
+    y: Math.max(10, height - initialSize - 30),
     transparent: true,
     frame: false,
     alwaysOnTop: true,
     resizable: false,
     hasShadow: false,
     skipTaskbar: true,
+    show: true,
+    backgroundColor: '#00000000',
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       nodeIntegration: false,
@@ -70,6 +71,7 @@ function createNeonOrbWindow() {
   });
 
   orbWindow.setAlwaysOnTop(true, 'screen-saver');
+  orbWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 
   const orbUrl = app.isPackaged
     ? `file://${path.join(__dirname, '../renderer/index.html')}?mode=orb`
