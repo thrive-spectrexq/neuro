@@ -8,9 +8,22 @@ import {
   ZoomOut, 
   RotateCcw, 
   Type, 
-  Trash2
+  Trash2,
+  Palette,
+  Edit3,
+  Check
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
+
+const OBSIDIAN_COLORS = [
+  { name: 'Red', hex: '#e06c75' },
+  { name: 'Orange', hex: '#d19a66' },
+  { name: 'Yellow', hex: '#e5c07b' },
+  { name: 'Green', hex: '#98c379' },
+  { name: 'Cyan', hex: '#56b6c2' },
+  { name: 'Purple', hex: '#c678dd' },
+  { name: 'Indigo', hex: '#6366f1' },
+];
 
 interface CanvasNode {
   id: string;
@@ -45,6 +58,20 @@ export function VaultCanvasStudio() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [roadmapGoal, setRoadmapGoal] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+
+  const handleSetNodeColor = (colorHex: string) => {
+    if (!selectedNodeId) return;
+    setNodes((prev) =>
+      prev.map((n) => (n.id === selectedNodeId ? { ...n, color: colorHex } : n))
+    );
+  };
+
+  const handleUpdateNodeText = (id: string, newText: string) => {
+    setNodes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, text: newText } : n))
+    );
+  };
 
   const [nodes, setNodes] = useState<CanvasNode[]>([
     {
@@ -340,6 +367,34 @@ export function VaultCanvasStudio() {
             <Type className="w-3.5 h-3.5 text-purple-400" />
             Add Text
           </button>
+          {/* Node Customization Palette when a Node is Selected */}
+          {selectedNodeId && (
+            <div className="flex items-center gap-1 px-2 py-1 bg-white/5 border border-white/10 rounded-xl">
+              <span className="text-[10px] text-slate-400 font-mono mr-1">Color:</span>
+              {OBSIDIAN_COLORS.map((c) => (
+                <button
+                  key={c.hex}
+                  onClick={() => handleSetNodeColor(c.hex)}
+                  className="w-4 h-4 rounded-full border border-white/20 hover:scale-125 transition-transform"
+                  style={{ backgroundColor: c.hex }}
+                  title={c.name}
+                />
+              ))}
+              <div className="h-3 w-px bg-white/10 mx-1" />
+              <button
+                onClick={() => setEditingNodeId(editingNodeId === selectedNodeId ? null : selectedNodeId)}
+                className={`p-1 rounded-lg text-xs transition-all ${
+                  editingNodeId === selectedNodeId
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+                title="Edit Card Markdown"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {selectedNodeId && (
             <button
               onClick={handleDeleteSelected}
@@ -475,8 +530,39 @@ export function VaultCanvasStudio() {
                 </div>
 
                 {/* Node Content Body */}
-                <div className="p-3.5 text-xs text-slate-200 font-sans leading-relaxed whitespace-pre-wrap flex-1 select-text">
-                  {node.text}
+                <div 
+                  className="p-3.5 text-xs text-slate-200 font-sans leading-relaxed flex-1 select-text"
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    setEditingNodeId(node.id);
+                  }}
+                >
+                  {editingNodeId === node.id ? (
+                    <div className="flex flex-col gap-2 h-full">
+                      <textarea
+                        value={node.text || ''}
+                        onChange={(e) => handleUpdateNodeText(node.id, e.target.value)}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        autoFocus
+                        rows={5}
+                        className="w-full p-2 bg-black/60 border border-indigo-500/50 rounded-lg text-xs text-slate-100 font-mono focus:outline-none resize-none"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingNodeId(null);
+                        }}
+                        className="self-end px-2 py-1 bg-indigo-600 text-white text-[10px] font-semibold rounded-md flex items-center gap-1"
+                      >
+                        <Check className="w-3 h-3" />
+                        Done
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap">
+                      {node.text}
+                    </div>
+                  )}
                 </div>
               </div>
             );

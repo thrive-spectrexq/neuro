@@ -8,6 +8,7 @@ import { AuditLogViewer } from './components/AuditLogViewer';
 import { AutomationBuilder } from './components/AutomationBuilder';
 import { VaultCanvasStudio } from './components/VaultCanvasStudio';
 import { VaultLintStudio } from './components/VaultLintStudio';
+import { SpacedRepetitionStudio } from './components/SpacedRepetitionStudio';
 import { ImportHubModal } from './components/ImportHubModal';
 import { WebClipperModal } from './components/WebClipperModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
@@ -25,11 +26,12 @@ import {
   Search, 
   Command, 
   FolderPlus, 
-  Globe 
+  Globe,
+  GraduationCap 
 } from 'lucide-react';
 import { VoiceAssistant } from './components/VoiceAssistant';
 
-type ActiveTab = 'graph' | 'canvas' | 'tasks' | 'diagnostics' | 'automations' | 'audit';
+type ActiveTab = 'graph' | 'canvas' | 'tasks' | 'study' | 'diagnostics' | 'automations' | 'audit';
 
 export default function App() {
   const token = useAuthStore((state) => state.token);
@@ -156,6 +158,18 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setActiveTab('study')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'study'
+                  ? 'bg-indigo-600 text-white shadow-md border border-white/15'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              Study & Recall
+            </button>
+
+            <button
               onClick={() => setActiveTab('diagnostics')}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'diagnostics'
@@ -242,6 +256,12 @@ export default function App() {
           {activeTab === 'tasks' && (
             <div className="w-full h-full">
               <TaskKanbanBoard />
+            </div>
+          )}
+
+          {activeTab === 'study' && (
+            <div className="w-full h-full">
+              <SpacedRepetitionStudio />
             </div>
           )}
 
