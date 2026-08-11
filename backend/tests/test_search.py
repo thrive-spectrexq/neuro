@@ -27,6 +27,12 @@ async def test_search_empty_query(test_client: AsyncClient, auth_headers: dict[s
 
 
 @pytest.mark.asyncio
+async def test_search_rejects_whitespace_query(test_client: AsyncClient, auth_headers: dict[str, str]):
+    response = await test_client.get("/api/v1/search?q=%20%20", headers=auth_headers)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_search_requires_authentication(test_client: AsyncClient):
     response = await test_client.get("/api/v1/search?q=Unique")
     assert response.status_code == 401

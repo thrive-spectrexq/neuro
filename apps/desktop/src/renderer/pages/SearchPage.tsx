@@ -4,6 +4,9 @@ import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
 import { soundEngine } from '../utils/soundEngine';
 
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+const AUTH_TOKEN_KEY = 'neuro_token';
+
 interface SearchPageProps {
   onNavigate?: (page: 'editor' | 'notes') => void;
 }
@@ -27,8 +30,10 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
     setIsSearching(true);
     const timeout = setTimeout(async () => {
       try {
-        // Try backend hybrid search
-        const res = await fetch(`http://localhost:8000/api/v1/search?q=${encodeURIComponent(query)}`);
+        // Try backend hybrid search with the same bearer token used by other clients.
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+        const res = await fetch(`${API_BASE_URL}/api/v1/search?q=${encodeURIComponent(query.trim())}`, { headers });
         if (res.ok) {
           const data = await res.json();
           if (data.results && data.results.length > 0) {

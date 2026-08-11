@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
@@ -19,8 +19,12 @@ async def search_notes(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
+    query = q.strip()
+    if not query:
+        raise HTTPException(status_code=422, detail="Search query must contain at least one non-whitespace character")
+
     user_id = current_user.id if hasattr(current_user, "id") else current_user.get("id")
     results = await search_engine.hybrid_search(
-        session=session, query=q, user_id=user_id, project_id=project_id, limit=limit
+        session=session, query=query, user_id=user_id, project_id=project_id, limit=limit
     )
-    return {"query": q, "results": results}
+    return {"query": query, "results": results}
