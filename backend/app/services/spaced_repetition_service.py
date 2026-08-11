@@ -49,9 +49,7 @@ class SpacedRepetitionService:
     """
 
     @classmethod
-    def extract_flashcards_from_note(
-        cls, note_id: str, title: str, content: str
-    ) -> list[Flashcard]:
+    def extract_flashcards_from_note(cls, note_id: str, title: str, content: str) -> list[Flashcard]:
         """Extracts flashcards from note content using multiple standard syntax formats."""
         cards: list[Flashcard] = []
         if not content:
@@ -60,9 +58,7 @@ class SpacedRepetitionService:
         now_iso = datetime.now(UTC).isoformat()
 
         # 1. Inline Q::A syntax (e.g. "What is CAP theorem?::Consistency, Availability, Partition tolerance")
-        inline_qa_pattern = re.compile(
-            r"^(?!\s*#)\s*([^\n:]+?)::([^\n]+)$", re.MULTILINE
-        )
+        inline_qa_pattern = re.compile(r"^(?!\s*#)\s*([^\n:]+?)::([^\n]+)$", re.MULTILINE)
         for idx, match in enumerate(inline_qa_pattern.finditer(content)):
             front = match.group(1).strip()
             back = match.group(2).strip()
@@ -170,9 +166,7 @@ class SpacedRepetitionService:
         )
 
     @classmethod
-    def aggregate_vault_study_stats(
-        cls, cards: list[dict[str, Any]]
-    ) -> VaultStudyStats:
+    def aggregate_vault_study_stats(cls, cards: list[dict[str, Any]]) -> VaultStudyStats:
         """Computes comprehensive spaced repetition study stats for the entire vault."""
         now = datetime.now(UTC)
         total = len(cards)
@@ -208,9 +202,7 @@ class SpacedRepetitionService:
             else:
                 due_count += 1
 
-        retention_rate = (
-            round((mastered / total) * 100.0, 1) if total > 0 else 100.0
-        )
+        retention_rate = round((mastered / total) * 100.0, 1) if total > 0 else 100.0
 
         return VaultStudyStats(
             total_cards=total,
