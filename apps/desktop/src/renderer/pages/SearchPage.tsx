@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, Tag, ArrowRight, Sparkles, Filter, Clock, Hash, CornerDownLeft } from 'lucide-react';
+import {
+  Search,
+  FileText,
+  Tag,
+  ArrowRight,
+  Sparkles,
+  Filter,
+  Clock,
+  Hash,
+  CornerDownLeft,
+} from 'lucide-react';
 import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
 import { soundEngine } from '../utils/soundEngine';
@@ -33,7 +43,10 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
         // Try backend hybrid search with the same bearer token used by other clients.
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
         const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-        const res = await fetch(`${API_BASE_URL}/api/v1/search?q=${encodeURIComponent(query.trim())}`, { headers });
+        const res = await fetch(
+          `${API_BASE_URL}/api/v1/search?q=${encodeURIComponent(query.trim())}`,
+          { headers },
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.results && data.results.length > 0) {
@@ -64,7 +77,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
           tags: n.tags,
           score: 1.0,
           type: 'note',
-        }))
+        })),
       );
       setIsSearching(false);
     }, 200);
@@ -82,7 +95,6 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
 
   return (
     <div className="p-8 h-full flex flex-col max-w-4xl mx-auto overflow-y-auto select-none">
-      
       {/* Search Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
@@ -202,9 +214,12 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
             <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
               <Search size={20} className="text-zinc-500" />
             </div>
-            <p className="text-xs font-medium text-zinc-300">Type any concept or note title above</p>
+            <p className="text-xs font-medium text-zinc-300">
+              Type any concept or note title above
+            </p>
             <p className="text-[11px] text-zinc-500 mt-1 max-w-sm">
-              Supports full-text indexing, fuzzy search, and conceptual associations across your entire brain.
+              Supports full-text indexing, fuzzy search, and conceptual associations across your
+              entire brain.
             </p>
           </div>
         )}
