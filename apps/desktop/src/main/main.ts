@@ -172,9 +172,12 @@ ipcMain.handle('shell:openExternal', async (_, url: string) => {
   return openExternalUrl(url);
 });
 
-ipcMain.handle('shell:launchApp', async (_, { appName, args }: { appName: string; args?: string }) => {
-  return launchNativeApp(appName, args);
-});
+ipcMain.handle(
+  'shell:launchApp',
+  async (_, { appName, args }: { appName: string; args?: string }) => {
+    return launchNativeApp(appName, args);
+  },
+);
 
 ipcMain.handle('notification:show', (_, { title, body }: { title: string; body: string }) => {
   showDesktopNotification(title, body);
@@ -210,8 +213,8 @@ ipcMain.handle('orb:close', () => {
 
 ipcMain.handle('orb:resize', (_, { width, height }: { width: number; height: number }) => {
   if (orbWindow && !orbWindow.isDestroyed()) {
-    const [currentX, currentY] = orbWindow.getPosition();
-    const [currentW, currentH] = orbWindow.getSize();
+    const [currentX, currentY] = orbWindow.getPosition() as [number, number];
+    const [currentW, currentH] = orbWindow.getSize() as [number, number];
     // Expand upwards & leftwards to keep anchor steady at bottom-right
     const deltaW = width - currentW;
     const deltaH = height - currentH;
@@ -248,4 +251,3 @@ ipcMain.handle('window:toggle-main', () => {
   }
   return true;
 });
-
