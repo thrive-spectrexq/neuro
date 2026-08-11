@@ -16,14 +16,18 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@neuro/shared": ["../../packages/shared/dist/index.d.ts"],
-      "@neuro/shared/*": ["../../packages/shared/dist/*"]
-    }
+      "@neuro/shared": ["../../packages/shared/src/index.ts"],
+      "@neuro/shared/*": ["../../packages/shared/src/*"]
+    },
+    "rootDir": "../.."
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

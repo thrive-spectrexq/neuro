@@ -74,7 +74,7 @@ class SoundEngine {
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C Major arpeggio
+    const frequencies = [523.25, 659.25, 783.99, 1046.5]; // C Major arpeggio
 
     frequencies.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
@@ -119,6 +119,31 @@ class SoundEngine {
 
     osc.start(now);
     osc.stop(now + 0.05);
+  }
+
+  /**
+   * Short configurable beep for compact controls and status toggles.
+   */
+  public playBeep(frequency: number = 800, type: OscillatorType = 'sine', duration: number = 0.1) {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, now);
+
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + duration);
   }
 }
 
