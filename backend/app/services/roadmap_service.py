@@ -370,7 +370,9 @@ class RoadmapService:
 
         normalized_depth = depth.lower().strip() if depth else "intermediate"
         if normalized_depth not in {"beginner", "intermediate", "advanced"}:
-            raise RoadmapGenerationError(detail=f"Invalid depth '{depth}'. Must be beginner, intermediate, or advanced.")
+            raise RoadmapGenerationError(
+                detail=f"Invalid depth '{depth}'. Must be beginner, intermediate, or advanced."
+            )
 
         logger.info(f"Generating roadmap for goal: '{cleaned_goal}' (depth: {normalized_depth})")
         goal_lower = cleaned_goal.lower()

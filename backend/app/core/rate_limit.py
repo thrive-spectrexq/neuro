@@ -26,7 +26,11 @@ class RateLimiter:
         if len(timestamps) >= self.requests_per_minute:
             raise RateLimitExceededException(
                 detail=self.error_message,
-                context={"limit": self.requests_per_minute, "window_seconds": self.window_seconds, "client_ip": client_ip},
+                context={
+                    "limit": self.requests_per_minute,
+                    "window_seconds": self.window_seconds,
+                    "client_ip": client_ip,
+                },
             )
 
         timestamps.append(now)

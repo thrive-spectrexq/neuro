@@ -103,7 +103,13 @@ def timed_operation(logger: logging.Logger, operation_name: str, **extra: Any) -
         duration_ms = (time.perf_counter() - start) * 1000.0
         logger.error(
             f"Failed operation '{operation_name}' after {duration_ms:.2f}ms: {exc}",
-            extra={"operation": operation_name, "stage": "failed", "duration_ms": round(duration_ms, 2), "error": str(exc), **extra},
+            extra={
+                "operation": operation_name,
+                "stage": "failed",
+                "duration_ms": round(duration_ms, 2),
+                "error": str(exc),
+                **extra,
+            },
             exc_info=True,
         )
         raise exc

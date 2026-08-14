@@ -59,7 +59,11 @@ class ValidationException(NeuroException):
 class PathTraversalError(ForbiddenException):
     """Raised when an operation attempts to access or mutate files outside the vault boundary sandbox."""
 
-    def __init__(self, detail: str = "Path traversal violation: target resolves outside vault sandbox", context: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        detail: str = "Path traversal violation: target resolves outside vault sandbox",
+        context: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__(detail=detail, context=context)
 
 
@@ -73,7 +77,9 @@ class VaultIntegrityError(ConflictException):
 class GraphAnalysisException(NeuroException):
     """Raised when AST extraction, graph clustering, or blast radius computation fails."""
 
-    def __init__(self, detail: str = "Knowledge graph extraction or analysis failed", context: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, detail: str = "Knowledge graph extraction or analysis failed", context: dict[str, Any] | None = None
+    ) -> None:
         super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, context=context)
 
 
@@ -94,14 +100,18 @@ class ObsidianLintError(NeuroException):
 class DatabaseConnectionError(NeuroException):
     """Raised when database operations encounter connection timeouts, locks, or pool exhaustion."""
 
-    def __init__(self, detail: str = "Database service unavailable or timed out", context: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, detail: str = "Database service unavailable or timed out", context: dict[str, Any] | None = None
+    ) -> None:
         super().__init__(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=detail, context=context)
 
 
 class RateLimitExceededException(NeuroException):
     """Raised when sliding-window rate limit is exceeded."""
 
-    def __init__(self, detail: str = "Too many requests. Please try again later.", context: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, detail: str = "Too many requests. Please try again later.", context: dict[str, Any] | None = None
+    ) -> None:
         super().__init__(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=detail, context=context)
 
 

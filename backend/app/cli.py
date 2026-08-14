@@ -274,7 +274,9 @@ def ingest_data(path: Path) -> None:
     typer.echo(f"Ingesting data from '{path}'...")
     if path.is_file():
         if path.suffix.lower() not in ALLOWED_INGEST_EXTENSIONS:
-            typer.echo(f"Unsupported file format '{path.suffix}'. Allowed: {', '.join(sorted(ALLOWED_INGEST_EXTENSIONS))}")
+            typer.echo(
+                f"Unsupported file format '{path.suffix}'. Allowed: {', '.join(sorted(ALLOWED_INGEST_EXTENSIONS))}"
+            )
             raise typer.Exit(1)
         if path.stat().st_size > MAX_INGEST_SIZE_BYTES:
             typer.echo(f"File exceeds maximum allowed size of 50MB: {path.name}")
