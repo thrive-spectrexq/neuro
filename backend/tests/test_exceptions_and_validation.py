@@ -1,18 +1,14 @@
-import os
-from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
 from app.core.config import Settings
 from app.core.exceptions import (
-    ForbiddenException,
     GraphAnalysisException,
     NotFoundException,
     ObsidianLintError,
     PathTraversalError,
     RateLimitExceededException,
     RoadmapGenerationError,
-    VaultIntegrityError,
 )
 from app.services.roadmap_service import RoadmapService
 from app.services.vault_transaction_service import VaultBoundaryViolation, VaultTransactionService

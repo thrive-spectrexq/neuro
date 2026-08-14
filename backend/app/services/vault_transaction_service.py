@@ -9,7 +9,6 @@ Provides atomic plan-apply transactional mutability for notes, canvas, and vault
 """
 
 import hashlib
-import logging
 import os
 import shutil
 from dataclasses import dataclass, field

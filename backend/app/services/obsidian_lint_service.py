@@ -11,14 +11,12 @@ Provides deterministic, offline linting across knowledge notes and Obsidian vaul
 
 from __future__ import annotations
 
-import logging
 import re
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
 
-from app.core.exceptions import ObsidianLintError, PathTraversalError
 from app.core.logging import get_logger
 
 logger = get_logger("obsidian_lint")

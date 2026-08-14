@@ -8,7 +8,6 @@ Create Date: 2026-07-23 17:14:52.536783
 
 from collections.abc import Sequence
 
-import sqlalchemy as sa
 import sqlmodel
 from alembic import op
 

@@ -89,7 +89,7 @@ class ProjectService:
         )
         member_res = await session.execute(member_stmt)
         if not member_res.scalar_one_or_none():
-            raise HTTPException(status_code=403, detail="Only owners can delete projects")
+            raise ForbiddenException(detail="Only owners can delete projects")
 
         stmt = select(Project).where(Project.id == project_id)
         res = await session.execute(stmt)
@@ -123,7 +123,7 @@ class ProjectService:
         )
         admin_res = await session.execute(admin_stmt)
         if not admin_res.scalar_one_or_none():
-            raise HTTPException(status_code=403, detail="Not authorized to add members")
+            raise ForbiddenException(detail="Not authorized to add members")
 
         member_stmt = select(ProjectMember).where(
             ProjectMember.project_id == project_id,
@@ -166,7 +166,7 @@ class ProjectService:
             )
             admin_res = await session.execute(admin_stmt)
             if not admin_res.scalar_one_or_none():
-                raise HTTPException(status_code=403, detail="Not authorized to remove members")
+                raise ForbiddenException(detail="Not authorized to remove members")
 
         member_stmt = select(ProjectMember).where(
             ProjectMember.project_id == project_id,

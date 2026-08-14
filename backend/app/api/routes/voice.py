@@ -1,10 +1,9 @@
-import os
 import json
-import urllib.request
 import urllib.error
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, UploadFile, File, Form
+import urllib.request
+
+from fastapi import APIRouter, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-from typing import Optional
 
 from app.services.voice.pipeline import run_voice_pipeline
 
@@ -13,8 +12,8 @@ router = APIRouter(tags=["Voice"])
 
 class TranscribeResponse(BaseModel):
     text: str
-    language: Optional[str] = "en"
-    duration: Optional[float] = 0.0
+    language: str | None = "en"
+    duration: float | None = 0.0
 
 
 def transcribe_audio_payload(audio_bytes: bytes, content_type: str = "audio/webm") -> str:
@@ -45,7 +44,7 @@ def transcribe_audio_payload(audio_bytes: bytes, content_type: str = "audio/webm
                                 return alt[0]["transcript"].strip()
                     except Exception:
                         pass
-    except Exception as e:
+    except Exception:
         # Fallback local notice
         pass
 
@@ -54,7 +53,7 @@ def transcribe_audio_payload(audio_bytes: bytes, content_type: str = "audio/webm
 
 @router.post("/transcribe", response_model=TranscribeResponse)
 async def transcribe_audio(
-    file: Optional[UploadFile] = File(None),
+    file: UploadFile | None = File(None),
     model: str = Form("local-whisper"),
 ):
     """
@@ -76,7 +75,7 @@ async def transcribe_audio(
             text=text_result,
             duration=len(contents) / 32000.0,
         )
-    except Exception as e:
+    except Exception:
         return TranscribeResponse(text="", duration=0.0)
 
 
