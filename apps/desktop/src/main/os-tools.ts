@@ -1,6 +1,8 @@
 import { clipboard, Notification, shell } from 'electron';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import * as os from 'os';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface ExecuteAgentOptions {
   command: string;
@@ -26,6 +28,20 @@ export async function openExternalUrl(url: string): Promise<boolean> {
   }
 }
 
+function tryDirectLaunch(candidatePaths: string[], args: string[] = []): boolean {
+  for (const p of candidatePaths) {
+    if (!p) continue;
+    try {
+      if (fs.existsSync(p)) {
+        const child = spawn(p, args, { detached: true, stdio: 'ignore' });
+        child.unref();
+        return true;
+      }
+    } catch {}
+  }
+  return false;
+}
+
 export async function launchNativeApp(appName: string, args?: string): Promise<{ success: boolean; message: string }> {
   const platform = os.platform();
   const normalized = appName.toLowerCase().trim();
@@ -39,6 +55,79 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
 
     if (platform === 'win32') {
       const projectDir = process.cwd();
+      const localApp = process.env.LOCALAPPDATA || '';
+      const progFiles = process.env.ProgramFiles || 'C:\\Program Files';
+      const progFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+      const appData = process.env.APPDATA || '';
+
+      // Direct executable path maps for instantaneous 100% reliable launching
+      if (normalized === 'brave' || normalized.includes('brave')) {
+        const bravePaths = [
+          path.join(progFiles, 'BraveSoftware/Brave-Browser/Application/brave.exe'),
+          path.join(progFilesX86, 'BraveSoftware/Brave-Browser/Application/brave.exe'),
+          path.join(localApp, 'BraveSoftware/Brave-Browser/Application/brave.exe'),
+        ];
+        if (tryDirectLaunch(bravePaths, args ? [args] : [])) {
+          return { success: true, message: 'Launched Brave Browser' };
+        }
+      } else if (normalized === 'chrome' || normalized.includes('chrome')) {
+        const chromePaths = [
+          path.join(progFiles, 'Google/Chrome/Application/chrome.exe'),
+          path.join(progFilesX86, 'Google/Chrome/Application/chrome.exe'),
+          path.join(localApp, 'Google/Chrome/Application/chrome.exe'),
+        ];
+        if (tryDirectLaunch(chromePaths, args ? [args] : [])) {
+          return { success: true, message: 'Launched Google Chrome' };
+        }
+      } else if (normalized.includes('edge') || normalized.includes('msedge')) {
+        const edgePaths = [
+          path.join(progFilesX86, 'Microsoft/Edge/Application/msedge.exe'),
+          path.join(progFiles, 'Microsoft/Edge/Application/msedge.exe'),
+        ];
+        if (tryDirectLaunch(edgePaths, args ? [args] : [])) {
+          return { success: true, message: 'Launched Microsoft Edge' };
+        }
+      } else if (normalized === 'vscode' || normalized === 'code' || normalized.includes('vs code')) {
+        const codePaths = [
+          path.join(localApp, 'Programs/Microsoft VS Code/Code.exe'),
+          path.join(progFiles, 'Microsoft VS Code/Code.exe'),
+        ];
+        if (tryDirectLaunch(codePaths, [projectDir])) {
+          return { success: true, message: 'Launched VS Code' };
+        }
+      } else if (normalized === 'cursor' || normalized.includes('cursor')) {
+        const cursorPaths = [
+          path.join(localApp, 'Programs/cursor/Cursor.exe'),
+          path.join(localApp, 'Programs/Cursor/Cursor.exe'),
+        ];
+        if (tryDirectLaunch(cursorPaths, [projectDir])) {
+          return { success: true, message: 'Launched Cursor IDE' };
+        }
+      } else if (normalized === 'obsidian') {
+        const obsidianPaths = [
+          path.join(localApp, 'Obsidian/Obsidian.exe'),
+          path.join(localApp, 'Programs/Obsidian/Obsidian.exe'),
+        ];
+        if (tryDirectLaunch(obsidianPaths)) {
+          return { success: true, message: 'Launched Obsidian Vault' };
+        }
+      } else if (normalized === 'notion') {
+        const notionPaths = [
+          path.join(localApp, 'Programs/Notion/Notion.exe'),
+        ];
+        if (tryDirectLaunch(notionPaths)) {
+          return { success: true, message: 'Launched Notion' };
+        }
+      } else if (normalized === 'spotify') {
+        const spotifyPaths = [
+          path.join(appData, 'Spotify/Spotify.exe'),
+          path.join(localApp, 'Microsoft/WindowsApps/Spotify.exe'),
+        ];
+        if (tryDirectLaunch(spotifyPaths)) {
+          return { success: true, message: 'Launched Spotify' };
+        }
+      }
+
       let command = `start "" "${normalized}"`;
 
       if (normalized.includes('antigravity')) {
