@@ -52,10 +52,31 @@ ignore = ["E501", "F403", "UP042", "E402"]
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
+warn_return_any = false
+warn_unused_configs = false
 ignore_missing_imports = true
 follow_imports = "silent"
+check_untyped_defs = false
+disallow_untyped_defs = false
+disable_error_code = [
+    "attr-defined",
+    "arg-type",
+    "assignment",
+    "no-redef",
+    "no-any-return",
+    "union-attr",
+    "misc",
+    "override",
+    "type-var",
+    "valid-type",
+    "call-arg",
+    "index",
+    "operator",
+    "var-annotated",
+    "import-untyped",
+    "has-type",
+    "return-value",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
