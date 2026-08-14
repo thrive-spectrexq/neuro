@@ -235,11 +235,11 @@ OLLAMA_MODEL=llama3.2
 ## Documentation
 
 For in-depth architecture and integration guides, see:
-- 🏛️ [**Architecture & System Design**](docs/ARCHITECTURE.md) — Knowledge graph extraction, Louvain clustering, PageRank, and vault sandboxing.
-- 🔌 [**MCP Server Setup**](docs/MCP_SETUP.md) — Connect Claude Desktop, Cursor, and Windsurf directly to your Neuro second brain.
-- 💻 [**CLI Reference Manual**](docs/CLI.md) — Full command documentation for `neuro db`, `neuro graph`, `neuro obsidian`, and `neuro roadmap`.
-- ⚡ [**IPC Protocol Specification**](docs/IPC_PROTOCOL.md) — Electron IPC message contracts, telemetry channels, and push events.
-- 📡 [**API Reference**](docs/api/README.md) — REST API endpoints and schemas.
+- [**Architecture & System Design**](docs/ARCHITECTURE.md) — Knowledge graph extraction, Louvain clustering, PageRank, and vault sandboxing.
+- [**MCP Server Setup**](docs/MCP_SETUP.md) — Connect Claude Desktop, Cursor, and Windsurf directly to your Neuro second brain.
+- [**CLI Reference Manual**](docs/CLI.md) — Full command documentation for `neuro db`, `neuro graph`, `neuro obsidian`, and `neuro roadmap`.
+- [**IPC Protocol Specification**](docs/IPC_PROTOCOL.md) — Electron IPC message contracts, telemetry channels, and push events.
+- [**API Reference**](docs/api/README.md) — REST API endpoints and schemas.
 
 ---
 
