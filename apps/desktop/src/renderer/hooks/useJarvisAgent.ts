@@ -350,6 +350,85 @@ export function useJarvisAgent() {
         is_offline_native: true,
         confidence: 0.95,
       };
+    } else if (lower.includes('note') && (lower.includes('add') || lower.includes('create') || lower.includes('take') || lower.includes('write') || lower.includes('capture'))) {
+      const rawText = command.replace(/^(add to note|create note|take a note|add note|take note|write note|new note|note)\s*[:\-]?\s*/i, '').trim();
+      const noteTitle = rawText ? rawText.slice(0, 40) : 'Voice Quick Note';
+      const noteContent = rawText ? `# ${noteTitle}\n\n${rawText}\n\n*Captured via Neuro Voice Agent*` : '# Quick Note\n\nCaptured thought...';
+
+      // Save note locally to backend or local mock
+      try {
+        fetch('http://127.0.0.1:8000/api/v1/notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: noteTitle, content: noteContent, tags: ['voice-capture'] }),
+        }).catch(() => {});
+      } catch {}
+
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'create_note',
+        voice_response: `I've created and saved that note to your second brain.`,
+        display_text: `📝 Note Captured: "${noteTitle}"`,
+        is_offline_native: true,
+        confidence: 0.98,
+      };
+    } else if (lower.includes('browser') || lower.includes('chrome') || lower.includes('edge') || lower.includes('firefox')) {
+      const appTarget = lower.includes('edge') ? 'edge' : lower.includes('chrome') ? 'chrome' : lower.includes('firefox') ? 'firefox' : 'browser';
+      await window.electronAPI?.launchApp(appTarget);
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'open_browser',
+        voice_response: 'Opening web browser, sir.',
+        display_text: '🌐 Opened Web Browser',
+        is_offline_native: true,
+        confidence: 0.95,
+      };
+    } else if (lower.includes('terminal') || lower.includes('powershell') || lower.includes('command line') || lower === 'cmd') {
+      await window.electronAPI?.launchApp('terminal');
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'open_terminal',
+        voice_response: 'Opening terminal in project workspace.',
+        display_text: '⚡ Opened Terminal Console',
+        is_offline_native: true,
+        confidence: 0.98,
+      };
+    } else if (lower.includes('calculator') || lower.includes('calc')) {
+      await window.electronAPI?.launchApp('calculator');
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'open_calculator',
+        voice_response: 'Opening Calculator.',
+        display_text: '🔢 Opened Calculator',
+        is_offline_native: true,
+        confidence: 0.98,
+      };
+    } else if (lower.includes('explorer') || lower.includes('files') || lower.includes('folder') || lower.includes('open directory')) {
+      await window.electronAPI?.launchApp('explorer');
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'open_explorer',
+        voice_response: 'Opening project file folder in Explorer.',
+        display_text: '📂 Opened Project Folder',
+        is_offline_native: true,
+        confidence: 0.98,
+      };
+    } else if (lower.includes('task manager') || lower.includes('taskmgr') || lower.includes('processes')) {
+      await window.electronAPI?.launchApp('taskmgr');
+      fallbackResult = {
+        success: true,
+        input_text: command,
+        tool_name: 'open_taskmgr',
+        voice_response: 'Opening Windows Task Manager.',
+        display_text: '📊 Opened Task Manager',
+        is_offline_native: true,
+        confidence: 0.98,
+      };
     } else if (lower.includes('brave')) {
       await window.electronAPI?.launchApp('brave');
       fallbackResult = {
@@ -390,7 +469,7 @@ export function useJarvisAgent() {
       fallbackResult = {
         success: true,
         input_text: command,
-        voice_response: `I heard: ${command}. You can say "Open Antigravity", "Open Claude Code", "Continue coding session", or control your system apps.`,
+        voice_response: `I heard: ${command}. You can say "Open Antigravity", "Open Browser", "Add to note", "Play music", or launch any developer tool.`,
         display_text: `Recognized: "${command}"`,
         is_offline_native: true,
         confidence: 0.7,

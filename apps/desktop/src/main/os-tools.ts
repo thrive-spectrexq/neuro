@@ -67,13 +67,19 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = 'start "" "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" || start docker';
       } else if (normalized === 'postman') {
         command = 'start postman || start https://web.postman.co';
+      } else if (normalized.includes('browser') || normalized === 'web' || normalized === 'internet') {
+        command = 'start https://www.google.com';
+      } else if (normalized.includes('edge') || normalized.includes('msedge')) {
+        command = 'start msedge || start microsoft-edge:';
       } else if (normalized === 'brave' || normalized.includes('brave')) {
-        command = 'start brave';
+        command = 'start brave || start https://google.com';
       } else if (normalized === 'chrome' || normalized.includes('chrome')) {
-        command = 'start chrome';
+        command = 'start chrome || start https://google.com';
       } else if (normalized === 'firefox' || normalized.includes('firefox')) {
-        command = 'start firefox';
-      } else if (normalized === 'terminal' || normalized === 'powershell' || normalized === 'wt') {
+        command = 'start firefox || start https://google.com';
+      } else if (normalized === 'spotify') {
+        command = 'start spotify: || start spotify';
+      } else if (normalized === 'terminal' || normalized === 'powershell' || normalized === 'wt' || normalized === 'cmd') {
         command = `start wt -d "${projectDir}" || start powershell -NoExit -Command "cd '${projectDir}'"`;
       } else if (normalized === 'notion') {
         command = 'start notion || start https://notion.so';
@@ -83,13 +89,13 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = 'start figma || start https://figma.com';
       } else if (normalized === 'notepad') {
         command = 'start notepad';
-      } else if (normalized === 'explorer' || normalized === 'files') {
+      } else if (normalized === 'explorer' || normalized === 'files' || normalized === 'folder' || normalized.includes('open folder')) {
         command = `start explorer "${projectDir}"`;
       } else if (normalized === 'calculator' || normalized === 'calc') {
         command = 'start calc';
       } else if (normalized === 'taskmgr' || normalized.includes('task manager')) {
         command = 'start taskmgr';
-      } else if (normalized === 'snipping' || normalized.includes('screenshot')) {
+      } else if (normalized === 'snipping' || normalized.includes('screenshot') || normalized.includes('snip')) {
         command = 'start snippingtool';
       } else if (normalized === 'discord') {
         command = 'start discord';
