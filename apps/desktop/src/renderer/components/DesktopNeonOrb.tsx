@@ -5,6 +5,7 @@ import {
   Volume2, 
   Sparkles, 
   X, 
+  Minus,
   Maximize2, 
   Zap, 
   Radio,
@@ -88,6 +89,7 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const smoothedAudioRef = useRef(0);
 
@@ -101,11 +103,15 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   const sizeCfg = SIZE_CONFIGS[sizeMode];
 
-  // Stable window resizing: ONLY runs on explicit size mode change, NEVER on hover/unhover!
+  // Stable window resizing: handles size changes and minimize mode
   useEffect(() => {
     if (!standaloneMode || !window.electronAPI?.resizeOrbWindow) return;
-    window.electronAPI.resizeOrbWindow(sizeCfg.window.width, sizeCfg.window.height);
-  }, [standaloneMode, sizeMode, sizeCfg]);
+    if (isMinimized) {
+      window.electronAPI.resizeOrbWindow(110, 110);
+    } else {
+      window.electronAPI.resizeOrbWindow(sizeCfg.window.width, sizeCfg.window.height);
+    }
+  }, [standaloneMode, isMinimized, sizeMode, sizeCfg]);
 
   // Persist size choice
   const handleSetSizeMode = (newSize: OrbSizeMode) => {
@@ -316,8 +322,6 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
   const handleClose = () => {
     if (standaloneMode && window.electronAPI?.closeOrbWindow) {
       window.electronAPI.closeOrbWindow();
-    } else {
-      setIsVisible(false);
     }
   };
 
@@ -345,6 +349,27 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   // Render standalone desktop window layout
   if (standaloneMode) {
+    if (isMinimized) {
+      return (
+        <div
+          className="w-full h-full flex items-center justify-center cursor-pointer select-none no-drag p-2"
+          onClick={() => setIsMinimized(false)}
+          title="Click to Expand Neuro Desktop Orb"
+        >
+          <div className="relative w-16 h-16 rounded-full flex items-center justify-center bg-[#05070f]/95 border-2 border-cyan-400 shadow-[0_0_25px_rgba(0,245,255,0.75)] group hover:scale-110 active:scale-95 transition-all">
+            <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center">
+              {isListening ? (
+                <span className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
+              ) : (
+                <Zap className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+              )}
+            </div>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f5ff] animate-pulse" />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         className="w-full h-full relative flex flex-col items-center justify-end pb-3 select-none overflow-visible"
@@ -420,6 +445,16 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                   {isListening ? <Mic className="w-3.5 h-3.5 text-cyan-400" /> : <MicOff className="w-3.5 h-3.5" />}
                 </button>
 
+                {/* Minimize to Mini-Orb */}
+                <button
+                  onClick={() => setIsMinimized(true)}
+                  className="p-1.5 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg text-zinc-300 hover:text-white transition-colors"
+                  title="Minimize to Floating Mini-Orb"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Maximize Neuro Workstation */}
                 <button
                   onClick={handleSummon}
                   className="p-1.5 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg text-zinc-300 hover:text-white transition-colors"
@@ -428,10 +463,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                   <Maximize2 className="w-3.5 h-3.5" />
                 </button>
 
+                {/* Close/Hide Orb */}
                 <button
                   onClick={handleClose}
                   className="p-1.5 bg-white/[0.05] hover:bg-rose-900/40 border border-white/10 hover:border-rose-500/40 rounded-lg text-zinc-400 hover:text-rose-400 transition-colors"
-                  title="Hide Desktop Orb (Press Alt+O to Restore)"
+                  title="Close Desktop Orb (Press Alt+O to reopen)"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
