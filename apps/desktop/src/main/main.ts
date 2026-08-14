@@ -11,8 +11,15 @@ import {
   showDesktopNotification,
 } from './os-tools';
 
-// Suppress Chromium internal cloud speech recognition pipe errors
+// Suppress Chromium internal cloud speech recognition pipe errors and disk cache conflicts
 app.commandLine.appendSwitch('disable-features', 'SpeechRecognition');
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+app.commandLine.appendSwitch('log-level', '3');
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+}
 
 let mainWindow: BrowserWindow | null = null;
 let orbWindow: BrowserWindow | null = null;
@@ -167,6 +174,13 @@ function createNeonOrbWindow() {
     orbWindow = null;
   });
 }
+
+app.on('second-instance', () => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
 
 app.whenReady().then(async () => {
   // Grant microphone and notification permissions explicitly

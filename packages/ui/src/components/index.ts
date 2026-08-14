@@ -6,3 +6,7 @@ export * from './SearchBar';
 export * from './NoteCard';
 export * from './TagBadge';
 export * from './Spinner';
+export * from './Card';
+export * from './Badge';
+export * from './Tooltip';
+export * from './Typography';

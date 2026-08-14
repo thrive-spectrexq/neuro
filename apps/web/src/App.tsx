@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import GraphView from './components/GraphView';
 import AuthForm from './components/AuthForm';
 import CreateNoteForm from './components/CreateNoteForm';
-import { AIChatPanel } from './components/AIChatPanel';
-import { TaskKanbanBoard } from './components/TaskKanbanBoard';
-import { AuditLogViewer } from './components/AuditLogViewer';
-import { AutomationBuilder } from './components/AutomationBuilder';
-import { VaultCanvasStudio } from './components/VaultCanvasStudio';
-import { VaultLintStudio } from './components/VaultLintStudio';
-import { SpacedRepetitionStudio } from './components/SpacedRepetitionStudio';
+import { SystemIndicator } from './components/SystemIndicator';
+import { AssistantDrawer } from './components/assistant/AssistantDrawer';
 import { ImportHubModal } from './components/ImportHubModal';
 import { WebClipperModal } from './components/WebClipperModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
+import { VoiceAssistant } from './components/VoiceAssistant';
 import { useAuthStore } from './stores/authStore';
+import { useUIStore, ActiveTab } from './stores/uiStore';
 import { useQuery } from '@tanstack/react-query';
+import { apiClient } from './services/apiClient';
 import { 
   Network, 
   LayoutGrid, 
@@ -21,7 +19,6 @@ import {
   ShieldCheck, 
   Zap, 
   Shield, 
-  Sparkles, 
   Search, 
   FolderPlus, 
   Globe,
@@ -30,47 +27,66 @@ import {
   Cpu,
   Radio,
   Sliders,
-  PanelRightClose,
-  PanelRightOpen,
   LogOut,
-  FolderGit2
+  FolderGit2,
+  Loader2
 } from 'lucide-react';
-import { VoiceAssistant } from './components/VoiceAssistant';
 
-type ActiveTab = 'graph' | 'canvas' | 'tasks' | 'study' | 'diagnostics' | 'automations' | 'audit';
+// Code-split heavy studios for faster initial load
+const TaskKanbanBoard = lazy(() => import('./components/TaskKanbanBoard').then(m => ({ default: m.TaskKanbanBoard })));
+const VaultCanvasStudio = lazy(() => import('./components/VaultCanvasStudio').then(m => ({ default: m.VaultCanvasStudio })));
+const SpacedRepetitionStudio = lazy(() => import('./components/SpacedRepetitionStudio').then(m => ({ default: m.SpacedRepetitionStudio })));
+const VaultLintStudio = lazy(() => import('./components/VaultLintStudio').then(m => ({ default: m.VaultLintStudio })));
+const AutomationBuilder = lazy(() => import('./components/AutomationBuilder').then(m => ({ default: m.AutomationBuilder })));
+const AuditLogViewer = lazy(() => import('./components/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
+
+const StudioLoadingSkeleton: React.FC<{ title: string }> = ({ title }) => (
+  <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#090A0F] text-[#64748B]">
+    <Loader2 className="w-6 h-6 animate-spin text-indigo-500 mb-2" />
+    <span className="text-xs font-mono">Loading {title}...</span>
+  </div>
+);
 
 export default function App() {
   const token = useAuthStore((state) => state.token);
   const logout = useAuthStore((state) => state.logout);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('graph');
-  const [showAIChat, setShowAIChat] = useState(false);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [showImportHub, setShowImportHub] = useState(false);
-  const [showWebClipper, setShowWebClipper] = useState(false);
 
-  // Fetch live vault status for pro status bar
+  const {
+    activeTab,
+    setActiveTab,
+    toggleAssistant,
+    isCommandPaletteOpen,
+    setCommandPaletteOpen,
+    showImportHub,
+    setShowImportHub,
+    showWebClipper,
+    setShowWebClipper,
+  } = useUIStore();
+
+  // Fetch live vault status for status bar using apiClient
   const { data: notes = [] } = useQuery<any[]>({
     queryKey: ['notes'],
     queryFn: async () => {
-      const headers: HeadersInit = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch('/api/v1/notes', { headers });
-      return res.ok ? res.json() : [];
+      return apiClient.get<any[]>('/notes');
     },
     enabled: !!token,
   });
 
-  // Global keyboard shortcut listener (⌘K / Ctrl+K and 1-7 tab keys)
+  // Global keyboard shortcuts (⌘K / Ctrl+K for Search, ⌘J / Ctrl+J for Assistant)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
+        setCommandPaletteOpen(!isCommandPaletteOpen);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        toggleAssistant();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isCommandPaletteOpen, setCommandPaletteOpen, toggleAssistant]);
 
   if (!token) {
     return <AuthForm />;
@@ -117,7 +133,7 @@ export default function App() {
         {/* Center: Command Palette Trigger */}
         <div className="flex-1 max-w-md mx-4">
           <button
-            onClick={() => setIsCommandPaletteOpen(true)}
+            onClick={() => setCommandPaletteOpen(true)}
             className="w-full h-8 px-3 bg-[#141722] hover:bg-[#1A1E2B] border border-[#242A3C] hover:border-[#38415C] rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center justify-between text-xs group"
           >
             <div className="flex items-center gap-2">
@@ -130,7 +146,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* Right: Quick Tools, Copilot & Account */}
+        {/* Right: Quick Tools, System Indicator & Account */}
         <div className="flex items-center gap-2">
           {/* Quick Action Icon Buttons */}
           <button
@@ -153,19 +169,8 @@ export default function App() {
 
           <div className="h-4 w-px bg-[#202636]" />
 
-          {/* AI Copilot Drawer Toggle */}
-          <button
-            onClick={() => setShowAIChat(!showAIChat)}
-            className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors flex items-center gap-1.5 ${
-              showAIChat
-                ? 'bg-[#4F46E5] border-indigo-400 text-white shadow-sm'
-                : 'bg-[#141722] hover:bg-[#1D2230] border-[#242A3C] text-[#94A3B8] hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-300" />
-            <span>AI Copilot</span>
-            {showAIChat ? <PanelRightClose className="w-3 h-3 ml-0.5" /> : <PanelRightOpen className="w-3 h-3 ml-0.5" />}
-          </button>
+          {/* Contextual System & Assistant Indicator */}
+          <SystemIndicator />
 
           {/* Sign Out */}
           <button
@@ -233,48 +238,56 @@ export default function App() {
           )}
 
           {activeTab === 'canvas' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <VaultCanvasStudio />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Canvas Studio" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <VaultCanvasStudio />
+              </div>
+            </Suspense>
           )}
 
           {activeTab === 'tasks' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <TaskKanbanBoard />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Task Board" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <TaskKanbanBoard />
+              </div>
+            </Suspense>
           )}
 
           {activeTab === 'study' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <SpacedRepetitionStudio />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Study & Recall" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <SpacedRepetitionStudio />
+              </div>
+            </Suspense>
           )}
 
           {activeTab === 'diagnostics' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <VaultLintStudio />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Diagnostics Studio" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <VaultLintStudio />
+              </div>
+            </Suspense>
           )}
 
           {activeTab === 'automations' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <AutomationBuilder />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Automation Builder" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <AutomationBuilder />
+              </div>
+            </Suspense>
           )}
 
           {activeTab === 'audit' && (
-            <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
-              <AuditLogViewer />
-            </div>
+            <Suspense fallback={<StudioLoadingSkeleton title="Audit Log Viewer" />}>
+              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+                <AuditLogViewer />
+              </div>
+            </Suspense>
           )}
         </main>
 
-        {/* Collapsible Right Pro AI Copilot Sidebar */}
-        {showAIChat && (
-          <aside className="w-[420px] flex-shrink-0 border-l border-[#1C202C] bg-[#0E1017] flex flex-col overflow-hidden">
-            <AIChatPanel onClose={() => setShowAIChat(false)} />
-          </aside>
-        )}
+        {/* Collapsible Right Contextual Assistant Drawer */}
+        <AssistantDrawer />
       </div>
 
       {/* 4. Professional Workstation Status Bar (Footer) */}
@@ -309,7 +322,7 @@ export default function App() {
 
       <CommandPaletteModal
         isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
+        onClose={() => setCommandPaletteOpen(false)}
         onSelectTab={(tab) => setActiveTab(tab as any)}
       />
 
