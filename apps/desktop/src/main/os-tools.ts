@@ -1,13 +1,19 @@
 import { clipboard, Notification, shell } from 'electron';
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 import * as os from 'os';
 
 export interface ExecuteAgentOptions {
   command: string;
 }
 
-export function registerOSTools(): void {
-  // IPC handles will be attached in main.ts
+export interface SystemTelemetry {
+  platform: string;
+  arch: string;
+  totalMemoryGb: number;
+  freeMemoryGb: number;
+  memoryUsagePercent: number;
+  uptimeHours: number;
+  cpus: number;
 }
 
 export async function openExternalUrl(url: string): Promise<boolean> {
@@ -32,23 +38,53 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
     }
 
     if (platform === 'win32') {
+      const projectDir = process.cwd();
       let command = `start "" "${normalized}"`;
-      if (normalized === 'brave' || normalized.includes('brave')) {
+
+      if (normalized.includes('antigravity')) {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { Write-Host '⚡ Launching Antigravity Assistant in ${projectDir}...' -ForegroundColor Cyan; code . }"`;
+      } else if (normalized.includes('claude') || normalized.includes('claude code')) {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command claude -ErrorAction SilentlyContinue) { claude } else { Write-Host '⚡ Launching Claude Code in ${projectDir}...' -ForegroundColor Magenta; npx @anthropic-ai/claude-code }"`;
+      } else if (normalized.includes('codex') || normalized.includes('openai codex')) {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command codex -ErrorAction SilentlyContinue) { codex } else { Write-Host '⚡ Launching Codex CLI in ${projectDir}...' -ForegroundColor Green; code . }"`;
+      } else if (normalized.includes('aider')) {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command aider -ErrorAction SilentlyContinue) { aider } else { Write-Host '⚡ Launching Aider AI in ${projectDir}...' -ForegroundColor Yellow; code . }"`;
+      } else if (normalized.includes('coding') || normalized.includes('code_session') || normalized.includes('resume coding')) {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; Write-Host '🚀 Resuming AI Coding Session in ${projectDir}...' -ForegroundColor Cyan; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { code . }"`;
+      } else if (normalized === 'cursor' || normalized.includes('cursor')) {
+        command = `start cursor "${projectDir}" || cursor .`;
+      } else if (normalized === 'windsurf' || normalized.includes('windsurf')) {
+        command = `start windsurf "${projectDir}" || windsurf .`;
+      } else if (normalized === 'zed' || normalized.includes('zed')) {
+        command = `start zed "${projectDir}" || zed .`;
+      } else if (normalized === 'nvim' || normalized === 'neovim') {
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; nvim"`;
+      } else if (normalized === 'vscode' || normalized === 'code' || normalized.includes('vs code')) {
+        command = `start code "${projectDir}" || code .`;
+      } else if (normalized === 'github' || normalized.includes('github desktop')) {
+        command = 'start github-desktop || start https://github.com';
+      } else if (normalized === 'docker' || normalized.includes('docker desktop')) {
+        command = 'start "" "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" || start docker';
+      } else if (normalized === 'postman') {
+        command = 'start postman || start https://web.postman.co';
+      } else if (normalized === 'brave' || normalized.includes('brave')) {
         command = 'start brave';
       } else if (normalized === 'chrome' || normalized.includes('chrome')) {
         command = 'start chrome';
       } else if (normalized === 'firefox' || normalized.includes('firefox')) {
         command = 'start firefox';
-      } else if (normalized === 'vscode' || normalized === 'code') {
-        command = 'code .';
-      } else if (normalized === 'cursor') {
-        command = 'cursor .';
-      } else if (normalized === 'terminal' || normalized === 'powershell') {
-        command = 'start wt || start powershell';
+      } else if (normalized === 'terminal' || normalized === 'powershell' || normalized === 'wt') {
+        command = `start wt -d "${projectDir}" || start powershell -NoExit -Command "cd '${projectDir}'"`;
+      } else if (normalized === 'notion') {
+        command = 'start notion || start https://notion.so';
+      } else if (normalized === 'obsidian') {
+        command = 'start obsidian || start obsidian://';
+      } else if (normalized === 'figma') {
+        command = 'start figma || start https://figma.com';
       } else if (normalized === 'notepad') {
         command = 'start notepad';
       } else if (normalized === 'explorer' || normalized === 'files') {
-        command = 'start explorer';
+        command = `start explorer "${projectDir}"`;
       } else if (normalized === 'calculator' || normalized === 'calc') {
         command = 'start calc';
       } else if (normalized === 'taskmgr' || normalized.includes('task manager')) {
@@ -103,4 +139,49 @@ export function copyClipboard(text: string): void {
 
 export function readClipboard(): string {
   return clipboard.readText();
+}
+
+export function getSystemTelemetry(): SystemTelemetry {
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const usedMem = totalMem - freeMem;
+  const memUsagePercent = Math.round((usedMem / totalMem) * 100);
+
+  return {
+    platform: os.platform(),
+    arch: os.arch(),
+    totalMemoryGb: Number((totalMem / (1024 * 1024 * 1024)).toFixed(1)),
+    freeMemoryGb: Number((freeMem / (1024 * 1024 * 1024)).toFixed(1)),
+    memoryUsagePercent: memUsagePercent,
+    uptimeHours: Number((os.uptime() / 3600).toFixed(1)),
+    cpus: os.cpus().length,
+  };
+}
+
+export async function controlMedia(action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute'): Promise<boolean> {
+  const isWindows = process.platform === 'win32';
+  if (!isWindows) return false;
+
+  const keyMap: Record<string, number> = {
+    playpause: 0xb3,
+    next: 0xb0,
+    prev: 0xb1,
+    volumeup: 0xaf,
+    volumedown: 0xae,
+    mute: 0xad,
+  };
+
+  const vk = keyMap[action];
+  if (!vk) return false;
+
+  const script = `
+    $wsh = New-Object -ComObject Wscript.Shell;
+    $wsh.SendKeys([char]${vk});
+  `;
+
+  return new Promise((resolve) => {
+    exec(`powershell -Command "${script.replace(/\r?\n/g, ' ')}"`, (err) => {
+      resolve(!err);
+    });
+  });
 }

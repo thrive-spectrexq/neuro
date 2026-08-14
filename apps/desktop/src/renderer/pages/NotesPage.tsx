@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Plus,
   Search,
@@ -10,7 +10,12 @@ import {
   Sparkles,
   Layers,
   ArrowUpDown,
-  BookOpen
+  BookOpen,
+  Download,
+  Upload,
+  FileUp,
+  Check,
+  CheckCircle2
 } from 'lucide-react';
 import { useNotes, useCreateNote, useDeleteNote } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -28,6 +33,9 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
 
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Compute all unique tags
   const allTags = useMemo(() => {
@@ -62,12 +70,12 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
     }
   };
 
-  const handleCreateNote = () => {
+  const handleCreateNote = (templateTitle = 'Untitled Note', templateContent = '# Untitled Note\n\nStart capturing knowledge or ideas here...') => {
     soundEngine.playClick();
     createNoteMutation.mutate(
       {
-        title: 'Untitled Note',
-        content: '# Untitled Note\n\nStart capturing knowledge or ideas here...',
+        title: templateTitle,
+        content: templateContent,
         tags: [],
       },
       {
@@ -84,6 +92,69 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
     deleteNoteMutation.mutate(id);
   };
 
+  // Import Markdown files
+  const processFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    let imported = 0;
+
+    Array.from(files).forEach((file) => {
+      if (file.name.endsWith('.md') || file.name.endsWith('.txt') || file.name.endsWith('.markdown')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const rawText = (e.target?.result as string) || '';
+          const cleanFileName = file.name.replace(/\.(md|txt|markdown)$/, '');
+          
+          // Extract first heading as title if present
+          const headingMatch = rawText.match(/^#\s+(.+)$/m);
+          const title = (headingMatch && headingMatch[1]) ? headingMatch[1].trim() : cleanFileName;
+
+          // Extract tags `#tag`
+          const tagMatches = rawText.match(/#[a-zA-Z0-9_-]+/g) || [];
+          const tags = Array.from(new Set(tagMatches.map((t) => t.slice(1))));
+
+          createNoteMutation.mutate({
+            title,
+            content: rawText,
+            tags,
+          });
+          imported++;
+          setImportStatus(`Imported ${imported} note(s)`);
+          setTimeout(() => setImportStatus(null), 3000);
+          soundEngine.playSuccessTone();
+        };
+        reader.readAsText(file);
+      }
+    });
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingFile(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDraggingFile(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingFile(false);
+    processFiles(e.dataTransfer.files);
+  };
+
+  // Export all vault notes as JSON
+  const handleExportVault = () => {
+    if (!notes || notes.length === 0) return;
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(notes, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `neuro_vault_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    soundEngine.playSuccessTone();
+  };
+
   // Helper to strip markdown symbols for clean snippet previews
   const getCleanSnippet = (content: string) => {
     return content
@@ -96,42 +167,90 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto h-full flex flex-col overflow-y-auto select-none">
-      
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={`p-8 max-w-7xl mx-auto h-full flex flex-col overflow-y-auto select-none transition-all ${
+        isDraggingFile ? 'bg-cyan-950/20 ring-2 ring-cyan-400 ring-inset' : ''
+      }`}
+    >
+      {/* Drag & Drop Overlay Feedback */}
+      {isDraggingFile && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-cyan-400 pointer-events-none">
+          <FileUp size={48} className="animate-bounce mb-3" />
+          <p className="text-lg font-bold">Drop Markdown (.md) files to import into Neuro</p>
+          <p className="text-xs text-zinc-400 mt-1">Files will be indexed and linked to your knowledge vault</p>
+        </div>
+      )}
+
       {/* Workspace Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
             <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
-              Notes & Knowledge
+              Notes & Knowledge Vault
             </h1>
-            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono text-zinc-400">
-              {notes?.length || 0} items
+            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono text-cyan-400">
+              {notes?.length || 0} notes
             </span>
+            {importStatus && (
+              <span className="px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-300 flex items-center gap-1 animate-in fade-in">
+                <CheckCircle2 size={11} /> {importStatus}
+              </span>
+            )}
           </div>
           <p className="text-xs text-zinc-400 font-sans">
-            Personal second brain notes with bi-directional wiki linking and full-text search.
+            Personal second brain notes with bi-directional wiki linking, semantic search, and Markdown import.
           </p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Quick Search */}
-          <div className="relative w-64">
+          <div className="relative w-56">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
               placeholder="Filter notes..."
-              className="w-full bg-[#0e111a] border border-white/[0.08] rounded-xl pl-9 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/20 transition-all font-sans"
+              className="w-full bg-[#0e111a] border border-white/[0.08] rounded-xl pl-9 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-cyan-500/60 transition-all font-sans"
             />
           </div>
 
+          {/* Import Markdown Button */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => processFiles(e.target.files)}
+            multiple
+            accept=".md,.txt,.markdown"
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white rounded-xl text-xs font-semibold transition-all"
+            title="Import Markdown Files or Obsidian Notes"
+          >
+            <Upload size={13} className="text-cyan-400" />
+            <span>Import</span>
+          </button>
+
+          {/* Export Button */}
+          <button
+            onClick={handleExportVault}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white rounded-xl text-xs font-semibold transition-all"
+            title="Export all vault notes as JSON backup"
+          >
+            <Download size={13} className="text-purple-400" />
+            <span>Export</span>
+          </button>
+
           {/* New Note Button */}
           <button
-            onClick={handleCreateNote}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl text-xs font-semibold shadow-glow-primary transition-all duration-150"
+            onClick={() => handleCreateNote()}
+            className="flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-semibold shadow-[0_0_15px_rgba(0,245,255,0.3)] transition-all duration-150"
           >
             <Plus size={14} />
             <span>New Note</span>
@@ -158,7 +277,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
               onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
               className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1 ${
                 selectedTag === tag
-                  ? 'bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30'
+                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
                   : 'bg-white/[0.03] text-zinc-400 hover:text-zinc-200 border border-white/[0.05]'
               }`}
             >
@@ -178,83 +297,68 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
           <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
             <BookOpen size={20} className="text-zinc-500" />
           </div>
-          <h3 className="text-sm font-semibold text-zinc-200 mb-1">
+          <h3 className="text-sm font-semibold text-zinc-300 mb-1">
             {searchFilter || selectedTag ? 'No matching notes found' : 'Your Second Brain is Empty'}
           </h3>
-          <p className="text-xs text-zinc-500 max-w-sm mb-4">
+          <p className="text-xs text-zinc-500 max-w-sm mb-5">
             {searchFilter || selectedTag
-              ? 'Try clearing the search query or tag filters to see all notes.'
-              : 'Capture your first note, idea, or run "add this to note: ..." with the voice agent.'}
+              ? 'Try changing your search keywords or clearing active tag filters.'
+              : 'Create your first note or drag-and-drop your existing Markdown vault.'}
           </p>
           <button
-            onClick={handleCreateNote}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] text-white rounded-xl text-xs font-medium transition-all"
+            onClick={() => handleCreateNote()}
+            className="flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-semibold shadow-[0_0_15px_rgba(0,245,255,0.3)] transition-all"
           >
             <Plus size={14} />
             <span>Create First Note</span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredNotes.map((note) => {
-            const cleanSnippet = getCleanSnippet(note.content);
-            return (
-              <div
-                key={note.id}
-                onClick={() => handleNoteClick(note.id)}
-                className="group relative p-5 rounded-2xl bg-[#0d101a] border border-white/[0.07] hover:border-brand-primary/40 hover:bg-[#111524] transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-card hover:shadow-elevated"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="text-sm font-semibold text-zinc-100 group-hover:text-brand-primary-light transition-colors line-clamp-1">
-                      {note.title || 'Untitled Note'}
-                    </h3>
-                    
-                    <button
-                      onClick={(e) => handleDeleteNote(e, note.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-zinc-500 hover:text-brand-rose hover:bg-brand-rose/10 transition-all"
-                      title="Delete note"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 mb-4 font-sans font-normal">
-                    {cleanSnippet || 'Empty note content...'}
-                  </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+          {filteredNotes.map((note) => (
+            <div
+              key={note.id}
+              onClick={() => handleNoteClick(note.id)}
+              className="group p-5 rounded-2xl bg-[#0b0e18] hover:bg-[#101424] border border-white/[0.06] hover:border-cyan-500/40 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1 font-sans">
+                    {note.title || 'Untitled Note'}
+                  </h3>
+                  <button
+                    onClick={(e) => handleDeleteNote(e, note.id)}
+                    className="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition-all rounded-md hover:bg-rose-950/30"
+                    title="Delete Note"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-white/[0.04] text-[11px] text-zinc-500">
-                  <div className="flex items-center gap-1">
-                    <Clock size={11} className="text-zinc-600" />
-                    <span className="font-mono text-[10px]">
-                      {note.updatedAt || (note as any).updated_at
-                        ? new Date(note.updatedAt || (note as any).updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                        : 'Recent'}
-                    </span>
-                  </div>
-
-                  {note.tags && note.tags.length > 0 && (
-                    <div className="flex items-center gap-1.5 overflow-hidden max-w-[60%]">
-                      {note.tags.slice(0, 2).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-1.5 py-0.2 rounded bg-white/[0.04] text-zinc-400 text-[10px] font-mono border border-white/[0.06] truncate"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                      {note.tags.length > 2 && (
-                        <span className="text-[10px] text-zinc-600 font-mono">
-                          +{note.tags.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed mb-4 font-sans">
+                  {getCleanSnippet(note.content) || 'Empty note...'}
+                </p>
               </div>
-            );
-          })}
+
+              <div className="pt-3 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+                <div className="flex items-center gap-1">
+                  <Clock size={11} />
+                  <span>{new Date(note.updatedAt || note.createdAt || Date.now()).toLocaleDateString()}</span>
+                </div>
+
+                {note.tags && note.tags.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="px-1.5 py-0.5 bg-white/[0.04] rounded text-[10px] text-cyan-400">
+                      #{note.tags[0]}
+                    </span>
+                    {note.tags.length > 1 && (
+                      <span className="text-[10px] text-zinc-600">+{note.tags.length - 1}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

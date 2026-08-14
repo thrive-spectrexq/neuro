@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * NEURO SINGLE-COMMAND LAUNCHER
- * Boots the silent FastAPI backend, compiles Electron main/preload, and launches the desktop app.
- * All backend logs are redirected silently to `.neuro/logs/backend.log`.
+ * NEURO LIGHTNING SINGLE-COMMAND LAUNCHER
+ * Instant startup: launches Vite, Backend, and Electron in parallel with 0s latency.
  */
 
 const { spawn, execSync } = require('child_process');
@@ -16,34 +15,29 @@ const desktopDir = path.join(rootDir, 'apps', 'desktop');
 const logsDir = path.join(rootDir, '.neuro', 'logs');
 
 console.log('\x1b[35m%s\x1b[0m', '════════════════════════════════════════════════════════════');
-console.log('\x1b[36m%s\x1b[0m', '  ⚡ NEURO — AI Second Brain & OS Native Voice Agent');
+console.log('\x1b[36m%s\x1b[0m', '  ⚡ NEURO — AI Second Brain & Floating Desktop Neon Orb');
 console.log('\x1b[35m%s\x1b[0m', '════════════════════════════════════════════════════════════\n');
 
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// 1. Check & Ensure Backend Environment
-function ensureBackend() {
+// 1. Python Backend Executable Finder
+function findPythonExec() {
   const isWindows = process.platform === 'win32';
-  const venvPythonWin = path.join(backendDir, '.venv', 'Scripts', 'python.exe');
-  const venvPythonPosix = path.join(backendDir, '.venv', 'bin', 'python');
+  const venvWin = path.join(backendDir, '.venv', 'Scripts', 'python.exe');
+  const venvPosix = path.join(backendDir, '.venv', 'bin', 'python');
 
-  let pythonExec = isWindows ? 'python' : 'python3';
-  if (isWindows && fs.existsSync(venvPythonWin)) {
-    pythonExec = venvPythonWin;
-  } else if (!isWindows && fs.existsSync(venvPythonPosix)) {
-    pythonExec = venvPythonPosix;
-  }
-
-  return pythonExec;
+  if (isWindows && fs.existsSync(venvWin)) return venvWin;
+  if (!isWindows && fs.existsSync(venvPosix)) return venvPosix;
+  return isWindows ? 'python' : 'python3';
 }
 
 // 2. Health check helper
-function checkBackendHealth(timeoutMs = 1200) {
+function checkHttpPort(port, path = '/') {
   return new Promise((resolve) => {
-    const req = http.get('http://127.0.0.1:8000/health', { timeout: timeoutMs }, (res) => {
-      resolve(res.statusCode === 200);
+    const req = http.get(`http://127.0.0.1:${port}${path}`, { timeout: 300 }, (res) => {
+      resolve(true);
     });
     req.on('error', () => resolve(false));
     req.on('timeout', () => {
@@ -53,131 +47,149 @@ function checkBackendHealth(timeoutMs = 1200) {
   });
 }
 
-async function startSilentBackend(pythonExec) {
-  const isAlreadyRunning = await checkBackendHealth(1000);
-  if (isAlreadyRunning) {
-    console.log('\x1b[32m✔\x1b[0m Backend already active on http://127.0.0.1:8000');
-    return null;
-  }
-
-  console.log('\x1b[34mℹ\x1b[0m Starting silent FastAPI backend supervisor...');
+// 3. Launch Backend in Parallel
+function startBackendAsync(pythonExec) {
   const backendLog = fs.createWriteStream(path.join(logsDir, 'backend.log'), { flags: 'a' });
-
   const backendProc = spawn(pythonExec, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8000'], {
     cwd: backendDir,
     env: { ...process.env, PYTHONUNBUFFERED: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
-    detached: false,
   });
 
   backendProc.stdout.pipe(backendLog);
   backendProc.stderr.pipe(backendLog);
-
   backendProc.on('error', (err) => {
-    console.warn('\x1b[33m⚠\x1b[0m Note: Backend spawn warning (offline fallback active):', err.message);
+    console.warn('[Neuro] Backend process warning:', err.message);
   });
-
-  // Wait briefly for backend to warm up
-  let attempts = 0;
-  while (attempts < 15) {
-    if (await checkBackendHealth(500)) {
-      console.log('\x1b[32m✔\x1b[0m Silent backend online and healthy. (Logs: .neuro/logs/backend.log)');
-      break;
-    }
-    await new Promise((r) => setTimeout(r, 400));
-    attempts++;
-  }
-
   return backendProc;
 }
 
-async function main() {
-  try {
-    const pythonExec = ensureBackend();
-    const backendProc = await startSilentBackend(pythonExec);
-
+// 4. Ensure Main Process is compiled
+function ensureMainCompiled() {
+  const mainDist = path.join(desktopDir, 'dist', 'main', 'main.js');
+  if (!fs.existsSync(mainDist)) {
     const isWindows = process.platform === 'win32';
     const npxCmd = isWindows ? 'npx.cmd' : 'npx';
-    console.log('\x1b[34mℹ\x1b[0m Compiling Electron main & preload bridges...');
+    console.log('\x1b[34mℹ\x1b[0m Initializing Electron main build...');
     try {
       execSync(`${npxCmd} tsc -p tsconfig.main.json`, { cwd: desktopDir, stdio: 'inherit' });
-      console.log('\x1b[32m✔\x1b[0m Electron main bridge compiled.');
     } catch (e) {
-      console.warn('TypeScript compile warning:', e.message);
+      console.warn('[Neuro] TypeScript warning:', e.message);
     }
+  }
+}
 
-    console.log('\x1b[34mℹ\x1b[0m Starting Vite renderer server...');
+async function main() {
+  const isWindows = process.platform === 'win32';
 
-    const directElectronExe = path.join(desktopDir, 'node_modules', 'electron', 'dist', 'electron.exe');
-    const electronBin = isWindows && fs.existsSync(directElectronExe) 
-      ? directElectronExe 
-      : path.join(desktopDir, 'node_modules', '.bin', isWindows ? 'electron.cmd' : 'electron');
-    const viteBin = path.join(desktopDir, 'node_modules', '.bin', isWindows ? 'vite.cmd' : 'vite');
+  // 1. Ensure Electron main bridge exists
+  ensureMainCompiled();
 
-    const viteProc = spawn(fs.existsSync(viteBin) ? viteBin : npxCmd, fs.existsSync(viteBin) ? [] : ['vite'], {
-      cwd: desktopDir,
-      stdio: 'pipe',
-      shell: isWindows,
-    });
+  // 2. Launch Silent Backend in background (Non-blocking)
+  const isBackendRunning = await checkHttpPort(8000, '/health');
+  let backendProc = null;
+  if (!isBackendRunning) {
+    const pythonExec = findPythonExec();
+    backendProc = startBackendAsync(pythonExec);
+    console.log('\x1b[32m✔\x1b[0m Silent FastAPI Agent backend starting in background.');
+  } else {
+    console.log('\x1b[32m✔\x1b[0m Backend already active on http://127.0.0.1:8000');
+  }
 
-    viteProc.stdout.on('data', (data) => {
-      const msg = data.toString();
-      if (msg.includes('Local:') || msg.includes('3000')) {
-        console.log('\x1b[32m✔\x1b[0m UI Renderer ready at http://localhost:3000');
-        launchElectron();
+  // 3. Resolve Electron binary
+  let electronExe = null;
+  try {
+    const electronModulePath = require.resolve('electron', { paths: [desktopDir, rootDir] });
+    const resolved = require(electronModulePath);
+    if (typeof resolved === 'string' && fs.existsSync(resolved)) {
+      electronExe = resolved;
+    }
+  } catch (e) {}
+
+  if (!electronExe) {
+    const candidates = [
+      path.join(desktopDir, 'node_modules', 'electron', 'dist', isWindows ? 'electron.exe' : 'electron'),
+      path.join(desktopDir, 'node_modules', '.bin', isWindows ? 'electron.cmd' : 'electron'),
+      path.join(rootDir, 'node_modules', '.bin', isWindows ? 'electron.cmd' : 'electron'),
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) {
+        electronExe = c;
+        break;
       }
+    }
+  }
+
+  // 4. Start Vite Renderer
+  const viteBin = path.join(desktopDir, 'node_modules', '.bin', isWindows ? 'vite.cmd' : 'vite');
+  const viteCmd = fs.existsSync(viteBin) ? viteBin : (isWindows ? 'npx.cmd' : 'npx');
+  const viteArgs = fs.existsSync(viteBin) ? [] : ['vite'];
+
+  const viteProc = spawn(viteCmd, viteArgs, {
+    cwd: desktopDir,
+    stdio: 'pipe',
+    shell: isWindows,
+  });
+
+  let electronLaunched = false;
+  function launchElectron() {
+    if (electronLaunched) return;
+    electronLaunched = true;
+
+    console.log('\x1b[32m🚀\x1b[0m Launching NEURO Desktop App & Desktop Neon Orb (Ctrl+Space)...');
+    
+    const runCmd = electronExe || (isWindows ? 'npx.cmd' : 'npx');
+    const runArgs = electronExe ? ['.'] : ['electron', '.'];
+
+    const electronProc = spawn(runCmd, runArgs, {
+      cwd: desktopDir,
+      stdio: 'inherit',
+      shell: !electronExe && isWindows,
     });
 
-    let electronLaunched = false;
-    function launchElectron() {
-      if (electronLaunched) return;
-      electronLaunched = true;
-
-      console.log('\x1b[32m🚀\x1b[0m Launching NEURO Desktop with OS-Native JARVIS Hotkey (Ctrl+Space)...');
-      const isDirectExe = isWindows && fs.existsSync(directElectronExe);
-      const electronCmd = isDirectExe ? directElectronExe : (fs.existsSync(electronBin) ? electronBin : npxCmd);
-      const electronArgs = isDirectExe ? ['.'] : (fs.existsSync(electronBin) ? ['.'] : ['electron', '.']);
-
-      const electronProc = spawn(electronCmd, electronArgs, {
-        cwd: desktopDir,
-        stdio: 'inherit',
-        shell: !isDirectExe && isWindows,
-      });
-
-      electronProc.on('exit', (code) => {
-        if (code === 0) {
-          console.log('\n\x1b[35mNeuro shutdown.\x1b[0m');
-          if (backendProc) {
-            if (isWindows && backendProc.pid) {
-              spawn('taskkill', ['/pid', backendProc.pid.toString(), '/f', '/t']);
-            } else {
-              backendProc.kill('SIGTERM');
-            }
-          }
-          viteProc.kill();
-          process.exit(0);
+    electronProc.on('exit', (code) => {
+      console.log('\n\x1b[35mNeuro Desktop closed.\x1b[0m');
+      if (backendProc) {
+        if (isWindows && backendProc.pid) {
+          spawn('taskkill', ['/pid', backendProc.pid.toString(), '/f', '/t']);
         } else {
-          console.log(`\x1b[36m✨ Neuro Web UI active at \x1b[1mhttp://localhost:3000\x1b[0m \x1b[36m(FastAPI Backend: \x1b[1mhttp://127.0.0.1:8000\x1b[0m)`);
-          console.log('\x1b[90mPress Ctrl+C in terminal to stop all services.\x1b[0m');
+          backendProc.kill('SIGTERM');
         }
-      });
-    }
-
-    // Safety fallback: if vite doesn't output string in 3s, launch electron anyway
-    setTimeout(() => {
-      launchElectron();
-    }, 3500);
-
-    // Clean exit handlers
-    process.on('SIGINT', () => {
-      if (backendProc) backendProc.kill();
+      }
       viteProc.kill();
       process.exit(0);
     });
-  } catch (err) {
-    console.error('Launcher error:', err);
   }
+
+  // Rapid Port Polling for instant zero-delay window load
+  let pollCount = 0;
+  const portInterval = setInterval(async () => {
+    pollCount++;
+    const isViteReady = await checkHttpPort(3000, '/');
+    if (isViteReady) {
+      clearInterval(portInterval);
+      launchElectron();
+    } else if (pollCount > 80) {
+      clearInterval(portInterval);
+      launchElectron();
+    }
+  }, 50);
+
+  viteProc.stdout.on('data', (data) => {
+    const msg = data.toString();
+    if (msg.includes('Local:') || msg.includes('3000') || msg.includes('ready in')) {
+      clearInterval(portInterval);
+      launchElectron();
+    }
+  });
+
+  // Clean exit handlers
+  process.on('SIGINT', () => {
+    if (backendProc) backendProc.kill();
+    viteProc.kill();
+    process.exit(0);
+  });
 }
 
 main();

@@ -11,7 +11,18 @@ export interface ElectronAPI {
   resizeOrbWindow: (width: number, height: number) => Promise<boolean>;
   focusMainWindow: () => Promise<boolean>;
   toggleMainWindow: () => Promise<boolean>;
+  getSystemTelemetry: () => Promise<{
+    platform: string;
+    arch: string;
+    totalMemoryGb: number;
+    freeMemoryGb: number;
+    memoryUsagePercent: number;
+    uptimeHours: number;
+    cpus: number;
+  }>;
+  controlMedia: (action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => Promise<boolean>;
   onToggleJarvisHUD: (callback: () => void) => () => void;
+  onQuickNote: (callback: () => void) => () => void;
 }
 
 declare global {

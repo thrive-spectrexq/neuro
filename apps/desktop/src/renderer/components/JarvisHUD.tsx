@@ -24,6 +24,7 @@ import {
   Radio,
   Copy,
   Check,
+  Code,
   type LucideIcon,
 } from 'lucide-react';
 import { useJarvisAgent, AgentExecutionResponse } from '../hooks/useJarvisAgent';
@@ -44,12 +45,15 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { id: 'brave', label: 'Launch Brave', cmd: 'open brave', category: 'Apps', icon: ExternalLink, hotkey: '1' },
-  { id: 'spotify', label: 'Play on Spotify', cmd: 'play starboy on spotify', category: 'Media', icon: Play, hotkey: '2' },
-  { id: 'vscode', label: 'Open VS Code', cmd: 'open vscode', category: 'Dev', icon: Terminal, hotkey: '3' },
-  { id: 'note', label: 'Quick Capture Note', cmd: 'add this to note: brainstorming architecture improvements', category: 'Brain', icon: FileText, hotkey: '4' },
-  { id: 'reminder', label: 'Set 15m Reminder', cmd: 'set a reminder in 15 minutes to review roadmap', category: 'Tasks', icon: Clock, hotkey: '5' },
-  { id: 'search', label: 'Web Research', cmd: 'search quantum algorithms on google', category: 'Web', icon: Search, hotkey: '6' },
+  { id: 'antigravity', label: '🚀 Antigravity Pair Programmer', cmd: 'open antigravity', category: 'AI Coding', icon: Sparkles, hotkey: '1' },
+  { id: 'claude', label: '🤖 Claude Code CLI', cmd: 'open claude code', category: 'AI Coding', icon: Terminal, hotkey: '2' },
+  { id: 'codex', label: '🧠 Codex Agent', cmd: 'open codex', category: 'AI Coding', icon: Zap, hotkey: '3' },
+  { id: 'coding_session', label: '⚡ Resume Coding Session', cmd: 'continue my coding session', category: 'Dev', icon: Code, hotkey: '4' },
+  { id: 'cursor', label: '💻 Open Cursor IDE', cmd: 'open cursor', category: 'Dev', icon: Terminal, hotkey: '5' },
+  { id: 'vscode', label: '📝 Open VS Code', cmd: 'open vscode', category: 'Dev', icon: Terminal, hotkey: '6' },
+  { id: 'github', label: '🐙 Open GitHub', cmd: 'open github', category: 'Dev', icon: ExternalLink, hotkey: '7' },
+  { id: 'docker', label: '🐳 Launch Docker', cmd: 'open docker', category: 'Dev', icon: ExternalLink, hotkey: '8' },
+  { id: 'spotify', label: '🎵 Play on Spotify', cmd: 'play synthwave on spotify', category: 'Media', icon: Play, hotkey: '9' },
 ];
 
 export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
@@ -66,6 +70,10 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     stopListening,
     executeCommand,
     isSpeechSupported,
+    audioVolume,
+    isSpeaking,
+    voiceLevel,
+    activationThreshold,
   } = useJarvisAgent();
 
   const [inputVal, setInputVal] = useState('');
@@ -410,14 +418,57 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
             )}
           </div>
 
-          {/* Fluid Multi-Band Audio Spectrum Canvas */}
-          <div className="w-36 h-10 flex items-center justify-center flex-shrink-0 bg-black/40 rounded-xl px-2 border border-white/[0.04]">
-            <canvas
-              ref={canvasRef}
-              width={140}
-              height={36}
-              className="w-full h-full"
-            />
+          {/* Fluid Multi-Band Audio Spectrum Canvas & Decibel Meter */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            {/* Live Volume Sensitivity VU Meter */}
+            {isListening && (
+              <div className="flex flex-col items-end gap-1 font-mono">
+                <div className="flex items-center gap-1 text-[10px]">
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    voiceLevel === 'optimal' ? 'bg-emerald-400 animate-pulse' :
+                    voiceLevel === 'quiet' ? 'bg-amber-400' :
+                    voiceLevel === 'loud' ? 'bg-rose-400' : 'bg-zinc-600'
+                  }`} />
+                  <span className={`text-[10px] font-medium ${
+                    voiceLevel === 'optimal' ? 'text-emerald-300' :
+                    voiceLevel === 'quiet' ? 'text-amber-300' :
+                    voiceLevel === 'loud' ? 'text-rose-300' : 'text-zinc-500'
+                  }`}>
+                    {voiceLevel === 'optimal' ? 'Optimal Audio' :
+                     voiceLevel === 'quiet' ? 'Speak Louder ⏶' :
+                     voiceLevel === 'loud' ? 'Loud Audio ⏷' : 'Listening...'}
+                  </span>
+                  <span className="text-cyan-400 font-bold ml-1">{audioVolume}%</span>
+                </div>
+
+                <div className="relative w-28 h-1.5 bg-zinc-900 rounded-full overflow-hidden flex items-center border border-white/[0.06]">
+                  {/* Activation threshold indicator line */}
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 z-10 opacity-75"
+                    style={{ left: `${activationThreshold}%` }}
+                    title={`Activation Threshold (${activationThreshold}%)`}
+                  />
+                  <div
+                    className={`h-full transition-all duration-75 rounded-full ${
+                      audioVolume >= 75 ? 'bg-gradient-to-r from-cyan-500 via-emerald-400 to-rose-500' :
+                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
+                      'bg-amber-500/60'
+                    }`}
+                    style={{ width: `${Math.max(3, audioVolume)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Audio Waveform Canvas */}
+            <div className="w-32 h-10 flex items-center justify-center flex-shrink-0 bg-black/40 rounded-xl px-2 border border-white/[0.04]">
+              <canvas
+                ref={canvasRef}
+                width={128}
+                height={36}
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </div>
 

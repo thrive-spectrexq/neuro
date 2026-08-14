@@ -3,12 +3,13 @@ import Layout from './components/Layout';
 import NotesPage from './pages/NotesPage';
 import EditorPage from './pages/EditorPage';
 import GraphPage from './pages/GraphPage';
+import FlashcardsPage from './pages/FlashcardsPage';
 import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import JarvisHUD from './components/JarvisHUD';
 import DesktopNeonOrb from './components/DesktopNeonOrb';
 
-type Page = 'notes' | 'editor' | 'graph' | 'search' | 'settings';
+type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('notes');
@@ -34,6 +35,16 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isJarvisOpen]);
 
+  // Global Quick Note Shortcut handler
+  useEffect(() => {
+    if (window.electronAPI?.onQuickNote) {
+      const cleanup = window.electronAPI.onQuickNote(() => {
+        setCurrentPage('editor');
+      });
+      return cleanup;
+    }
+  }, []);
+
   if (isOrbOnlyMode) {
     return (
       <div className="w-full h-full bg-transparent overflow-hidden flex items-center justify-center">
@@ -52,6 +63,7 @@ export default function App() {
       case 'notes': return <NotesPage onNavigate={setCurrentPage as any} />;
       case 'editor': return <EditorPage />;
       case 'graph': return <GraphPage />;
+      case 'flashcards': return <FlashcardsPage onNavigate={setCurrentPage as any} />;
       case 'search': return <SearchPage onNavigate={setCurrentPage as any} />;
       case 'settings': return <SettingsPage />;
       default: return <NotesPage onNavigate={setCurrentPage as any} />;

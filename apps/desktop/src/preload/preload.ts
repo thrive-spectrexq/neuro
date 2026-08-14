@@ -13,11 +13,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   resizeOrbWindow: (width: number, height: number) => ipcRenderer.invoke('orb:resize', { width, height }),
   focusMainWindow: () => ipcRenderer.invoke('window:focus-main'),
   toggleMainWindow: () => ipcRenderer.invoke('window:toggle-main'),
+  getSystemTelemetry: () => ipcRenderer.invoke('system:telemetry'),
+  controlMedia: (action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => ipcRenderer.invoke('media:control', action),
   onToggleJarvisHUD: (callback: () => void) => {
     const handler = () => callback();
     ipcRenderer.on('jarvis:toggle-hud', handler);
     return () => {
       ipcRenderer.removeListener('jarvis:toggle-hud', handler);
+    };
+  },
+  onQuickNote: (callback: () => void) => {
+    const handler = () => callback();
+    ipcRenderer.on('neuro:quick-note', handler);
+    return () => {
+      ipcRenderer.removeListener('neuro:quick-note', handler);
     };
   },
 });

@@ -11,6 +11,7 @@ import {
   ChevronRight,
   HelpCircle,
   Radio,
+  Brain
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -25,8 +26,9 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
     { id: 'notes', icon: FileText, label: 'Notes', shortcut: '1' },
     { id: 'editor', icon: Edit3, label: 'Editor', shortcut: '2' },
     { id: 'graph', icon: Network, label: 'Graph', shortcut: '3' },
-    { id: 'search', icon: Search, label: 'Search', shortcut: '4' },
-    { id: 'settings', icon: Settings, label: 'Settings', shortcut: '5' },
+    { id: 'flashcards', icon: Brain, label: 'Recall', shortcut: '4' },
+    { id: 'search', icon: Search, label: 'Search', shortcut: '5' },
+    { id: 'settings', icon: Settings, label: 'Settings', shortcut: '6' },
   ];
 
   return (

@@ -1,16 +1,31 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, screen } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, screen, session, Tray, Menu, nativeImage } from 'electron';
 import * as path from 'path';
 import { backendProcessManager } from './backend-process';
 import {
+  controlMedia,
   copyClipboard,
+  getSystemTelemetry,
   launchNativeApp,
   openExternalUrl,
   readClipboard,
   showDesktopNotification,
 } from './os-tools';
 
+// Suppress Chromium internal cloud speech recognition pipe errors
+app.commandLine.appendSwitch('disable-features', 'SpeechRecognition');
+
 let mainWindow: BrowserWindow | null = null;
 let orbWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+
+function createTrayIcon() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13" fill="#07080c" stroke="#00f5ff" stroke-width="3"/>
+    <circle cx="16" cy="16" r="5" fill="#00f5ff"/>
+  </svg>`;
+  const base64 = Buffer.from(svg).toString('base64');
+  return nativeImage.createFromDataURL(`data:image/svg+xml;base64,${base64}`);
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -18,8 +33,8 @@ function createWindow() {
     height: 850,
     minWidth: 900,
     minHeight: 600,
-    backgroundColor: '#0a0b10',
-    titleBarStyle: 'hiddenInset',
+    title: 'Neuro — AI Second Brain',
+    backgroundColor: '#07080c',
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       nodeIntegration: false,
@@ -37,13 +52,17 @@ function createWindow() {
     mainWindow.loadURL(mainUrl);
   }
 
+  let mainRetryCount = 0;
   mainWindow.webContents.on('did-fail-load', () => {
-    setTimeout(() => {
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        if (app.isPackaged) mainWindow.loadFile(mainUrl);
-        else mainWindow.loadURL(mainUrl);
-      }
-    }, 1200);
+    if (mainRetryCount < 30) {
+      mainRetryCount++;
+      setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          if (app.isPackaged) mainWindow.loadFile(mainUrl);
+          else mainWindow.loadURL(mainUrl);
+        }
+      }, 100);
+    }
   });
 
   mainWindow.on('closed', () => {
@@ -61,13 +80,14 @@ function createNeonOrbWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { x, y, width, height } = primaryDisplay.workArea;
 
-  const initialSize = 150;
-  const initialX = Math.round(x + width - initialSize - 24);
-  const initialY = Math.round(y + height - initialSize - 24);
+  const initialWidth = 380;
+  const initialHeight = 460;
+  const initialX = Math.round(x + width - initialWidth - 28);
+  const initialY = Math.round(y + height - initialHeight - 36);
 
   orbWindow = new BrowserWindow({
-    width: initialSize,
-    height: initialSize,
+    width: initialWidth,
+    height: initialHeight,
     x: initialX,
     y: initialY,
     transparent: true,
@@ -100,12 +120,16 @@ function createNeonOrbWindow() {
     }
   });
 
+  let orbRetryCount = 0;
   orbWindow.webContents.on('did-fail-load', () => {
-    setTimeout(() => {
-      if (orbWindow && !orbWindow.isDestroyed()) {
-        orbWindow.loadURL(orbUrl);
-      }
-    }, 1200);
+    if (orbRetryCount < 30) {
+      orbRetryCount++;
+      setTimeout(() => {
+        if (orbWindow && !orbWindow.isDestroyed()) {
+          orbWindow.loadURL(orbUrl);
+        }
+      }, 100);
+    }
   });
 
   orbWindow.on('closed', () => {
@@ -114,6 +138,16 @@ function createNeonOrbWindow() {
 }
 
 app.whenReady().then(async () => {
+  // Grant microphone and notification permissions explicitly
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === 'media' || permission === 'notifications') {
+      return callback(true);
+    }
+    callback(true);
+  });
+
+  session.defaultSession.setPermissionCheckHandler(() => true);
+
   // 1. Launch FastAPI backend silently in background
   backendProcessManager.start().catch((err) => {
     console.error('[Neuro] Backend silent launch error:', err);
@@ -142,8 +176,97 @@ app.whenReady().then(async () => {
         mainWindow.webContents.send('jarvis:toggle-hud');
       }
     });
+
+    globalShortcut.register('Alt+N', () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+        mainWindow.webContents.send('neuro:quick-note');
+      }
+    });
+
+    globalShortcut.register('CommandOrControl+Shift+N', () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+        mainWindow.webContents.send('neuro:quick-note');
+      }
+    });
   } catch (e) {
     console.warn('[Neuro] Could not register global shortcut:', e);
+  }
+
+  // 5. Initialize System Tray with Native Menu
+  try {
+    const icon = createTrayIcon();
+    tray = new Tray(icon);
+    tray.setToolTip('Neuro — AI Second Brain & Voice Agent');
+    
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '🚀 Open Neuro Workstation',
+        click: () => {
+          if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.show();
+            mainWindow.focus();
+          } else {
+            createWindow();
+          }
+        },
+      },
+      {
+        label: '🔮 Toggle Desktop Neon Orb',
+        click: () => {
+          if (orbWindow && !orbWindow.isDestroyed()) {
+            if (orbWindow.isVisible()) orbWindow.hide();
+            else orbWindow.show();
+          } else {
+            createNeonOrbWindow();
+          }
+        },
+      },
+      {
+        label: '🎙️ Summon JARVIS HUD (Ctrl+Space)',
+        click: () => {
+          if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+            mainWindow.webContents.send('jarvis:toggle-hud');
+          }
+        },
+      },
+      {
+        label: '📝 Quick Note (Alt+N)',
+        click: () => {
+          if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+            mainWindow.webContents.send('neuro:quick-note');
+          }
+        },
+      },
+      { type: 'separator' },
+      {
+        label: '❌ Quit Neuro',
+        click: () => {
+          app.quit();
+        },
+      },
+    ]);
+
+    tray.setContextMenu(contextMenu);
+    tray.on('click', () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+        mainWindow.focus();
+      } else {
+        createWindow();
+      }
+    });
+  } catch (trayErr) {
+    console.warn('[Neuro] Tray initialization notice:', trayErr);
   }
 
   app.on('activate', function () {
@@ -215,17 +338,39 @@ ipcMain.handle('orb:resize', (_, { width, height }: { width: number; height: num
   if (orbWindow && !orbWindow.isDestroyed()) {
     const [currentX, currentY] = orbWindow.getPosition() as [number, number];
     const [currentW, currentH] = orbWindow.getSize() as [number, number];
-    // Expand upwards & leftwards to keep anchor steady at bottom-right
+    
+    // Smoothly shift to keep bottom-right alignment anchored
     const deltaW = width - currentW;
     const deltaH = height - currentH;
+
+    const primaryDisplay = screen.getDisplayNearestPoint({ x: currentX, y: currentY }) || screen.getPrimaryDisplay();
+    const { x: workX, y: workY, width: workW, height: workH } = primaryDisplay.workArea;
+
+    let targetX = currentX - deltaW;
+    let targetY = currentY - deltaH;
+
+    // Clamp within screen boundaries
+    if (targetX < workX) targetX = workX;
+    if (targetX + width > workX + workW) targetX = workX + workW - width;
+    if (targetY < workY) targetY = workY;
+    if (targetY + height > workY + workH) targetY = workY + workH - height;
+
     orbWindow.setBounds({
-      x: currentX - deltaW,
-      y: currentY - deltaH,
-      width,
-      height,
+      x: Math.round(targetX),
+      y: Math.round(targetY),
+      width: Math.round(width),
+      height: Math.round(height),
     });
   }
   return true;
+});
+
+ipcMain.handle('system:telemetry', () => {
+  return getSystemTelemetry();
+});
+
+ipcMain.handle('media:control', async (_, action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => {
+  return controlMedia(action);
 });
 
 ipcMain.handle('window:focus-main', () => {

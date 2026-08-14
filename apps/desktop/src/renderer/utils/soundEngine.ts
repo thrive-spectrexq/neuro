@@ -145,6 +145,13 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + duration);
   }
+
+  /**
+   * Futuristic processing pulse
+   */
+  public playProcessingHum() {
+    this.playBeep(640, 'triangle', 0.08);
+  }
 }
 
 export const soundEngine = new SoundEngine();
