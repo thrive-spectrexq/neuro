@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getBackendStatus: () => ipcRenderer.invoke('backend:status'),
   createOrbWindow: () => ipcRenderer.invoke('orb:create'),
   closeOrbWindow: () => ipcRenderer.invoke('orb:close'),
+  toggleOrbWindow: () => ipcRenderer.invoke('orb:toggle'),
   resizeOrbWindow: (width: number, height: number) => ipcRenderer.invoke('orb:resize', { width, height }),
   focusMainWindow: () => ipcRenderer.invoke('window:focus-main'),
   toggleMainWindow: () => ipcRenderer.invoke('window:toggle-main'),

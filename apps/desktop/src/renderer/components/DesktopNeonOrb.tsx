@@ -431,7 +431,7 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                 <button
                   onClick={handleClose}
                   className="p-1.5 bg-white/[0.05] hover:bg-rose-900/40 border border-white/10 hover:border-rose-500/40 rounded-lg text-zinc-400 hover:text-rose-400 transition-colors"
-                  title="Close Desktop Orb"
+                  title="Hide Desktop Orb (Press Alt+O to Restore)"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

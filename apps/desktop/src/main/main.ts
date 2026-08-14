@@ -70,9 +70,40 @@ function createWindow() {
   });
 }
 
+function showNeonOrbWindow() {
+  if (orbWindow && !orbWindow.isDestroyed()) {
+    orbWindow.show();
+    orbWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+    orbWindow.focus();
+  } else {
+    createNeonOrbWindow();
+  }
+}
+
+function hideNeonOrbWindow() {
+  if (orbWindow && !orbWindow.isDestroyed()) {
+    orbWindow.hide();
+  }
+}
+
+function toggleNeonOrbWindow() {
+  if (!orbWindow || orbWindow.isDestroyed()) {
+    createNeonOrbWindow();
+    return;
+  }
+  if (orbWindow.isVisible()) {
+    orbWindow.hide();
+  } else {
+    orbWindow.show();
+    orbWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+    orbWindow.focus();
+  }
+}
+
 function createNeonOrbWindow() {
   if (orbWindow && !orbWindow.isDestroyed()) {
     orbWindow.show();
+    orbWindow.setAlwaysOnTop(true, 'screen-saver', 1);
     orbWindow.focus();
     return;
   }
@@ -186,21 +217,11 @@ app.whenReady().then(async () => {
     });
 
     globalShortcut.register('Alt+O', () => {
-      if (orbWindow && !orbWindow.isDestroyed()) {
-        if (orbWindow.isVisible()) orbWindow.hide();
-        else orbWindow.show();
-      } else {
-        createNeonOrbWindow();
-      }
+      toggleNeonOrbWindow();
     });
 
     globalShortcut.register('CommandOrControl+Shift+O', () => {
-      if (orbWindow && !orbWindow.isDestroyed()) {
-        if (orbWindow.isVisible()) orbWindow.hide();
-        else orbWindow.show();
-      } else {
-        createNeonOrbWindow();
-      }
+      toggleNeonOrbWindow();
     });
   } catch (e) {
     console.warn('[Neuro] Could not register global shortcut:', e);
@@ -226,14 +247,9 @@ app.whenReady().then(async () => {
         },
       },
       {
-        label: '🔮 Toggle Desktop Neon Orb',
+        label: '🔮 Toggle Desktop Neon Orb (Alt+O)',
         click: () => {
-          if (orbWindow && !orbWindow.isDestroyed()) {
-            if (orbWindow.isVisible()) orbWindow.hide();
-            else orbWindow.show();
-          } else {
-            createNeonOrbWindow();
-          }
+          toggleNeonOrbWindow();
         },
       },
       {
@@ -332,15 +348,17 @@ ipcMain.handle('backend:status', async () => {
 });
 
 ipcMain.handle('orb:create', () => {
-  createNeonOrbWindow();
+  showNeonOrbWindow();
   return true;
 });
 
 ipcMain.handle('orb:close', () => {
-  if (orbWindow) {
-    orbWindow.close();
-    orbWindow = null;
-  }
+  hideNeonOrbWindow();
+  return true;
+});
+
+ipcMain.handle('orb:toggle', () => {
+  toggleNeonOrbWindow();
   return true;
 });
 
