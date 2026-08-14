@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.exceptions import ForbiddenException, NotFoundException
 from app.models.audit import AuditLog
 from app.models.project import Project, ProjectMember, Role
 from app.schemas.project import ProjectCreate, ProjectUpdate
@@ -12,11 +12,11 @@ from app.schemas.project import ProjectCreate, ProjectUpdate
 class ProjectService:
     @staticmethod
     async def create_project(session: AsyncSession, user_id: UUID, data: ProjectCreate) -> Project:
-        project = Project(**data.model_dump(), owner_id=user_id)
+        project = Project(**data.model_dump(), user_id=user_id)
         session.add(project)
         await session.flush()
 
-        member = ProjectMember(project_id=project.id, user_id=user_id, role=Role.OWNER)
+        member = ProjectMember(project_id=project.id, user_id=user_id, role=Role.owner)
         session.add(member)
 
         audit = AuditLog(
@@ -40,14 +40,14 @@ class ProjectService:
         )
         member_res = await session.execute(member_stmt)
         if not member_res.scalar_one_or_none():
-            raise HTTPException(status_code=403, detail="Not authorized to access this project")
+            raise ForbiddenException(detail="Not authorized to access this project")
 
         stmt = select(Project).where(Project.id == project_id)
         res = await session.execute(stmt)
         project = res.scalar_one_or_none()
 
         if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+            raise NotFoundException(detail="Project not found")
 
         return project
 

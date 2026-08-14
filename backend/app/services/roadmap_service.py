@@ -6,7 +6,10 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-logger = logging.getLogger(__name__)
+from app.core.exceptions import RoadmapGenerationError
+from app.core.logging import get_logger
+
+logger = get_logger("roadmap_service")
 
 
 class RoadmapNode(BaseModel):
@@ -360,7 +363,18 @@ class RoadmapService:
         Synthesizes a structured dependency graph for a learning goal.
         Matches curated domain models for high-demand topics or generates dynamic DAG.
         """
-        goal_lower = goal.lower()
+        cleaned_goal = (goal or "").strip()
+        if not cleaned_goal:
+            raise RoadmapGenerationError(detail="Goal cannot be empty.")
+        if len(cleaned_goal) > 200:
+            raise RoadmapGenerationError(detail="Goal exceeds maximum allowed length of 200 characters.")
+
+        normalized_depth = depth.lower().strip() if depth else "intermediate"
+        if normalized_depth not in {"beginner", "intermediate", "advanced"}:
+            raise RoadmapGenerationError(detail=f"Invalid depth '{depth}'. Must be beginner, intermediate, or advanced.")
+
+        logger.info(f"Generating roadmap for goal: '{cleaned_goal}' (depth: {normalized_depth})")
+        goal_lower = cleaned_goal.lower()
 
         # Check curated domains
         for key, template in CURATED_ROADMAP_TEMPLATES.items():

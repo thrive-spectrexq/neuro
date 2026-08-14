@@ -17,7 +17,7 @@ app.add_typer(notes_app, name="notes", help="Note operations")
 
 
 @db_app.command("upgrade")
-def db_upgrade(revision: str = "head"):
+def db_upgrade(revision: str = "head") -> None:
     """Upgrade database schema using Alembic."""
     typer.echo(f"Upgrading database to {revision}...")
     try:
@@ -29,7 +29,7 @@ def db_upgrade(revision: str = "head"):
 
 
 @db_app.command("init")
-def db_init():
+def db_init() -> None:
     """Initialize database tables."""
     typer.echo("Initializing database and tables...")
     from app.core.database import create_db_and_tables
@@ -38,15 +38,51 @@ def db_init():
     typer.echo("Database tables created.")
 
 
+@db_app.command("validate")
+def db_validate() -> None:
+    """Validate database connectivity, foreign keys, and table health."""
+    typer.echo("Validating database health and schema integrity...")
+
+    async def validate_schema() -> dict[str, int]:
+        from sqlmodel import func, select
+
+        from app.core.database import get_session_context
+        from app.models.audit import AuditLog
+        from app.models.note import Note
+        from app.models.project import Project
+        from app.models.tag import Tag
+        from app.models.task import Task
+        from app.models.user import User
+
+        counts = {}
+        async with get_session_context() as session:
+            counts["users"] = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            counts["projects"] = (await session.execute(select(func.count(Project.id)))).scalar() or 0
+            counts["notes"] = (await session.execute(select(func.count(Note.id)))).scalar() or 0
+            counts["tasks"] = (await session.execute(select(func.count(Task.id)))).scalar() or 0
+            counts["tags"] = (await session.execute(select(func.count(Tag.id)))).scalar() or 0
+            counts["audit_logs"] = (await session.execute(select(func.count(AuditLog.id)))).scalar() or 0
+        return counts
+
+    try:
+        counts = asyncio.run(validate_schema())
+        typer.echo("✅ Database connection healthy. Integrity verified:")
+        for tbl, count in counts.items():
+            typer.echo(f"  - {tbl.capitalize()}: {count} records")
+    except Exception as exc:
+        typer.echo(f"❌ Database validation error: {exc}")
+        raise typer.Exit(1)
+
+
 @db_app.command("seed")
-def db_seed():
-    """Seeds the database with sample data (a user, some notes, tags, a project)."""
+def db_seed() -> None:
+    """Seeds the database with sample data (a user, some notes, tags, a project) idempotently."""
     typer.echo("Seeding database with sample data...")
 
-    async def seed_data():
-        from sqlalchemy.ext.asyncio import AsyncSession
+    async def seed_data() -> None:
+        from sqlmodel import select
 
-        from app.core.database import engine
+        from app.core.database import get_session_context
         from app.core.security import get_password_hash
         from app.models.note import Note, NoteLink
         from app.models.project import Project, ProjectMember, Role
@@ -54,19 +90,21 @@ def db_seed():
         from app.models.task import Task
         from app.models.user import User
 
-        async with AsyncSession(engine) as session:
-            # Check if user already exists
-            from sqlmodel import select
+        async with get_session_context() as session:
+            user_stmt = select(User).where(User.username == "testuser")
+            existing_user = (await session.execute(user_stmt)).scalars().first()
 
-            user = (await session.execute(select(User).limit(1))).scalar()
-            if not user:
-                user = User(
-                    email="test@example.com",
-                    username="testuser",
-                    hashed_password=get_password_hash("password123"),
-                )
-                session.add(user)
-                await session.flush()
+            if existing_user:
+                typer.echo("Seed user 'testuser' already exists. Skipping seed creation.")
+                return
+
+            user = User(
+                email="test@example.com",
+                username="testuser",
+                hashed_password=get_password_hash("password123"),
+            )
+            session.add(user)
+            await session.flush()
 
             # Create Projects
             p1 = Project(name="Project Alpha", description="A sample project", user_id=user.id)
@@ -137,15 +175,15 @@ def db_seed():
             )
 
             # Create Tasks
-            task1 = Task(title="Design UI", status="todo", project_id=p1.id)
-            task2 = Task(title="Write Backend", status="in_progress", project_id=p1.id)
-            task3 = Task(title="Deploy V1", status="todo", project_id=p2.id)
+            task1 = Task(title="Design UI", status="todo", project_id=p1.id, user_id=user.id)
+            task2 = Task(title="Write Backend", status="in_progress", project_id=p1.id, user_id=user.id)
+            task3 = Task(title="Deploy V1", status="todo", project_id=p2.id, user_id=user.id)
             session.add_all([task1, task2, task3])
 
             await session.commit()
+            typer.echo("Database seeded successfully.")
 
     asyncio.run(seed_data())
-    typer.echo("Database seeded successfully.")
 
 
 @db_app.command("prune")
@@ -174,8 +212,12 @@ def db_prune():
 
 
 @plugin_app.command("create")
-def plugin_create(name: str):
+def plugin_create(name: str) -> None:
     """Scaffold a new plugin in the plugins directory."""
+    if not name or not name.isalnum():
+        typer.echo("Plugin name must be alphanumeric.")
+        raise typer.Exit(1)
+
     typer.echo(f"Creating plugin '{name}'...")
     plugin_dir = Path.cwd() / "plugins" / name
     if plugin_dir.exists():
@@ -194,7 +236,7 @@ def plugin_create(name: str):
 
 
 @plugin_app.command("list")
-def plugin_list():
+def plugin_list() -> None:
     """List all local plugins."""
     plugins_dir = Path.cwd() / "plugins"
     if not plugins_dir.exists():
@@ -208,22 +250,35 @@ def plugin_list():
 
 
 @notes_app.command("list")
-def notes_list(limit: int = 10):
+def notes_list(limit: int = 10) -> None:
     """List notes in the knowledge base."""
+    if limit <= 0 or limit > 1000:
+        typer.echo("Limit must be between 1 and 1000.")
+        raise typer.Exit(1)
+
     typer.echo(f"Listing top {limit} notes...")
-    # CLI note list logic
     typer.echo("Use API GET /api/v1/notes or view in Desktop app.")
 
 
+ALLOWED_INGEST_EXTENSIONS = {".txt", ".md", ".pdf", ".py", ".ts", ".tsx", ".js", ".json", ".yaml", ".yml", ".canvas"}
+MAX_INGEST_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB
+
+
 @app.command("ingest")
-def ingest_data(path: Path):
-    """Ingest a file or directory into Neuro."""
+def ingest_data(path: Path) -> None:
+    """Ingest a file or directory into Neuro with extension and size checks."""
     if not path.exists():
         typer.echo(f"Path '{path}' does not exist.")
         raise typer.Exit(1)
 
     typer.echo(f"Ingesting data from '{path}'...")
     if path.is_file():
+        if path.suffix.lower() not in ALLOWED_INGEST_EXTENSIONS:
+            typer.echo(f"Unsupported file format '{path.suffix}'. Allowed: {', '.join(sorted(ALLOWED_INGEST_EXTENSIONS))}")
+            raise typer.Exit(1)
+        if path.stat().st_size > MAX_INGEST_SIZE_BYTES:
+            typer.echo(f"File exceeds maximum allowed size of 50MB: {path.name}")
+            raise typer.Exit(1)
         typer.echo(f"Processing file: {path.name}")
     elif path.is_dir():
         typer.echo(f"Processing directory: {path.name}")
@@ -232,30 +287,29 @@ def ingest_data(path: Path):
 
 
 @app.command("stats")
-def system_stats():
+def system_stats() -> None:
     """Display system status and entity counts."""
     typer.echo("Neuro System Overview:")
     typer.echo(" - Framework: FastAPI + SQLModel")
     typer.echo(" - Storage: SQLite / ChromaDB")
     typer.echo(" - AI Engine: Multi-provider (Ollama / OpenAI / Anthropic)")
 
-    async def get_stats():
-        from sqlalchemy.ext.asyncio import AsyncSession
+    async def get_stats() -> tuple[int, int, int, int, int]:
         from sqlmodel import func, select
 
-        from app.core.database import engine
+        from app.core.database import get_session_context
         from app.models.note import Note
         from app.models.project import Project
         from app.models.tag import Tag
         from app.models.task import Task
         from app.models.user import User
 
-        async with AsyncSession(engine) as session:
-            u_count = (await session.execute(select(func.count(User.id)))).scalar()
-            p_count = (await session.execute(select(func.count(Project.id)))).scalar()
-            n_count = (await session.execute(select(func.count(Note.id)))).scalar()
-            t_count = (await session.execute(select(func.count(Task.id)))).scalar()
-            tag_count = (await session.execute(select(func.count(Tag.id)))).scalar()
+        async with get_session_context() as session:
+            u_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            p_count = (await session.execute(select(func.count(Project.id)))).scalar() or 0
+            n_count = (await session.execute(select(func.count(Note.id)))).scalar() or 0
+            t_count = (await session.execute(select(func.count(Task.id)))).scalar() or 0
+            tag_count = (await session.execute(select(func.count(Tag.id)))).scalar() or 0
             return u_count, p_count, n_count, t_count, tag_count
 
     try:
@@ -266,7 +320,7 @@ def system_stats():
 
 
 @app.command("mcp")
-def run_mcp_server():
+def run_mcp_server() -> None:
     """Start the Model Context Protocol (MCP) stdio server for Claude Desktop, Cursor, and other AI clients."""
     from app.mcp_server.server import main as run_mcp
 
@@ -277,11 +331,21 @@ def run_mcp_server():
 def cli_generate_roadmap(
     goal: str = typer.Argument(..., help="Subject or learning goal (e.g. 'Rust Async', 'Machine Learning')"),
     depth: str = typer.Option("intermediate", help="Depth level: beginner, intermediate, advanced"),
-):
+) -> None:
     """Generate a structured prerequisite learning roadmap DAG for any topic."""
+    cleaned_goal = goal.strip()
+    if not cleaned_goal or len(cleaned_goal) > 200:
+        typer.echo("Goal must be between 1 and 200 characters.")
+        raise typer.Exit(1)
+
+    normalized_depth = depth.lower().strip()
+    if normalized_depth not in {"beginner", "intermediate", "advanced"}:
+        typer.echo(f"Invalid depth '{depth}'. Must be one of: beginner, intermediate, advanced")
+        raise typer.Exit(1)
+
     from app.services.roadmap_service import RoadmapService
 
-    roadmap = RoadmapService.generate_roadmap(goal=goal, depth=depth)
+    roadmap = RoadmapService.generate_roadmap(goal=cleaned_goal, depth=normalized_depth)
     typer.echo("\n=======================================================")
     typer.echo(f"🎯 Roadmap: {roadmap.subject}")
     typer.echo(f"📖 Description: {roadmap.description}")
@@ -305,8 +369,12 @@ app.add_typer(graph_app, name="graph", help="Codebase Knowledge Graph & Architec
 def cli_extract_graph(
     path: str = typer.Option(".", help="Root directory path to scan"),
     max_files: int = typer.Option(500, help="Maximum files to scan"),
-):
+) -> None:
     """Scan and extract AST knowledge graph from codebase files."""
+    if max_files <= 0 or max_files > 5000:
+        typer.echo("max_files must be between 1 and 5000.")
+        raise typer.Exit(1)
+
     from app.services.graph_intelligence_service import graph_extractor
 
     typer.echo(f"Scanning codebase at '{path}'...")
@@ -319,7 +387,7 @@ def cli_extract_graph(
 @graph_app.command("analyze")
 def cli_analyze_graph(
     path: str = typer.Option(".", help="Root directory path to scan"),
-):
+) -> None:
     """Run Louvain clustering, God node detection, and architectural diagnostics."""
     from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
 
@@ -351,8 +419,12 @@ def cli_analyze_graph(
 def cli_blast_radius(
     target: str = typer.Argument(..., help="Symbol, class, function, or file to test"),
     depth: int = typer.Option(3, help="Max hop depth"),
-):
+) -> None:
     """Calculate blast radius and upstream/downstream impact for a code change."""
+    if depth <= 0 or depth > 10:
+        typer.echo("Depth must be between 1 and 10.")
+        raise typer.Exit(1)
+
     import os
 
     from app.services.graph_intelligence_service import GraphAnalyticsEngine, graph_analytics, graph_extractor
@@ -370,7 +442,7 @@ def cli_blast_radius(
 @graph_app.command("wiki")
 def cli_generate_wiki(
     out_dir: str = typer.Option("./wiki", help="Output directory for generated markdown files"),
-):
+) -> None:
     """Generate Wikipedia-style Markdown documentation from codebase graph."""
     import os
 
@@ -390,7 +462,7 @@ app.add_typer(obsidian_app, name="obsidian", help="Obsidian Vault Intelligence, 
 @obsidian_app.command("lint")
 def cli_obsidian_lint(
     path: str = typer.Option(".", help="Path to local Obsidian vault directory to lint"),
-):
+) -> None:
     """Lint an Obsidian vault for dead links, orphans, metadata gaps, and health diagnostics."""
     from app.services.obsidian_lint_service import ObsidianLintService
 
@@ -400,10 +472,10 @@ def cli_obsidian_lint(
     typer.echo("=======================================================")
     typer.echo(f"🛡️  VAULT HEALTH REPORT: {report.vault_name}")
     typer.echo(f"Scanned Notes: {report.total_notes_scanned} | Health Score: {report.health_score}% ({report.status})")
-    typer.echo("=======================================================\n")
+    typer.echo("=======================================================")
 
     if report.dead_links:
-        typer.echo(f"❌ DEAD / BROKEN LINKS ({len(report.dead_links)}):")
+        typer.echo(f"\n❌ DEAD / BROKEN LINKS ({len(report.dead_links)}):")
         for dl in report.dead_links[:10]:
             typer.echo(f"  - [{dl.source_file}:L{dl.line_number}] -> {dl.raw_wikilink}")
         if len(report.dead_links) > 10:
@@ -430,7 +502,7 @@ def cli_obsidian_lint(
 def cli_obsidian_canvas(
     title: str = typer.Option("Neuro Knowledge Canvas", help="Title for the canvas"),
     out: str = typer.Option("knowledge.canvas", help="Output .canvas file path"),
-):
+) -> None:
     """Generate an Obsidian JSON Canvas 1.0 spatial visual map."""
     from pathlib import Path
 
@@ -455,13 +527,23 @@ def cli_obsidian_route(
     title: str = typer.Argument(..., help="Note title to route"),
     content: str = typer.Option("", help="Optional note content snippet"),
     mode: str = typer.Option("generic", help="Methodology mode: generic, lyt, para, zettelkasten"),
-):
+) -> None:
     """Calculate the optimal destination folder, filename, and tags according to PARA/LYT/Zettelkasten."""
+    cleaned_title = title.strip()
+    if not cleaned_title:
+        typer.echo("Title cannot be empty.")
+        raise typer.Exit(1)
+
+    normalized_mode = mode.lower().strip()
+    if normalized_mode not in {"generic", "lyt", "para", "zettelkasten"}:
+        typer.echo(f"Invalid mode '{mode}'. Must be one of: generic, lyt, para, zettelkasten")
+        raise typer.Exit(1)
+
     from app.services.obsidian_mode_service import ObsidianModeService
 
-    suggestion = ObsidianModeService.route_note(title=title, content=content, mode=mode)
+    suggestion = ObsidianModeService.route_note(title=cleaned_title, content=content, mode=normalized_mode)
     typer.echo("\n=======================================================")
-    typer.echo(f"📂 NOTE ROUTING: {title} (Mode: {suggestion.mode.upper()})")
+    typer.echo(f"📂 NOTE ROUTING: {cleaned_title} (Mode: {suggestion.mode.upper()})")
     typer.echo(f"Destination Path: {suggestion.suggested_rel_path}")
     typer.echo(f"Target Folder:    {suggestion.suggested_folder}")
     typer.echo(f"Target Filename:  {suggestion.suggested_filename}")

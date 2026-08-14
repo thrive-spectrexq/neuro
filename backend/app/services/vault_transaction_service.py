@@ -9,6 +9,7 @@ Provides atomic plan-apply transactional mutability for notes, canvas, and vault
 """
 
 import hashlib
+import logging
 import os
 import shutil
 from dataclasses import dataclass, field
@@ -16,14 +17,19 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from app.core.exceptions import PathTraversalError, VaultIntegrityError
+from app.core.logging import get_logger
 
-class VaultBoundaryViolation(Exception):
+logger = get_logger("vault_transaction")
+
+
+class VaultBoundaryViolation(PathTraversalError):
     """Raised when an operation attempts to read/write outside the designated vault root."""
 
     pass
 
 
-class TransactionExecutionError(Exception):
+class TransactionExecutionError(VaultIntegrityError):
     """Raised when an atomic transaction fails during execution."""
 
     pass

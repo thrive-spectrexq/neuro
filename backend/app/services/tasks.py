@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.exceptions import NotFoundException
 from app.models.audit import AuditLog
 from app.models.task import Task, TaskCreate, TaskUpdate
 
@@ -36,7 +36,7 @@ class TaskService:
         task = res.scalar_one_or_none()
 
         if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
+            raise NotFoundException(detail="Task not found")
         return task
 
     @staticmethod

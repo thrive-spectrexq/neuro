@@ -1,7 +1,9 @@
 import json
 import logging
 import sys
-from typing import Any
+import time
+from contextlib import contextmanager
+from typing import Any, Generator
 
 from app.core.config import get_settings
 
@@ -12,9 +14,9 @@ class JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         log_record: dict[str, Any] = {
             "level": record.levelname,
-            "name": record.name,
-            "msg": record.getMessage(),
-            "time": self.formatTime(record, self.datefmt),
+            "logger": record.name,
+            "message": record.getMessage(),
+            "timestamp": self.formatTime(record, self.datefmt),
         }
 
         # Include extra attributes that were passed using `extra={...}`
@@ -66,11 +68,11 @@ def setup_logging() -> logging.Logger:
     if log_format == "json" or settings.NEURO_ENV == "production":
         handler.setFormatter(JSONFormatter())
     else:
-        handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+        handler.setFormatter(logging.Formatter("%(asctime)s - [%(name)s] - %(levelname)s - %(message)s"))
 
     logger.addHandler(handler)
 
-    # Set the root logger as well to capture uvicorn/fastapi logs if needed
+    # Set root logger
     root_logger = logging.getLogger()
     if not root_logger.handlers:
         root_logger.addHandler(handler)
@@ -82,3 +84,25 @@ def setup_logging() -> logging.Logger:
 def get_logger(name: str) -> logging.Logger:
     """Get a structured logger for the specific module."""
     return logging.getLogger(f"neuro.{name}")
+
+
+@contextmanager
+def timed_operation(logger: logging.Logger, operation_name: str, **extra: Any) -> Generator[None, None, None]:
+    """Context manager for tracing and recording operation execution duration."""
+    start = time.perf_counter()
+    logger.info(f"Started operation '{operation_name}'", extra={"operation": operation_name, "stage": "start", **extra})
+    try:
+        yield
+        duration_ms = (time.perf_counter() - start) * 1000.0
+        logger.info(
+            f"Completed operation '{operation_name}' in {duration_ms:.2f}ms",
+            extra={"operation": operation_name, "stage": "complete", "duration_ms": round(duration_ms, 2), **extra},
+        )
+    except Exception as exc:
+        duration_ms = (time.perf_counter() - start) * 1000.0
+        logger.error(
+            f"Failed operation '{operation_name}' after {duration_ms:.2f}ms: {exc}",
+            extra={"operation": operation_name, "stage": "failed", "duration_ms": round(duration_ms, 2), "error": str(exc), **extra},
+            exc_info=True,
+        )
+        raise exc

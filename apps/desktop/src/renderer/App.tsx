@@ -8,6 +8,7 @@ import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import JarvisHUD from './components/JarvisHUD';
 import DesktopNeonOrb from './components/DesktopNeonOrb';
+import ErrorBoundary from './components/ErrorBoundary';
 
 type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings';
 
@@ -71,13 +72,15 @@ export default function App() {
   };
 
   return (
-    <>
+    <ErrorBoundary onReset={() => setCurrentPage('notes')}>
       <Layout
         currentPage={currentPage}
         onNavigate={setCurrentPage}
         onOpenJarvis={() => setIsJarvisOpen(true)}
       >
-        {renderPage()}
+        <ErrorBoundary onReset={() => setCurrentPage('notes')}>
+          {renderPage()}
+        </ErrorBoundary>
       </Layout>
 
       {/* Futuristic JARVIS HUD Overlay */}
@@ -85,6 +88,6 @@ export default function App() {
         isOpen={isJarvisOpen}
         onClose={() => setIsJarvisOpen(false)}
       />
-    </>
+    </ErrorBoundary>
   );
 }

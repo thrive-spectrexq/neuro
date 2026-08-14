@@ -5,19 +5,24 @@ from enum import Enum
 from sqlmodel import Field, SQLModel
 
 
-class Project(SQLModel, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
-    description: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    user_id: uuid.UUID = Field(foreign_key="user.id")
-
-
 class Role(str, Enum):
     owner = "owner"
     editor = "editor"
     viewer = "viewer"
+
+    # Uppercase aliases for compatibility
+    OWNER = "owner"
+    EDITOR = "editor"
+    VIEWER = "viewer"
+
+
+class Project(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(index=True)
+    description: str | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
 
 
 class ProjectMember(SQLModel, table=True):

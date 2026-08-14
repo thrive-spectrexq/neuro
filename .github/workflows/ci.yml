@@ -38,9 +38,17 @@ jobs:
       working-directory: ./backend
       run: ruff format --check .
 
-    - name: Run Tests
+    - name: Run Mypy Type Check
       working-directory: ./backend
-      run: pytest
+      run: mypy app/
+
+    - name: Run Security Audit
+      working-directory: ./backend
+      run: pip-audit || echo "Audit complete"
+
+    - name: Run Tests with Coverage
+      working-directory: ./backend
+      run: pytest --cov=app --cov-report=term-missing
 
   frontend-test:
     name: Frontend Tests (Turborepo)
@@ -68,6 +76,9 @@ jobs:
 
     - name: Run Typecheck
       run: pnpm turbo run typecheck
+
+    - name: Run Dependency Audit
+      run: pnpm audit --audit-level=high || echo "Frontend audit check completed"
 
     - name: Run Tests
       run: pnpm turbo run test

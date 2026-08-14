@@ -283,20 +283,46 @@ Keep the PR description honest. If something is incomplete or has a known caveat
 
 ### Python
 
-Neuro uses `ruff` for linting and formatting.
+Neuro uses `ruff` for linting/formatting and `mypy` for strict type safety.
 
 ```bash
 cd backend
 
-# Check
-ruff check .
-
-# Format
+# Lint and format
+ruff check . --fix
 ruff format .
 
+# Static type checking
+mypy app/
+
 # Both (recommended before committing)
-ruff check . && ruff format .
+ruff check . && ruff format . && mypy app/
 ```
+
+### Pre-commit Hooks
+
+Ensure pre-commit hooks are installed locally:
+```bash
+pre-commit install
+```
+
+### Database Migration Workflow
+
+When modifying or adding models in `backend/app/models/`:
+1. Generate an auto-migration script:
+   ```bash
+   cd backend
+   alembic revision --autogenerate -m "description of changes"
+   ```
+2. Inspect the generated version file in `backend/migrations/versions/`.
+3. Apply migration to local database:
+   ```bash
+   neuro db upgrade head
+   ```
+4. Verify database schema integrity:
+   ```bash
+   neuro db validate
+   ```
 
 **Key conventions:**
 - Type annotations are required for all function signatures

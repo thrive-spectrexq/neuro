@@ -64,6 +64,13 @@ export class BackendProcessManager {
   }
 
   public async start(): Promise<void> {
+    // If backend is already launched by root launcher script, avoid duplicate spawning
+    if (process.env.NEURO_BACKEND_MANAGED_BY_LAUNCHER === '1') {
+      console.log('[Neuro] Backend is managed by root launcher, waiting for health check...');
+      await this.waitForHealthy(25000);
+      return;
+    }
+
     // Check if backend is already running
     const alreadyRunning = await this.isBackendHealthy();
     if (alreadyRunning) {
@@ -119,8 +126,8 @@ export class BackendProcessManager {
         this.childProcess = null;
       });
 
-      // Poll until backend is responsive
-      await this.waitForHealthy(15000);
+      // Poll until backend is responsive (allow up to 25s for embedding model loading)
+      await this.waitForHealthy(25000);
     } catch (error) {
       console.error('[Neuro] Backend process spawn error:', error);
     }

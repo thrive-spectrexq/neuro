@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.exceptions import ForbiddenException, NotFoundException
 from app.models.audit import AuditLog
 from app.models.note import Note, NoteLink
 from app.models.tag import NoteTag, Tag
@@ -50,9 +50,9 @@ class NoteService:
         note = result.scalar_one_or_none()
 
         if not note:
-            raise HTTPException(status_code=404, detail="Note not found")
+            raise NotFoundException(detail="Note not found")
         if note.user_id != user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to access this note")
+            raise ForbiddenException(detail="Not authorized to access this note")
 
         return note
 

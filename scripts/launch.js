@@ -47,9 +47,32 @@ function checkHttpPort(port, path = '/') {
   });
 }
 
+// Rotate log files if they exceed 10MB (keeps up to 5 backups)
+function rotateLogs(logFilePath, maxBackups = 5, maxSizeBytes = 10 * 1024 * 1024) {
+  try {
+    if (!fs.existsSync(logFilePath)) return;
+    const stats = fs.statSync(logFilePath);
+    if (stats.size < maxSizeBytes) return;
+
+    for (let i = maxBackups - 1; i >= 1; i--) {
+      const src = `${logFilePath}.${i}`;
+      const dest = `${logFilePath}.${i + 1}`;
+      if (fs.existsSync(src)) {
+        fs.renameSync(src, dest);
+      }
+    }
+    fs.renameSync(logFilePath, `${logFilePath}.1`);
+  } catch (err) {
+    console.warn('[Neuro] Log rotation notice:', err.message);
+  }
+}
+
 // 3. Launch Backend in Parallel
 function startBackendAsync(pythonExec) {
-  const backendLog = fs.createWriteStream(path.join(logsDir, 'backend.log'), { flags: 'a' });
+  const logFilePath = path.join(logsDir, 'backend.log');
+  rotateLogs(logFilePath);
+
+  const backendLog = fs.createWriteStream(logFilePath, { flags: 'a' });
   const backendProc = spawn(pythonExec, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8000'], {
     cwd: backendDir,
     env: { ...process.env, PYTHONUNBUFFERED: '1' },
@@ -126,6 +149,7 @@ async function main() {
   const viteCmd = fs.existsSync(viteBin) ? viteBin : (isWindows ? 'npx.cmd' : 'npx');
   const viteArgs = fs.existsSync(viteBin) ? [] : ['vite'];
 
+  console.log('\x1b[34mℹ\x1b[0m Starting Vite development server...');
   const viteProc = spawn(viteCmd, viteArgs, {
     cwd: desktopDir,
     stdio: 'pipe',
@@ -146,6 +170,10 @@ async function main() {
       cwd: desktopDir,
       stdio: 'inherit',
       shell: !electronExe && isWindows,
+      env: {
+        ...process.env,
+        NEURO_BACKEND_MANAGED_BY_LAUNCHER: '1',
+      },
     });
 
     electronProc.on('exit', (code) => {
@@ -162,25 +190,34 @@ async function main() {
     });
   }
 
-  // Rapid Port Polling for instant zero-delay window load
+  // Rapid Port Polling: only launch Electron once Vite is genuinely ready on port 3000
   let pollCount = 0;
+  const maxPolls = 300; // up to 30s
   const portInterval = setInterval(async () => {
     pollCount++;
     const isViteReady = await checkHttpPort(3000, '/');
     if (isViteReady) {
       clearInterval(portInterval);
       launchElectron();
-    } else if (pollCount > 80) {
+    } else if (pollCount >= maxPolls) {
       clearInterval(portInterval);
+      console.warn('[Neuro] Vite server polling timed out, attempting to launch Electron...');
       launchElectron();
     }
-  }, 50);
+  }, 100);
 
   viteProc.stdout.on('data', (data) => {
     const msg = data.toString();
     if (msg.includes('Local:') || msg.includes('3000') || msg.includes('ready in')) {
       clearInterval(portInterval);
       launchElectron();
+    }
+  });
+
+  viteProc.stderr.on('data', (data) => {
+    const msg = data.toString();
+    if (msg.includes('error') || msg.includes('Error')) {
+      console.warn('[Neuro] Vite notice:', msg.trim());
     }
   });
 

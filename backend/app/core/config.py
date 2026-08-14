@@ -1,6 +1,11 @@
 from functools import lru_cache
+import logging
+from typing import Any
 
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger("neuro.config")
 
 
 class Settings(BaseSettings):
@@ -27,6 +32,17 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "*"
     MAX_PAGE_SIZE: int = 100
     DEFAULT_PAGE_SIZE: int = 20
+
+    @field_validator("NEURO_SECRET_KEY")
+    @classmethod
+    def validate_secret_key(cls, v: str, info: ValidationInfo) -> str:
+        env = info.data.get("NEURO_ENV", "development")
+        if env == "production":
+            if v == "changeme" or len(v) < 32:
+                raise ValueError("In production, NEURO_SECRET_KEY must be at least 32 characters and not 'changeme'")
+        elif v == "changeme":
+            logger.warning("Using default insecure 'changeme' NEURO_SECRET_KEY in non-production mode.")
+        return v
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

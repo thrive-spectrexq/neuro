@@ -8,6 +8,7 @@ Wikipedia-style markdown wiki generation.
 from __future__ import annotations
 
 import ast
+import logging
 import os
 import re
 from dataclasses import asdict, dataclass, field
@@ -15,6 +16,12 @@ from pathlib import Path
 from typing import Any
 
 import networkx as nx
+
+from app.core.exceptions import GraphAnalysisException
+from app.core.logging import get_logger, timed_operation
+from app.models.graph import AffectedNodeHit, GraphEdge, GraphNode
+
+logger = get_logger("graph_intelligence")
 
 # Extensions supported for knowledge graph extraction
 CODE_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".rs", ".go", ".sql", ".json", ".yaml", ".yml"}
@@ -61,44 +68,6 @@ BUILTIN_NOISE_LABELS = {
     "print",
     "len",
 }
-
-
-@dataclass
-class GraphNode:
-    id: str
-    label: str
-    type: str  # "file", "function", "class", "component", "endpoint", "note", "concept"
-    source_file: str | None = None
-    source_location: str | None = None
-    docstring: str | None = None
-    community: int | None = None
-    properties: dict[str, Any] = field(default_factory=dict)
-
-    def to_dict(self) -> dict[str, Any]:
-        return {k: v for k, v in asdict(self).items() if v is not None}
-
-
-@dataclass
-class GraphEdge:
-    source: str
-    target: str
-    relation: str  # "calls", "imports", "defines", "inherits", "renders", "links_to", "depends_on"
-    confidence: str = "EXTRACTED"  # "EXTRACTED", "INFERRED", "AMBIGUOUS"
-    weight: float = 1.0
-    properties: dict[str, Any] = field(default_factory=dict)
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass
-class AffectedNodeHit:
-    node_id: str
-    label: str
-    depth: int
-    via_relation: str
-    source_file: str | None = None
-    source_location: str | None = None
 
 
 @dataclass

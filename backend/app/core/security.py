@@ -63,6 +63,11 @@ async def get_current_user(
     return user
 
 
+import logging
+
+logger = logging.getLogger("neuro.security")
+
+
 async def get_current_user_optional(
     token: Annotated[str | None, Depends(oauth2_scheme_optional)] = None,
     session: AsyncSession = Depends(get_session),
@@ -71,11 +76,14 @@ async def get_current_user_optional(
         return None
     try:
         payload = jwt.decode(token, settings.NEURO_SECRET_KEY, algorithms=["HS256"])
-        username: str = payload.get("sub")
-        if username is None:
+        username: str | None = payload.get("sub")
+        if not username:
             return None
         stmt = select(User).where(User.username == username)
         result = await session.execute(stmt)
         return result.scalars().first()
-    except Exception:
+    except JWTError:
+        return None
+    except Exception as exc:
+        logger.error(f"Optional user resolution encountered unexpected error: {exc}", exc_info=True)
         return None
