@@ -185,11 +185,21 @@ app.whenReady().then(async () => {
       }
     });
 
-    globalShortcut.register('CommandOrControl+Shift+N', () => {
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.focus();
-        mainWindow.webContents.send('neuro:quick-note');
+    globalShortcut.register('Alt+O', () => {
+      if (orbWindow && !orbWindow.isDestroyed()) {
+        if (orbWindow.isVisible()) orbWindow.hide();
+        else orbWindow.show();
+      } else {
+        createNeonOrbWindow();
+      }
+    });
+
+    globalShortcut.register('CommandOrControl+Shift+O', () => {
+      if (orbWindow && !orbWindow.isDestroyed()) {
+        if (orbWindow.isVisible()) orbWindow.hide();
+        else orbWindow.show();
+      } else {
+        createNeonOrbWindow();
       }
     });
   } catch (e) {
