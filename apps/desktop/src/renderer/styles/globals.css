@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   NEURO DESIGN SYSTEM — Global CSS Layer
+   Professional dark-mode workstation surface
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
   * {
     border-color: rgba(255, 255, 255, 0.08);
@@ -14,6 +19,8 @@
   body {
     @apply text-zinc-100 font-sans select-none antialiased;
     letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html.mode-orb,
@@ -30,9 +37,31 @@
   input, textarea {
     @apply select-text;
   }
+
+  /* Focus-visible ring for keyboard nav */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-cyan/50 ring-offset-1 ring-offset-background;
+  }
 }
 
-@layer utilities {
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT UTILITIES — Reusable across all pages
+   ═══════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* ─── Card Surfaces ─── */
+  .card-surface {
+    @apply bg-panel rounded-card border border-white/[0.06]
+           hover:border-white/[0.12] hover:bg-panel-hover
+           transition-all duration-200 ease-out
+           shadow-card hover:shadow-card-hover;
+  }
+
+  .card-surface-static {
+    @apply bg-panel rounded-card border border-white/[0.06] shadow-card;
+  }
+
+  /* ─── Glass Surfaces ─── */
   .glass-surface {
     background: rgba(14, 17, 26, 0.72);
     backdrop-filter: blur(20px) saturate(180%);
@@ -55,6 +84,127 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
+  /* ─── Buttons ─── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2
+           bg-brand-cyan hover:bg-brand-cyan-light
+           text-white text-xs font-semibold
+           rounded-button shadow-glow-cyan
+           transition-all duration-150 ease-out
+           active:scale-[0.97];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2
+           bg-white/[0.04] hover:bg-white/[0.08]
+           border border-white/[0.08] hover:border-white/[0.14]
+           text-zinc-300 hover:text-white text-xs font-semibold
+           rounded-button shadow-inner-glow
+           transition-all duration-150 ease-out
+           active:scale-[0.97];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5
+           text-zinc-400 hover:text-zinc-200
+           hover:bg-white/[0.04]
+           text-xs font-medium
+           rounded-button
+           transition-all duration-150 ease-out;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2
+           bg-rose-500/10 hover:bg-rose-500/20
+           border border-rose-500/20 hover:border-rose-500/40
+           text-rose-400 hover:text-rose-300 text-xs font-semibold
+           rounded-button
+           transition-all duration-150 ease-out;
+  }
+
+  /* ─── Inputs ─── */
+  .input-base {
+    @apply w-full bg-background-secondary border border-white/[0.08] rounded-input
+           px-3 py-2 text-xs text-zinc-200 placeholder-zinc-500
+           focus:outline-none focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan/20
+           transition-all duration-150 font-sans;
+  }
+
+  /* ─── Badges ─── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5
+           rounded-pill text-[10px] font-mono font-medium;
+  }
+
+  .badge-cyan {
+    @apply badge bg-cyan-950/50 border border-cyan-500/25 text-cyan-400;
+  }
+
+  .badge-emerald {
+    @apply badge bg-emerald-950/50 border border-emerald-500/25 text-emerald-400;
+  }
+
+  .badge-amber {
+    @apply badge bg-amber-950/50 border border-amber-500/25 text-amber-400;
+  }
+
+  .badge-rose {
+    @apply badge bg-rose-950/50 border border-rose-500/25 text-rose-400;
+  }
+
+  .badge-purple {
+    @apply badge bg-purple-950/50 border border-purple-500/25 text-purple-400;
+  }
+
+  .badge-neutral {
+    @apply badge bg-white/[0.05] border border-white/[0.08] text-zinc-400;
+  }
+
+  /* ─── Page Layout ─── */
+  .page-container {
+    @apply px-page-x py-page-y max-w-7xl mx-auto h-full flex flex-col overflow-y-auto;
+  }
+
+  .page-header {
+    @apply flex flex-col gap-1 mb-6;
+  }
+
+  .page-title {
+    @apply text-xl font-bold tracking-tight text-white font-sans flex items-center gap-2.5;
+  }
+
+  .page-subtitle {
+    @apply text-xs text-zinc-400 font-sans;
+  }
+
+  /* ─── Section Headings ─── */
+  .section-label {
+    @apply text-[10px] font-mono font-semibold uppercase tracking-widest text-zinc-500 mb-3;
+  }
+
+  /* ─── Status Dots ─── */
+  .status-dot {
+    @apply w-1.5 h-1.5 rounded-full;
+  }
+
+  .status-dot-online {
+    @apply status-dot bg-emerald-400 animate-pulse;
+  }
+
+  .status-dot-warning {
+    @apply status-dot bg-amber-400 animate-pulse;
+  }
+
+  .status-dot-error {
+    @apply status-dot bg-rose-400 animate-pulse;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY EXTENSIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@layer utilities {
   .hairline-border {
     border: 1px solid rgba(255, 255, 255, 0.07);
   }
@@ -78,9 +228,31 @@
   .hud-glow {
     box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
+
+  /* Text gradient */
+  .text-gradient-cyan {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400;
+  }
+
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary-light to-brand-cyan-light;
+  }
+
+  /* Shimmer loading effect */
+  .shimmer {
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.04) 50%,
+      rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
 }
 
-/* Precision Custom Scrollbar */
+/* ═══════════════════════════════════════════════════════════════
+   PRECISION SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -91,15 +263,18 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
 }
 
-/* Electron Window Drag Utilities */
+/* ═══════════════════════════════════════════════════════════════
+   ELECTRON WINDOW DRAG
+   ═══════════════════════════════════════════════════════════════ */
+
 .titlebar-drag {
   -webkit-app-region: drag;
 }
@@ -107,4 +282,3 @@
 .no-drag {
   -webkit-app-region: no-drag;
 }
-

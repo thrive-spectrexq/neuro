@@ -15,7 +15,8 @@ import {
   Upload,
   FileUp,
   Check,
-  CheckCircle2
+  CheckCircle2,
+  Link
 } from 'lucide-react';
 import { useNotes, useCreateNote, useDeleteNote } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -166,56 +167,69 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
       .slice(0, 120);
   };
 
+  // Helper to count wikilinks
+  const getWikilinkCount = (content: string) => {
+    const matches = content.match(/\[\[(.*?)\]\]/g);
+    return matches ? matches.length : 0;
+  };
+
   return (
     <div
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`p-8 max-w-7xl mx-auto h-full flex flex-col overflow-y-auto select-none transition-all ${
+      className={`page-container ${
         isDraggingFile ? 'bg-cyan-950/20 ring-2 ring-cyan-400 ring-inset' : ''
       }`}
     >
       {/* Drag & Drop Overlay Feedback */}
       {isDraggingFile && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-cyan-400 pointer-events-none">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-brand-cyan pointer-events-none animate-fade-in">
           <FileUp size={48} className="animate-bounce mb-3" />
           <p className="text-lg font-bold">Drop Markdown (.md) files to import into Neuro</p>
-          <p className="text-xs text-zinc-400 mt-1">Files will be indexed and linked to your knowledge vault</p>
+          <p className="text-xs text-text-muted mt-1">Files will be indexed and linked to your knowledge vault</p>
         </div>
       )}
 
       {/* Workspace Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7 animate-fade-in">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="page-title">
               Notes & Knowledge Vault
             </h1>
-            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono text-cyan-400">
-              {notes?.length || 0} notes
-            </span>
-            {importStatus && (
-              <span className="px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-300 flex items-center gap-1 animate-in fade-in">
-                <CheckCircle2 size={11} /> {importStatus}
+            <div className="flex items-center gap-2">
+              <span className="badge-neutral flex items-center gap-1">
+                <FileText size={12} />
+                {notes?.length || 0} notes
               </span>
-            )}
+              <span className="badge-neutral flex items-center gap-1">
+                <Tag size={12} />
+                {allTags.length} tags
+              </span>
+              {importStatus && (
+                <span className="badge-emerald flex items-center gap-1 animate-fade-in">
+                  <CheckCircle2 size={12} /> {importStatus}
+                </span>
+              )}
+            </div>
           </div>
-          <p className="text-xs text-zinc-400 font-sans">
+          <p className="page-subtitle">
             Personal second brain notes with bi-directional wiki linking, semantic search, and Markdown import.
           </p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Quick Search */}
           <div className="relative w-56">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
             <input
               type="text"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
               placeholder="Filter notes..."
-              className="w-full bg-[#0e111a] border border-white/[0.08] rounded-xl pl-9 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-cyan-500/60 transition-all font-sans"
+              className="input-base pl-9 w-full"
             />
           </div>
 
@@ -230,29 +244,29 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white rounded-xl text-xs font-semibold transition-all"
+            className="btn-secondary"
             title="Import Markdown Files or Obsidian Notes"
           >
-            <Upload size={13} className="text-cyan-400" />
+            <Upload size={14} className="text-brand-cyan" />
             <span>Import</span>
           </button>
 
           {/* Export Button */}
           <button
             onClick={handleExportVault}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white rounded-xl text-xs font-semibold transition-all"
+            className="btn-secondary"
             title="Export all vault notes as JSON backup"
           >
-            <Download size={13} className="text-purple-400" />
+            <Download size={14} className="text-brand-primary" />
             <span>Export</span>
           </button>
 
           {/* New Note Button */}
           <button
             onClick={() => handleCreateNote()}
-            className="flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-semibold shadow-[0_0_15px_rgba(0,245,255,0.3)] transition-all duration-150"
+            className="btn-primary"
           >
-            <Plus size={14} />
+            <Plus size={16} />
             <span>New Note</span>
           </button>
         </div>
@@ -260,13 +274,13 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
 
       {/* Tag Filter Bar */}
       {allTags.length > 0 && (
-        <div className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <button
             onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               selectedTag === null
-                ? 'bg-white/[0.1] text-white border border-white/[0.1]'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                ? 'bg-surface-elevated text-text-primary border border-surface-elevated'
+                : 'text-text-secondary hover:text-text-primary hover:bg-surface border border-transparent'
             }`}
           >
             All Notes
@@ -275,13 +289,14 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
                 selectedTag === tag
-                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                  : 'bg-white/[0.03] text-zinc-400 hover:text-zinc-200 border border-white/[0.05]'
+                  ? 'badge-cyan'
+                  : 'bg-surface text-text-secondary hover:text-text-primary border border-surface hover:border-surface-elevated'
               }`}
             >
-              <span>#{tag}</span>
+              <Tag size={12} className={selectedTag === tag ? 'opacity-70' : 'opacity-50'} />
+              <span>{tag}</span>
             </button>
           ))}
         </div>
@@ -289,78 +304,93 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
 
       {/* Notes Grid */}
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center text-zinc-500 text-xs font-mono">
+        <div className="flex-1 flex items-center justify-center text-text-muted text-sm font-mono animate-pulse">
           Loading knowledge repository...
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-12 rounded-2xl border border-dashed border-white/[0.08] bg-[#0a0c14]">
-          <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
-            <BookOpen size={20} className="text-zinc-500" />
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-12 rounded-2xl border border-dashed border-surface-elevated card-surface-static animate-scale-in">
+          <div className="w-14 h-14 rounded-2xl bg-surface flex items-center justify-center mb-4">
+            <BookOpen size={24} className="text-text-muted" />
           </div>
-          <h3 className="text-sm font-semibold text-zinc-300 mb-1">
+          <h3 className="text-base font-semibold text-text-primary mb-2">
             {searchFilter || selectedTag ? 'No matching notes found' : 'Your Second Brain is Empty'}
           </h3>
-          <p className="text-xs text-zinc-500 max-w-sm mb-5">
+          <p className="text-sm text-text-secondary max-w-md mb-6">
             {searchFilter || selectedTag
               ? 'Try changing your search keywords or clearing active tag filters.'
               : 'Create your first note or drag-and-drop your existing Markdown vault.'}
           </p>
           <button
             onClick={() => handleCreateNote()}
-            className="flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-semibold shadow-[0_0_15px_rgba(0,245,255,0.3)] transition-all"
+            className="btn-primary"
           >
-            <Plus size={14} />
+            <Plus size={16} />
             <span>Create First Note</span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
-          {filteredNotes.map((note) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-12">
+          {filteredNotes.map((note, index) => (
             <div
               key={note.id}
               onClick={() => handleNoteClick(note.id)}
-              className="group p-5 rounded-2xl bg-[#0b0e18] hover:bg-[#101424] border border-white/[0.06] hover:border-cyan-500/40 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] flex flex-col justify-between"
+              className="card-surface group flex flex-col justify-between animate-scale-in"
+              style={{ animationDelay: `${index * 30}ms` }}
             >
               <div>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1 font-sans">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-cyan transition-colors line-clamp-1">
                     {note.title || 'Untitled Note'}
                   </h3>
                   <button
                     onClick={(e) => handleDeleteNote(e, note.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition-all rounded-md hover:bg-rose-950/30"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 text-text-muted hover:text-rose-400 transition-all rounded-md hover:bg-rose-500/10"
                     title="Delete Note"
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
 
-                <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed mb-4 font-sans">
-                  {getCleanSnippet(note.content) || 'Empty note...'}
+                <p className="text-xs text-text-secondary line-clamp-4 leading-relaxed mb-4">
+                  {getCleanSnippet(note.content) || <span className="italic text-text-tertiary">Empty note...</span>}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-zinc-500 font-mono">
-                <div className="flex items-center gap-1">
-                  <Clock size={11} />
-                  <span>{new Date(note.updatedAt || note.createdAt || Date.now()).toLocaleDateString()}</span>
+              <div className="pt-3 border-t border-surface-elevated flex items-center justify-between text-xs text-text-muted font-mono">
+                <div className="flex items-center gap-1.5">
+                  <Clock size={12} className="opacity-70" />
+                  <span>{new Date(note.updatedAt || note.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
+                
+                <div className="flex items-center gap-3">
+                  {getWikilinkCount(note.content) > 0 && (
+                    <div className="flex items-center gap-1 text-text-tertiary" title={`${getWikilinkCount(note.content)} linked references`}>
+                      <Link size={12} />
+                      <span>{getWikilinkCount(note.content)}</span>
+                    </div>
+                  )}
 
-                {note.tags && note.tags.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <span className="px-1.5 py-0.5 bg-white/[0.04] rounded text-[10px] text-cyan-400">
-                      #{note.tags[0]}
-                    </span>
-                    {note.tags.length > 1 && (
-                      <span className="text-[10px] text-zinc-600">+{note.tags.length - 1}</span>
-                    )}
-                  </div>
-                )}
+                  {note.tags && note.tags.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Tag size={12} className="opacity-70" />
+                      <span>{note.tags.length}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Floating Action Button for Mobile */}
+      <button
+        onClick={() => handleCreateNote()}
+        className="md:hidden fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 bg-brand-cyan hover:bg-cyan-500 text-background rounded-full shadow-[0_0_20px_rgba(0,245,255,0.3)] transition-transform hover:scale-105 active:scale-95 z-40 font-semibold text-sm"
+      >
+        <Plus size={18} />
+        <span>Quick Note</span>
+      </button>
     </div>
   );
 }

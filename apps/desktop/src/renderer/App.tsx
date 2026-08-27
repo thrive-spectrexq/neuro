@@ -6,11 +6,13 @@ import GraphPage from './pages/GraphPage';
 import FlashcardsPage from './pages/FlashcardsPage';
 import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
+import VaultHealthPage from './pages/VaultHealthPage';
+import IngestPage from './pages/IngestPage';
 import JarvisHUD from './components/JarvisHUD';
 import DesktopNeonOrb from './components/DesktopNeonOrb';
 import ErrorBoundary from './components/ErrorBoundary';
 
-type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings';
+type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings' | 'vault-health' | 'ingest';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('notes');
@@ -67,6 +69,8 @@ export default function App() {
       case 'flashcards': return <FlashcardsPage onNavigate={setCurrentPage as any} />;
       case 'search': return <SearchPage onNavigate={setCurrentPage as any} />;
       case 'settings': return <SettingsPage />;
+      case 'vault-health': return <VaultHealthPage />;
+      case 'ingest': return <IngestPage />;
       default: return <NotesPage onNavigate={setCurrentPage as any} />;
     }
   };

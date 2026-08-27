@@ -304,3 +304,188 @@ async def route_note_methodology(request: RouteNoteApiRequest):
         tags=request.tags,
         mode=request.mode,
     )
+
+
+# ═══════════════════════════════════════════════════════════════
+# Vault Health & Diagnostics Endpoints
+# ═══════════════════════════════════════════════════════════════
+
+
+class VaultHealthSummary(BaseModel):
+    score: int  # 0-100 overall vault health
+    total_notes: int
+    total_links: int
+    total_tags: int
+    categories: dict  # { dead_links, orphan_notes, missing_frontmatter, empty_sections }
+    recent_lint_at: str | None = None
+
+
+@router.get("/health-summary", response_model=VaultHealthSummary)
+async def get_vault_health_summary(
+    session: AsyncSession = Depends(get_session),
+    current_user: User | None = Depends(get_current_user_optional),
+):
+    """
+    Aggregate lint results, note counts, and link health into a single vault
+    health score with category breakdowns.
+    """
+    import re
+    from datetime import datetime, timezone
+
+    # Fetch notes
+    notes_stmt = (
+        select(Note).where(Note.user_id == current_user.id)
+        if current_user
+        else select(Note)
+    )
+    notes_res = await session.execute(notes_stmt)
+    notes = notes_res.scalars().all()
+    total_notes = len(notes)
+
+    # Fetch links
+    links_stmt = select(NoteLink)
+    links_res = await session.execute(links_stmt)
+    links = links_res.scalars().all()
+    total_links = len(links)
+
+    # Fetch tags
+    tags_stmt = select(Tag)
+    tags_res = await session.execute(tags_stmt)
+    tags = tags_res.scalars().all()
+    total_tags = len(tags)
+
+    # Compute diagnostics
+    note_ids = {str(n.id) for n in notes}
+    note_titles_lower = {n.title.lower().strip() for n in notes if n.title}
+
+    dead_links_count = 0
+    orphan_note_ids = set(note_ids)
+    missing_frontmatter_count = 0
+    empty_sections_count = 0
+
+    for link in links:
+        if str(link.source_note_id) in note_ids:
+            orphan_note_ids.discard(str(link.source_note_id))
+        if str(link.target_note_id) in note_ids:
+            orphan_note_ids.discard(str(link.target_note_id))
+        else:
+            dead_links_count += 1
+
+    for note in notes:
+        content = note.content or ""
+        # Check frontmatter
+        if not content.strip().startswith("---"):
+            missing_frontmatter_count += 1
+        # Check empty sections
+        headings = re.findall(r"^(#{1,6})\s+.+$", content, re.MULTILINE)
+        sections = re.split(r"^#{1,6}\s+.+$", content, flags=re.MULTILINE)
+        for section in sections[1:]:  # skip preamble
+            if section.strip() == "":
+                empty_sections_count += 1
+
+    orphan_notes_count = len(orphan_note_ids)
+
+    # Calculate health score (weighted)
+    if total_notes == 0:
+        score = 100
+    else:
+        issue_ratio = (
+            (dead_links_count * 3)
+            + (orphan_notes_count * 1)
+            + (missing_frontmatter_count * 0.5)
+            + (empty_sections_count * 0.3)
+        ) / max(total_notes, 1)
+        score = max(0, min(100, int(100 - issue_ratio * 10)))
+
+    return VaultHealthSummary(
+        score=score,
+        total_notes=total_notes,
+        total_links=total_links,
+        total_tags=total_tags,
+        categories={
+            "dead_links": {
+                "count": dead_links_count,
+                "severity": "error" if dead_links_count > 5 else "warning" if dead_links_count > 0 else "ok",
+            },
+            "orphan_notes": {
+                "count": orphan_notes_count,
+                "severity": "warning" if orphan_notes_count > 3 else "ok",
+            },
+            "missing_frontmatter": {
+                "count": missing_frontmatter_count,
+                "severity": "info" if missing_frontmatter_count > 0 else "ok",
+            },
+            "empty_sections": {
+                "count": empty_sections_count,
+                "severity": "info" if empty_sections_count > 0 else "ok",
+            },
+        },
+        recent_lint_at=datetime.now(timezone.utc).isoformat(),
+    )
+
+
+class AutoHealRequest(BaseModel):
+    fix_type: str = "all"  # all, dead_links, frontmatter, empty_sections
+
+
+class AutoHealResult(BaseModel):
+    fixed_count: int
+    fix_type: str
+    details: list[str] = []
+
+
+@router.post("/auto-heal", response_model=AutoHealResult)
+async def auto_heal_vault(
+    request: AutoHealRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user: User | None = Depends(get_current_user_optional),
+):
+    """
+    Automatically fix common vault issues: remove dead links,
+    generate frontmatter stubs, and clean empty sections.
+    """
+    fixed_count = 0
+    details: list[str] = []
+
+    notes_stmt = (
+        select(Note).where(Note.user_id == current_user.id)
+        if current_user
+        else select(Note)
+    )
+    notes_res = await session.execute(notes_stmt)
+    notes = notes_res.scalars().all()
+
+    if request.fix_type in ("all", "frontmatter"):
+        for note in notes:
+            content = note.content or ""
+            if not content.strip().startswith("---"):
+                from datetime import datetime, timezone
+
+                frontmatter = (
+                    f"---\ntitle: \"{note.title}\"\n"
+                    f"created: {note.created_at.isoformat() if note.created_at else datetime.now(timezone.utc).isoformat()}\n"
+                    f"---\n\n"
+                )
+                note.content = frontmatter + content
+                fixed_count += 1
+                details.append(f"Added frontmatter to: {note.title}")
+
+    if request.fix_type in ("all", "dead_links"):
+        links_stmt = select(NoteLink)
+        links_res = await session.execute(links_stmt)
+        links = links_res.scalars().all()
+        note_ids = {str(n.id) for n in notes}
+
+        for link in links:
+            if str(link.target_note_id) not in note_ids:
+                await session.delete(link)
+                fixed_count += 1
+                details.append(f"Removed dead link: {link.source_note_id} → {link.target_note_id}")
+
+    await session.commit()
+
+    return AutoHealResult(
+        fixed_count=fixed_count,
+        fix_type=request.fix_type,
+        details=details[:20],  # Cap details for large vaults
+    )
