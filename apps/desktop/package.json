@@ -1,6 +1,6 @@
 {
   "name": "@neuro/desktop",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "main": "dist/main/main.js",
   "scripts": {
     "start": "electron .",

@@ -128,7 +128,9 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         }
       }
 
-      let command = `start "" "${normalized}"`;
+      // Shell-escape input for safe fallback execution
+      const sanitizedAppName = normalized.replace(/[&|;$\`><]/g, '');
+      let command = `start "" "${sanitizedAppName}"`;
 
       if (normalized.includes('antigravity')) {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { Write-Host '⚡ Launching Antigravity Assistant in ${projectDir}...' -ForegroundColor Cyan; code . }"`;
