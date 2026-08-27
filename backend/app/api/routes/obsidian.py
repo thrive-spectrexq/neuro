@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+import re
 from collections import defaultdict
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
@@ -329,9 +331,6 @@ async def get_vault_health_summary(
     Aggregate lint results, note counts, and link health into a single vault
     health score with category breakdowns.
     """
-    import re
-    from datetime import datetime, timezone
-
     # Fetch notes
     notes_stmt = (
         select(Note).where(Note.user_id == current_user.id)
@@ -356,7 +355,6 @@ async def get_vault_health_summary(
 
     # Compute diagnostics
     note_ids = {str(n.id) for n in notes}
-    note_titles_lower = {n.title.lower().strip() for n in notes if n.title}
 
     dead_links_count = 0
     orphan_note_ids = set(note_ids)
@@ -377,7 +375,6 @@ async def get_vault_health_summary(
         if not content.strip().startswith("---"):
             missing_frontmatter_count += 1
         # Check empty sections
-        headings = re.findall(r"^(#{1,6})\s+.+$", content, re.MULTILINE)
         sections = re.split(r"^#{1,6}\s+.+$", content, flags=re.MULTILINE)
         for section in sections[1:]:  # skip preamble
             if section.strip() == "":
@@ -420,7 +417,7 @@ async def get_vault_health_summary(
                 "severity": "info" if empty_sections_count > 0 else "ok",
             },
         },
-        recent_lint_at=datetime.now(timezone.utc).isoformat(),
+        recent_lint_at=datetime.now(UTC).isoformat(),
     )
 
 
@@ -459,11 +456,9 @@ async def auto_heal_vault(
         for note in notes:
             content = note.content or ""
             if not content.strip().startswith("---"):
-                from datetime import datetime, timezone
-
                 frontmatter = (
                     f"---\ntitle: \"{note.title}\"\n"
-                    f"created: {note.created_at.isoformat() if note.created_at else datetime.now(timezone.utc).isoformat()}\n"
+                    f"created: {note.created_at.isoformat() if note.created_at else datetime.now(UTC).isoformat()}\n"
                     f"---\n\n"
                 )
                 note.content = frontmatter + content
