@@ -332,11 +332,7 @@ async def get_vault_health_summary(
     health score with category breakdowns.
     """
     # Fetch notes
-    notes_stmt = (
-        select(Note).where(Note.user_id == current_user.id)
-        if current_user
-        else select(Note)
-    )
+    notes_stmt = select(Note).where(Note.user_id == current_user.id) if current_user else select(Note)
     notes_res = await session.execute(notes_stmt)
     notes = notes_res.scalars().all()
     total_notes = len(notes)
@@ -444,11 +440,7 @@ async def auto_heal_vault(
     fixed_count = 0
     details: list[str] = []
 
-    notes_stmt = (
-        select(Note).where(Note.user_id == current_user.id)
-        if current_user
-        else select(Note)
-    )
+    notes_stmt = select(Note).where(Note.user_id == current_user.id) if current_user else select(Note)
     notes_res = await session.execute(notes_stmt)
     notes = notes_res.scalars().all()
 
@@ -457,7 +449,7 @@ async def auto_heal_vault(
             content = note.content or ""
             if not content.strip().startswith("---"):
                 frontmatter = (
-                    f"---\ntitle: \"{note.title}\"\n"
+                    f'---\ntitle: "{note.title}"\n'
                     f"created: {note.created_at.isoformat() if note.created_at else datetime.now(UTC).isoformat()}\n"
                     f"---\n\n"
                 )
