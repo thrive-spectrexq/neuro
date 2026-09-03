@@ -4,7 +4,7 @@ version = "0.1.1"
 description = "Backend for Neuro project"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.110.1",
+    "fastapi==0.141.1",
     "uvicorn[standard]==0.29.0",
     "sqlmodel==0.0.16",
     "alembic==1.13.1",
