@@ -69,7 +69,7 @@ jobs:
         cache: 'pnpm'
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: pnpm install --no-frozen-lockfile
 
     - name: Run Linting
       run: pnpm turbo run lint
@@ -106,7 +106,7 @@ jobs:
         cache: 'pnpm'
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: pnpm install --no-frozen-lockfile
 
     - name: Build Web & Shared Packages First
       run: pnpm turbo run build --filter="@neuro/web" --filter="@neuro/shared" --filter="@neuro/ui" --filter="@neuro/sdk"

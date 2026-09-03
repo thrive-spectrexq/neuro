@@ -1,4 +1,3 @@
-import uuid
 from datetime import UTC, datetime
 from typing import Any
 
@@ -8,12 +7,11 @@ from sqlmodel import delete, func, select
 
 from app.core.database import get_session
 from app.core.security import get_current_user
-from app.models.audit import AuditLog
 from app.models.comment import Comment
 from app.models.memory import Memory
 from app.models.note import Note, NoteLink
-from app.models.project import Project, ProjectMember
-from app.models.tag import NoteTag, Tag
+from app.models.project import ProjectMember
+from app.models.tag import NoteTag
 from app.models.task import Task
 from app.models.user import User
 
@@ -151,13 +149,9 @@ async def delete_user_account_and_data(
 
     if user_note_ids:
         await session.execute(
-            delete(NoteLink).where(
-                (NoteLink.source_id.in_(user_note_ids)) | (NoteLink.target_id.in_(user_note_ids))
-            )
+            delete(NoteLink).where((NoteLink.source_id.in_(user_note_ids)) | (NoteLink.target_id.in_(user_note_ids)))
         )
-        await session.execute(
-            delete(NoteTag).where(NoteTag.note_id.in_(user_note_ids))
-        )
+        await session.execute(delete(NoteTag).where(NoteTag.note_id.in_(user_note_ids)))
         await session.execute(delete(Note).where(Note.user_id == user_id))
 
     # 5. Delete project memberships

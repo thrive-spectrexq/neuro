@@ -4,7 +4,7 @@ Unit tests for the hallucination verification service.
 
 import pytest
 
-from app.services.ai.verifier import ClaimStatus, ResponseVerifier
+from app.services.ai.verifier import ResponseVerifier
 from app.services.chunking import Chunk, ChunkMetadata
 
 

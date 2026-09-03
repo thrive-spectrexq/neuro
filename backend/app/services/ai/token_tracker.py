@@ -9,9 +9,6 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import SQLModel, select
-
 logger = logging.getLogger("neuro.ai.token_tracker")
 
 # Approximate cost per 1M tokens (USD) — updated periodically
@@ -123,11 +120,7 @@ class TokenTracker:
         )
 
         self._records.append(record)
-        logger.debug(
-            f"Token usage: {provider}/{model} "
-            f"in={input_tokens} out={output_tokens} "
-            f"cost=${cost_usd:.6f}"
-        )
+        logger.debug(f"Token usage: {provider}/{model} in={input_tokens} out={output_tokens} cost=${cost_usd:.6f}")
 
         # Emit Prometheus metrics if available
         try:
@@ -220,6 +213,8 @@ class TokenTracker:
         remaining = monthly_budget_usd - summary.total_cost_usd
 
         if remaining <= 0:
-            logger.warning(f"User {user_id} has exceeded monthly budget: ${summary.total_cost_usd:.2f} / ${monthly_budget_usd:.2f}")
+            logger.warning(
+                f"User {user_id} has exceeded monthly budget: ${summary.total_cost_usd:.2f} / ${monthly_budget_usd:.2f}"
+            )
 
         return remaining > 0, round(remaining, 2)

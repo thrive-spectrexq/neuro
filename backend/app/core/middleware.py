@@ -1,11 +1,12 @@
+import contextvars
 import time
 import uuid
-import contextvars
 from collections.abc import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
+
 from app.core.config import get_settings
 
 correlation_id_var: contextvars.ContextVar[str] = contextvars.ContextVar("correlation_id", default="")

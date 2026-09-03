@@ -6,13 +6,11 @@ from app.core.config import get_settings
 logger = logging.getLogger("neuro.sentry")
 settings = get_settings()
 
+
 def _scrub_pii(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any]:
     def scrub(data: Any) -> Any:
         if isinstance(data, dict):
-            return {
-                k: ("***" if k.lower() in {"password", "token", "api_key"} else scrub(v))
-                for k, v in data.items()
-            }
+            return {k: ("***" if k.lower() in {"password", "token", "api_key"} else scrub(v)) for k, v in data.items()}
         elif isinstance(data, list):
             return [scrub(i) for i in data]
         return data
@@ -22,7 +20,8 @@ def _scrub_pii(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any]:
 
     return event
 
-def init_sentry(dsn: str | None, environment: str = 'development') -> None:
+
+def init_sentry(dsn: str | None, environment: str = "development") -> None:
     if not dsn:
         logger.info("Sentry DSN not provided. Sentry SDK will not be initialized.")
         return
@@ -32,7 +31,7 @@ def init_sentry(dsn: str | None, environment: str = 'development') -> None:
         from sentry_sdk.integrations.fastapi import FastApiIntegration
         from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
-        traces_sample_rate = 0.1 if environment == 'production' else 1.0
+        traces_sample_rate = 0.1 if environment == "production" else 1.0
 
         sentry_sdk.init(
             dsn=dsn,

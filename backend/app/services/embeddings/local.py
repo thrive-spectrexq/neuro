@@ -36,10 +36,7 @@ class LocalEmbeddingProvider(EmbeddingProvider):
             logger.info(f"Loading embedding model: {self._model_name}")
             self._model = SentenceTransformer(self._model_name)
             self._dimension = self._model.get_sentence_embedding_dimension()
-            logger.info(
-                f"Loaded {self._model_name} "
-                f"(dimension={self._dimension})"
-            )
+            logger.info(f"Loaded {self._model_name} (dimension={self._dimension})")
         return self._model
 
     async def embed(self, texts: list[str]) -> EmbeddingResult:

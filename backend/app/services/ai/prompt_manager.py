@@ -149,10 +149,7 @@ class PromptManager:
                     "For each claim, cite the specific context passage that supports or "
                     "contradicts it. Output as a structured list."
                 ),
-                user_prompt_template=(
-                    "Response to verify:\n$response\n\n"
-                    "Context documents:\n$context"
-                ),
+                user_prompt_template=("Response to verify:\n$response\n\nContext documents:\n$context"),
                 max_context_tokens=8192,
                 temperature=0.1,
             ),

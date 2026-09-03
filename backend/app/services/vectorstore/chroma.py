@@ -52,15 +52,10 @@ class ChromaVectorStore(VectorStore):
             logger.info(f"Connected to ChromaDB at {host}:{port}")
         except Exception as e:
             if in_memory_fallback:
-                logger.warning(
-                    f"Failed to connect to ChromaDB at {host}:{port}, "
-                    f"falling back to in-memory client: {e}"
-                )
+                logger.warning(f"Failed to connect to ChromaDB at {host}:{port}, falling back to in-memory client: {e}")
                 self._client = chromadb.Client()
             else:
-                raise ConnectionError(
-                    f"Cannot connect to ChromaDB at {host}:{port}"
-                ) from e
+                raise ConnectionError(f"Cannot connect to ChromaDB at {host}:{port}") from e
 
     async def create_collection(
         self,

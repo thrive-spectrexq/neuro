@@ -66,12 +66,12 @@ class Chunker:
 
     # Recursive splitting separators, from largest to smallest
     _RECURSIVE_SEPARATORS = [
-        "\n\n\n",   # Triple newline (major sections)
-        "\n\n",      # Double newline (paragraphs)
-        "\n",        # Single newline (lines)
-        ". ",        # Sentences
-        ", ",        # Clauses
-        " ",         # Words
+        "\n\n\n",  # Triple newline (major sections)
+        "\n\n",  # Double newline (paragraphs)
+        "\n",  # Single newline (lines)
+        ". ",  # Sentences
+        ", ",  # Clauses
+        " ",  # Words
     ]
 
     def chunk(
@@ -189,7 +189,9 @@ class Chunker:
                             # Fall back to fixed-size for oversized paragraphs
                             sub_chunks = self._chunk_fixed_size(para, chunk_size, overlap)
                             for sc in sub_chunks:
-                                chunks.append((sc[0], current_line_start, current_line_start + sc[0].count("\n"), section_title))
+                                chunks.append(
+                                    (sc[0], current_line_start, current_line_start + sc[0].count("\n"), section_title)
+                                )
                         else:
                             line_end = current_line_start + para.count("\n")
                             chunks.append((para, current_line_start, line_end, section_title))

@@ -22,12 +22,23 @@ except ImportError:
     PROMETHEUS_AVAILABLE = False
 
     class MockMetric:
-        def __init__(self, *args, **kwargs): pass
-        def labels(self, *args, **kwargs): return self
-        def inc(self, *args, **kwargs): pass
-        def dec(self, *args, **kwargs): pass
-        def set(self, *args, **kwargs): pass
-        def observe(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def labels(self, *args, **kwargs):
+            return self
+
+        def inc(self, *args, **kwargs):
+            pass
+
+        def dec(self, *args, **kwargs):
+            pass
+
+        def set(self, *args, **kwargs):
+            pass
+
+        def observe(self, *args, **kwargs):
+            pass
 
     REQUEST_COUNT = MockMetric()
     REQUEST_LATENCY = MockMetric()
@@ -38,6 +49,7 @@ except ImportError:
     SEARCH_LATENCY = MockMetric()
     ACTIVE_CONNECTIONS = MockMetric()
     DB_QUERY_LATENCY = MockMetric()
+
 
 class MetricsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:

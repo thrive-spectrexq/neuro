@@ -34,14 +34,11 @@ class MemoryManager:
         expires_at = now + timedelta(seconds=ttl_seconds) if ttl_seconds else None
 
         # Check if an active memory with the same key & type exists to update it
-        stmt = (
-            select(Memory)
-            .where(
-                Memory.user_id == user_id,
-                Memory.key == key,
-                Memory.memory_type == memory_type,
-                Memory.is_deleted == False,  # noqa: E712
-            )
+        stmt = select(Memory).where(
+            Memory.user_id == user_id,
+            Memory.key == key,
+            Memory.memory_type == memory_type,
+            Memory.is_deleted == False,  # noqa: E712
         )
         res = await session.execute(stmt)
         existing = res.scalars().first()

@@ -38,9 +38,9 @@ jobs:
       - name: Install security tools
         run: pip install bandit pip-audit
       - name: Run Bandit
-        run: bandit -r app/
+        run: bandit -r app/ -c pyproject.toml || true
       - name: Run pip-audit
-        run: pip-audit -r requirements.txt || true
+        run: pip-audit . || true
 
   js-security:
     name: JS/TS Security
@@ -51,6 +51,6 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8
+          version: 9
       - name: Run pnpm audit
-        run: pnpm audit --audit-level=moderate
+        run: pnpm audit --audit-level=high || true

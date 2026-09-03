@@ -74,7 +74,24 @@ class ResponseVerifier:
     # Minimum word overlap ratio to consider a claim supported
     SUPPORT_THRESHOLD = 0.4
     # Negation words that may indicate contradiction
-    NEGATION_WORDS = frozenset({"not", "no", "never", "neither", "nor", "doesn't", "don't", "isn't", "wasn't", "aren't", "weren't", "cannot", "can't", "won't"})
+    NEGATION_WORDS = frozenset(
+        {
+            "not",
+            "no",
+            "never",
+            "neither",
+            "nor",
+            "doesn't",
+            "don't",
+            "isn't",
+            "wasn't",
+            "aren't",
+            "weren't",
+            "cannot",
+            "can't",
+            "won't",
+        }
+    )
 
     async def verify(
         self,
@@ -143,14 +160,14 @@ class ResponseVerifier:
         hedging language, and meta-commentary.
         """
         # Split into sentences
-        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        sentences = re.split(r"(?<=[.!?])\s+", text.strip())
 
         claims: list[str] = []
         skip_patterns = [
-            r'^(I think|I believe|Perhaps|Maybe|It seems|In my opinion)',
-            r'^(However|But|Although|While)',
-            r'\?$',  # Questions
-            r'^(Here|Let me|Sure|Of course|Certainly)',
+            r"^(I think|I believe|Perhaps|Maybe|It seems|In my opinion)",
+            r"^(However|But|Although|While)",
+            r"\?$",  # Questions
+            r"^(Here|Let me|Sure|Of course|Certainly)",
         ]
 
         for sentence in sentences:
@@ -229,23 +246,74 @@ class ResponseVerifier:
 
     def _normalize_words(self, text: str) -> list[str]:
         """Normalize text to lowercase words, removing punctuation."""
-        words = re.findall(r'\b[a-z]+\b', text.lower())
+        words = re.findall(r"\b[a-z]+\b", text.lower())
         # Remove common stop words for better signal
-        stop_words = frozenset({
-            "the", "a", "an", "is", "are", "was", "were", "be", "been",
-            "being", "have", "has", "had", "do", "does", "did", "will",
-            "would", "could", "should", "may", "might", "shall", "can",
-            "to", "of", "in", "for", "on", "with", "at", "by", "from",
-            "as", "into", "through", "during", "before", "after", "and",
-            "or", "if", "then", "than", "that", "this", "these", "those",
-            "it", "its", "they", "them", "their", "we", "our", "you",
-        })
+        stop_words = frozenset(
+            {
+                "the",
+                "a",
+                "an",
+                "is",
+                "are",
+                "was",
+                "were",
+                "be",
+                "been",
+                "being",
+                "have",
+                "has",
+                "had",
+                "do",
+                "does",
+                "did",
+                "will",
+                "would",
+                "could",
+                "should",
+                "may",
+                "might",
+                "shall",
+                "can",
+                "to",
+                "of",
+                "in",
+                "for",
+                "on",
+                "with",
+                "at",
+                "by",
+                "from",
+                "as",
+                "into",
+                "through",
+                "during",
+                "before",
+                "after",
+                "and",
+                "or",
+                "if",
+                "then",
+                "than",
+                "that",
+                "this",
+                "these",
+                "those",
+                "it",
+                "its",
+                "they",
+                "them",
+                "their",
+                "we",
+                "our",
+                "you",
+            }
+        )
         return [w for w in words if w not in stop_words]
 
     def _find_best_snippet(self, claim: str, context: str, window: int = 200) -> str | None:
         """Find the most relevant snippet from context for a given claim."""
         claim_words = set(self._normalize_words(claim))
-        sentences = re.split(r'(?<=[.!?])\s+', context)
+        sentences = re.split(r"(?<=[.!?])\s+", context)
 
         best_score = 0
         best_snippet = None

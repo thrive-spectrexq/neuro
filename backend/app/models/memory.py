@@ -3,14 +3,14 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from sqlalchemy import Column, JSON
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
 
 class MemoryType(str, Enum):
     SHORT_TERM = "short_term"  # Ephemeral conversation context/window
-    SESSION = "session"        # Active task/session facts
-    LONG_TERM = "long_term"    # Persistent user knowledge, preferences & facts
+    SESSION = "session"  # Active task/session facts
+    LONG_TERM = "long_term"  # Persistent user knowledge, preferences & facts
 
 
 class Memory(SQLModel, table=True):

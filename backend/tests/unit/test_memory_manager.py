@@ -2,7 +2,6 @@
 Unit tests for the layered memory management service.
 """
 
-import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -54,9 +53,7 @@ async def test_memory_upsert_by_key(test_session: AsyncSession, test_user: User)
     assert updated.content == "High contrast dark mode"
 
     # Verify single active record exists for this key
-    memories = await memory_manager.list_memories(
-        test_session, test_user.id, memory_type=MemoryType.SESSION
-    )
+    memories = await memory_manager.list_memories(test_session, test_user.id, memory_type=MemoryType.SESSION)
     matching = [m for m in memories if m.key == "theme_preference"]
     assert len(matching) == 1
 
