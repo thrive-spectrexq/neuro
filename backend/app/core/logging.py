@@ -7,18 +7,24 @@ from contextlib import contextmanager
 from typing import Any
 
 from app.core.config import get_settings
+from app.core.middleware import correlation_id_var
 
 settings = get_settings()
 
 
 class JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
+        req_id = correlation_id_var.get()
         log_record: dict[str, Any] = {
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
             "timestamp": self.formatTime(record, self.datefmt),
+            "service": "neuro-backend",
         }
+        if req_id:
+            log_record["correlation_id"] = req_id
+            log_record["request_id"] = req_id
 
         # Include extra attributes that were passed using `extra={...}`
         for key, value in record.__dict__.items():

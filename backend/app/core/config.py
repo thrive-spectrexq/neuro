@@ -21,14 +21,23 @@ class Settings(BaseSettings):
     ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"
     OLLAMA_MODEL: str = "llama3"
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    GEMINI_API_KEY: str | None = None
+    ENFORCE_HTTPS: bool = False
+    SENTRY_DSN: str | None = None
 
     # JWT Settings
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+
+    # Rate Limiting Settings
+    RATE_LIMIT_DEFAULT: int = 60
+    RATE_LIMIT_AI: int = 30
+    RATE_LIMIT_AUTH: int = 10
 
     # App Settings
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"  # 'json' or 'text'
-    CORS_ORIGINS: str = "*"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:8000,http://127.0.0.1:3000,http://127.0.0.1:5173,app://."
     MAX_PAGE_SIZE: int = 100
     DEFAULT_PAGE_SIZE: int = 20
 

@@ -40,6 +40,11 @@ dev = [
     "ruff>=0.3.4",
     "mypy>=1.9.0",
     "pip-audit>=2.7.0",
+    "bandit>=1.7.8",
+]
+observability = [
+    "sentry-sdk[fastapi]>=2.0.0",
+    "prometheus-client>=0.20.0",
 ]
 
 [tool.ruff]
@@ -47,36 +52,24 @@ line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP"]
+select = ["E", "F", "I", "UP", "S", "B", "SIM"]
 ignore = ["E501", "F403", "UP042", "E402"]
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = false
-warn_unused_configs = false
+warn_return_any = true
+warn_unused_configs = true
 ignore_missing_imports = true
-follow_imports = "silent"
-check_untyped_defs = false
+follow_imports = "normal"
+check_untyped_defs = true
 disallow_untyped_defs = false
 disable_error_code = [
-    "attr-defined",
-    "arg-type",
-    "assignment",
-    "no-redef",
-    "no-any-return",
-    "union-attr",
-    "misc",
-    "override",
-    "type-var",
-    "valid-type",
-    "call-arg",
-    "index",
-    "operator",
-    "var-annotated",
     "import-untyped",
-    "has-type",
-    "return-value",
+    "no-any-return",
 ]
+
+[tool.bandit]
+skips = ["B101"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

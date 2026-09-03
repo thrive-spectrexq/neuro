@@ -42,3 +42,4 @@ export function definePlugin(config: PluginConfig): PluginConfig {
 }
 
 export * from './loader';
+export * from './types';

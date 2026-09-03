@@ -1,9 +1,17 @@
 #!/bin/bash
 echo "Setting up Neuro project..."
 pnpm install
-cd apps/api
-python3 -m venv .venv
+
+if [ ! -f .env ]; then
+    cp .env.example .env
+    echo "Created .env from .env.example"
+fi
+
+cd backend
+if [ ! -d .venv ]; then
+    python3 -m venv .venv
+fi
 source .venv/bin/activate
-pip install -r requirements.txt
-cd ../..
-echo "Setup complete."
+pip install -e ".[dev]"
+cd ..
+echo "Setup complete. Run 'pnpm start' or './scripts/dev.sh' to launch."

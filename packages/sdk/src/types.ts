@@ -1,12 +1,37 @@
 import type { PluginContext } from './plugin';
 
+export type PluginPermission =
+  | 'notes:read'
+  | 'notes:write'
+  | 'search:query'
+  | 'ai:invoke'
+  | 'memory:read'
+  | 'memory:write'
+  | 'filesystem:read'
+  | 'filesystem:write'
+  | 'network:outbound'
+  | 'clipboard:read'
+  | 'clipboard:write';
+
+export type PluginCapability =
+  | 'note-action'
+  | 'command-palette'
+  | 'sidebar-view'
+  | 'status-bar-item'
+  | 'ai-tool'
+  | 'background-sync';
+
 export interface PluginManifest {
   id: string;
   name: string;
   version: string;
   description?: string;
   author?: string;
-  permissions?: string[];
+  permissions?: PluginPermission[];
+  capabilities?: PluginCapability[];
+  homepage?: string;
+  repository?: string;
+  icon?: string;
 }
 
 export interface PluginHooks {

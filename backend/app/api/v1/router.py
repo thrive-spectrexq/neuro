@@ -10,8 +10,10 @@ from app.api.routes import (
     graph,
     graph_intelligence,
     ingest,
+    memory,
     notes,
     obsidian,
+    privacy,
     projects,
     roadmap,
     search,
@@ -25,6 +27,8 @@ api_router = APIRouter()
 api_router.include_router(agent.router, prefix="/agent", tags=["agent"])
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(notes.router, prefix="/notes", tags=["notes"])
+api_router.include_router(memory.router, prefix="/memory", tags=["memory"])
+api_router.include_router(privacy.router, prefix="/privacy", tags=["privacy"])
 api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
 api_router.include_router(comments.router, prefix="/comments", tags=["comments"])
 api_router.include_router(voice.router, prefix="/voice", tags=["voice"])

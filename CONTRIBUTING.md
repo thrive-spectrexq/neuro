@@ -30,9 +30,9 @@ Please read this guide before opening issues or pull requests. It exists to make
 
 ## Code of Conduct
 
-This project follows a simple standard: be respectful, constructive, and assume good faith. Harassment, discrimination, and bad-faith behavior of any kind will not be tolerated and may result in permanent removal from the project.
+Neuro is committed to fostering an open, welcoming, and harassment-free community. All participants are expected to adhere to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
-If you experience or witness unacceptable behavior, report it by opening a private issue or contacting the maintainers directly.
+If you experience or witness unacceptable behavior, report it by opening a private issue or contacting the maintainers directly at `conduct@neuro.local`.
 
 ---
 
@@ -515,6 +515,11 @@ If you discover a security issue, please report it privately by emailing the mai
 - Any suggested mitigations if you have them
 
 We will acknowledge receipt within 48 hours and aim to resolve critical issues within 14 days. You will be credited in the release notes unless you prefer to remain anonymous.
+ 
+For deployment hardening guidelines and operational security best practices, consult:
+- [Deployment Security Hardening Checklist](docs/security/HARDENING.md)
+- [Secret Management and Key Rotation Procedures](docs/security/SECRET_MANAGEMENT.md)
+- [Privacy Policy](docs/legal/PRIVACY_POLICY.md)
 
 ---
 
