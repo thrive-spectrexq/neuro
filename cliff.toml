@@ -31,14 +31,14 @@ commit_preprocessors = [
   { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/issues/${2}))" },
 ]
 commit_parsers = [
-  { message = "^feat", group = "<!-- 0 -->🚀 Features" },
-  { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
-  { message = "^docs", group = "<!-- 3 -->📚 Documentation" },
-  { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
-  { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^style", group = "<!-- 5 -->🎨 Styling" },
-  { message = "^test", group = "<!-- 6 -->🧪 Testing" },
-  { message = "^chore", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
+  { message = "^feat", group = "<!-- 0 -->Features" },
+  { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
+  { message = "^docs", group = "<!-- 3 -->Documentation" },
+  { message = "^perf", group = "<!-- 4 -->Performance" },
+  { message = "^refactor", group = "<!-- 2 -->Refactor" },
+  { message = "^style", group = "<!-- 5 -->Styling" },
+  { message = "^test", group = "<!-- 6 -->Testing" },
+  { message = "^chore", group = "<!-- 7 -->Miscellaneous Tasks" },
 ]
 protect_breaking_commits = false
 filter_commits = false

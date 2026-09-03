@@ -49,6 +49,8 @@ jobs:
 
     - name: Run Tests with Coverage
       working-directory: ./backend
+      env:
+        NPY_DISABLE_CPU_FEATURES: "AVX512F AVX512CD AVX512_SKX AVX512_CLX AVX512_CNL AVX512_ICL"
       run: pytest --cov=app --cov-report=term-missing
 
   frontend-test:
