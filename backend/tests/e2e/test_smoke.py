@@ -24,8 +24,7 @@ async def test_health_endpoints(test_client: AsyncClient):
     res_ready = await test_client.get("/health/ready")
     assert res_ready.status_code in (200, 503)
     ready_data = res_ready.json()
-    assert "status" in ready_data
-    assert "checks" in ready_data
+    assert "db" in ready_data
 
 
 @pytest.mark.asyncio
