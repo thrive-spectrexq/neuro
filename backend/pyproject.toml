@@ -13,7 +13,7 @@ dependencies = [
     "celery==5.3.6",
     "redis==5.0.3",
     "chromadb==0.4.24",
-    "numpy<2.0.0",
+    "numpy==1.26.4",
     "python-jose[cryptography]==3.3.0",
     "bcrypt==4.1.2",
     "python-multipart==0.0.9",
