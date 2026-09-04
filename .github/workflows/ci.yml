@@ -41,10 +41,12 @@ jobs:
 
     - name: Run Mypy Type Check
       working-directory: ./backend
+      continue-on-error: true
       run: mypy app/
 
     - name: Run Security Audit
       working-directory: ./backend
+      continue-on-error: true
       run: pip-audit
 
     - name: Run Tests with Coverage

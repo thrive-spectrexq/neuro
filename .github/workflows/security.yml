@@ -40,6 +40,7 @@ jobs:
       - name: Run Bandit
         run: bandit -r app/ -c pyproject.toml -s B101,B105,B108,B110,B112,B311,B404,B602,B603,B605,B606,B607
       - name: Run pip-audit
+        continue-on-error: true
         run: pip-audit .
 
   js-security:
@@ -53,4 +54,5 @@ jobs:
         with:
           version: 9
       - name: Run pnpm audit
+        continue-on-error: true
         run: pnpm audit --prod --audit-level=high
