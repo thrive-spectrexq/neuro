@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from app.models.note import Note, NoteLink
 from app.models.tag import NoteTag, Tag
 from app.services.agent.tools import ToolRegistry
@@ -13,6 +14,7 @@ from app.services.roadmap_service import RoadmapService
 logger = logging.getLogger(__name__)
 
 from app.core.config import get_settings
+
 settings = get_settings()
 
 from sqlmodel import select

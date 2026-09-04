@@ -37,7 +37,8 @@ const Popup = () => {
   const handleSave = async () => {
     setStatus('loading');
     try {
-      const response = await fetch(API_URL, {
+      const baseUrl = await getApiUrl();
+      const response = await fetch(`${baseUrl}/api/v1/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

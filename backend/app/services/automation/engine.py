@@ -54,9 +54,9 @@ class AutomationEngine:
         url = action.get("url")
         if url:
             try:
-                from urllib.parse import urlparse
                 import ipaddress
                 import socket
+                from urllib.parse import urlparse
                 
                 parsed = urlparse(url)
                 if parsed.scheme not in ("http", "https"):

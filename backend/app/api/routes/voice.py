@@ -1,6 +1,4 @@
 import json
-import urllib.error
-import urllib.request
 
 from fastapi import APIRouter, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel

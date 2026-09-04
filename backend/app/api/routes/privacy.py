@@ -133,10 +133,10 @@ async def delete_user_account_and_data(
         )
 
     user_id = current_user.id
-    from app.models.sync import SyncBlob, DeviceKey
     from app.models.audit import AuditLog
     from app.models.automation import AutomationRule
     from app.models.project import Project
+    from app.models.sync import DeviceKey, SyncBlob
 
     await session.execute(delete(SyncBlob).where(SyncBlob.user_id == user_id))
     await session.execute(delete(DeviceKey).where(DeviceKey.user_id == user_id))

@@ -11,12 +11,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create non-root user
 RUN useradd -m -U -s /bin/bash neuro
 
-# Copy pyproject.toml and install package dependencies for better layer caching
+# Copy pyproject.toml and app package for installation
 COPY pyproject.toml ./
+COPY app ./app
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir .
 
-# Copy backend application source code
+# Copy remaining files
 COPY . .
 
 # Change ownership of application files
