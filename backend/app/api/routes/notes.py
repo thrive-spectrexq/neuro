@@ -167,6 +167,7 @@ async def create_note(
         return NoteResponse(**response_data)
     except Exception:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.exception("Error creating note")
         from fastapi.responses import JSONResponse
@@ -184,7 +185,7 @@ async def list_notes(
 ):
     stmt = select(Note)
     count_stmt = select(func.count()).select_from(Note)
-    
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
 
     if project_id:
@@ -323,14 +324,14 @@ async def delete_note(
 
 @router.post("/{id}/extract-entities", status_code=202)
 async def extract_entities(
-    id: uuid.UUID, 
+    id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     current_user: dict = Depends(get_current_user),
 ):
     note = await session.get(Note, id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     await _check_note_permission(session, note, user_uuid)
 

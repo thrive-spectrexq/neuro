@@ -65,13 +65,13 @@ async def get_project(
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if project.user_id != user_uuid:
         member = await session.get(ProjectMember, (id, user_uuid))
         if not member:
             raise HTTPException(status_code=403, detail="Not authorized")
-            
+
     return project
 
 
@@ -85,7 +85,7 @@ async def update_project(
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if project.user_id != user_uuid:
         member = await session.get(ProjectMember, (id, user_uuid))

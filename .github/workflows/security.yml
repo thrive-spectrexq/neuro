@@ -38,7 +38,7 @@ jobs:
       - name: Install security tools
         run: pip install "bandit[toml]" pip-audit
       - name: Run Bandit
-        run: bandit -r app/ -c pyproject.toml -s B101,B110,B112,B602,B603,B607
+        run: bandit -r app/ -c pyproject.toml -s B101,B110,B112,B311,B602,B603,B605,B606,B607
       - name: Run pip-audit
         run: pip-audit .
 

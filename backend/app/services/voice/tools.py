@@ -16,7 +16,7 @@ async def create_note(args: dict[str, Any], user_id: uuid.UUID = None) -> str:
     title = args.get("title", "Untitled Note")
     content = args.get("content", "")
     project_id = args.get("project_id", None)
-    
+
     if user_id is None:
         user_id = args.get("user_id") or uuid.UUID(int=0)
 

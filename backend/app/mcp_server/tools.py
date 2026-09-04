@@ -340,6 +340,7 @@ async def handle_create_note(arguments: dict[str, Any]) -> str:
 
     async with AsyncSessionLocal() as session:
         import uuid
+
         new_note = Note(title=title, content=content, user_id=uuid.UUID(int=0))
         session.add(new_note)
         await session.commit()

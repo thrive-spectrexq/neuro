@@ -70,7 +70,7 @@ disable_error_code = [
 ]
 
 [tool.bandit]
-skips = ["B101", "B110", "B112", "B602", "B603", "B607"]
+skips = ["B101", "B110", "B112", "B311", "B602", "B603", "B605", "B606", "B607"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

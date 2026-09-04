@@ -25,6 +25,7 @@ def transcribe_audio_payload(audio_bytes: bytes, content_type: str = "audio/webm
     # 1. Native HTTP speech gateway
     try:
         import httpx
+
         url = "https://www.google.com/speech-api/v2/recognize?client=chromium&lang=en-US"
         with httpx.Client(timeout=7.0) as client:
             resp = client.post(url, content=audio_bytes, headers={"Content-Type": content_type or "audio/webm"})

@@ -57,18 +57,18 @@ class AutomationEngine:
                 import ipaddress
                 import socket
                 from urllib.parse import urlparse
-                
+
                 parsed = urlparse(url)
                 if parsed.scheme not in ("http", "https"):
                     raise ValueError("Invalid URL scheme")
-                    
+
                 hostname = parsed.hostname
                 if not hostname:
                     raise ValueError("Invalid URL hostname")
-                    
+
                 ip_addr = socket.gethostbyname(hostname)
                 ip = ipaddress.ip_address(ip_addr)
-                
+
                 if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_unspecified:
                     raise ValueError("URL resolves to internal/private IP")
 
