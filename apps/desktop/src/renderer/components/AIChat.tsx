@@ -106,7 +106,7 @@ export default function AIChat() {
       }
 
       // 2. Query Agent / AI Backend
-      const res = await fetch('http://localhost:8000/api/v1/agent/execute', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -172,14 +172,14 @@ export default function AIChat() {
       {/* Header */}
       <div className="px-4 py-3.5 border-b border-white/[0.06] bg-[#0a0c16] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+          <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
             <Brain size={13} />
           </div>
           <div>
             <h3 className="text-xs font-bold text-white font-sans tracking-tight">
               Neuro AI Copilot
             </h3>
-            <span className="text-[10px] text-cyan-400 font-mono">
+            <span className="text-[10px] text-emerald-400 font-mono">
               {activeNote ? `Active: ${activeNote.title.slice(0, 18)}...` : 'Vault Intelligence'}
             </span>
           </div>
@@ -190,7 +190,7 @@ export default function AIChat() {
           onClick={() => setSearchVaultMode(!searchVaultMode)}
           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-mono border transition-all ${
             searchVaultMode
-              ? 'bg-cyan-950/60 border-cyan-500/50 text-cyan-300 shadow-[0_0_10px_rgba(0,245,255,0.2)]'
+              ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
               : 'bg-white/[0.04] border-white/[0.08] text-zinc-400 hover:text-zinc-200'
           }`}
           title="Search entire second brain vault"
@@ -210,7 +210,7 @@ export default function AIChat() {
             <div
               className={`max-w-[90%] rounded-xl p-3 leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-cyan-600 text-white rounded-br-none shadow-md font-sans'
+                  ? 'bg-emerald-600 text-white rounded-br-none shadow-md font-sans'
                   : 'bg-[#101322] border border-white/[0.08] text-zinc-200 rounded-bl-none shadow-sm'
               }`}
             >
@@ -219,7 +219,7 @@ export default function AIChat() {
               {/* Source Note Citations Badges */}
               {msg.citations && msg.citations.length > 0 && (
                 <div className="mt-2.5 pt-2 border-t border-white/[0.08] space-y-1.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-bold flex items-center gap-1">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1">
                     <FileText size={10} /> Cited Vault Notes:
                   </div>
                   <div className="space-y-1">
@@ -227,11 +227,11 @@ export default function AIChat() {
                       <div
                         key={cite.id}
                         onClick={() => setActiveNoteId(cite.id)}
-                        className="p-1.5 rounded-lg bg-black/40 hover:bg-cyan-950/40 border border-white/[0.06] hover:border-cyan-500/30 cursor-pointer transition-all flex items-start gap-1.5 group"
+                        className="p-1.5 rounded-lg bg-black/40 hover:bg-emerald-950/40 border border-white/[0.06] hover:border-emerald-500/30 cursor-pointer transition-all flex items-start gap-1.5 group"
                       >
-                        <ArrowRight size={10} className="text-cyan-400 mt-0.5 group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight size={10} className="text-emerald-400 mt-0.5 group-hover:translate-x-0.5 transition-transform" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-bold text-zinc-200 group-hover:text-cyan-300 truncate">
+                          <p className="text-[10px] font-bold text-zinc-200 group-hover:text-emerald-300 truncate">
                             {cite.title}
                           </p>
                           <p className="text-[9px] text-zinc-400 line-clamp-1">
@@ -259,7 +259,7 @@ export default function AIChat() {
                 {activeNote && (
                   <button
                     onClick={() => handleInsertIntoNote(msg.id, msg.content)}
-                    className="hover:text-cyan-300 transition-colors flex items-center gap-1 text-zinc-400"
+                    className="hover:text-emerald-300 transition-colors flex items-center gap-1 text-zinc-400"
                   >
                     {insertedId === msg.id ? <Check size={10} className="text-emerald-400" /> : <PlusCircle size={10} />}
                     <span>{insertedId === msg.id ? 'Inserted' : 'Insert to Note'}</span>
@@ -272,7 +272,7 @@ export default function AIChat() {
 
         {isLoading && (
           <div className="flex items-center gap-2 text-zinc-500 font-mono text-[11px] p-2 bg-[#101322] border border-white/[0.06] rounded-xl w-fit">
-            <Loader2 size={12} className="animate-spin text-cyan-400" />
+            <Loader2 size={12} className="animate-spin text-emerald-400" />
             <span>Consulting Second Brain...</span>
           </div>
         )}
@@ -286,7 +286,7 @@ export default function AIChat() {
           <button
             key={i}
             onClick={() => handleSendMessage(qp.prompt)}
-            className="flex-shrink-0 px-2 py-1 rounded-md bg-white/[0.03] hover:bg-cyan-500/10 border border-white/[0.06] hover:border-cyan-500/30 text-[10px] text-zinc-400 hover:text-cyan-300 transition-all font-sans"
+            className="flex-shrink-0 px-2 py-1 rounded-md bg-white/[0.03] hover:bg-emerald-500/10 border border-white/[0.06] hover:border-emerald-500/30 text-[10px] text-zinc-400 hover:text-emerald-300 transition-all font-sans"
           >
             {qp.label}
           </button>
@@ -300,7 +300,7 @@ export default function AIChat() {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="flex items-center gap-2 bg-[#121626] border border-white/[0.08] focus-within:border-cyan-500/50 rounded-xl px-3 py-2 transition-all shadow-inner"
+          className="flex items-center gap-2 bg-[#121626] border border-white/[0.08] focus-within:border-emerald-500/50 rounded-xl px-3 py-2 transition-all shadow-inner"
         >
           <input
             type="text"
@@ -312,7 +312,7 @@ export default function AIChat() {
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="p-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-30 disabled:hover:bg-cyan-600 transition-all shadow-sm"
+            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-30 disabled:hover:bg-emerald-600 transition-all shadow-sm"
           >
             <Send size={12} />
           </button>

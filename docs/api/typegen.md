@@ -22,17 +22,10 @@ When the FastAPI backend is running locally, download the OpenAPI specification:
 ```bash
 curl http://localhost:8000/openapi.json -o docs/api/openapi.json
 ```
-Or use the automated export script:
-```bash
-python -m backend.scripts.export_openapi --output docs/api/openapi.json
-```
+(Alternatively, you can view the interactive OpenAPI documentation at `http://localhost:8000/docs`).
 
 ### Step 2: Generate TypeScript Types
-Run the workspace typegen script:
-```bash
-pnpm run typegen
-```
-Or execute `openapi-typescript` directly:
+Execute `openapi-typescript` directly to generate the types from the schema:
 ```bash
 npx openapi-typescript docs/api/openapi.json -o packages/shared/src/types/generated.d.ts
 ```

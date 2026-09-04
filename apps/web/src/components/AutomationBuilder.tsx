@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Zap, Plus, Trash2 } from 'lucide-react';
 
 interface AutomationRule {
@@ -28,18 +28,26 @@ export function AutomationBuilder() {
       is_active: true,
     },
   ]);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setRules(data);
+      })
+      .catch(console.error);
+  }, []);
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [triggerType, setTriggerType] = useState<'on_note_create' | 'on_tag_add' | 'on_task_done'>('on_note_create');
   const [triggerValue, setTriggerValue] = useState('');
   const [actionType, setActionType] = useState<'auto_summarize' | 'extract_tasks' | 'notify'>('auto_summarize');
 
-  const handleCreateRule = (e: React.FormEvent) => {
+  const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const newRule: AutomationRule = {
-      id: Date.now().toString(),
+    const newRule = {
       name,
       trigger_type: triggerType,
       trigger_value: triggerValue || undefined,
@@ -47,20 +55,48 @@ export function AutomationBuilder() {
       is_active: true,
     };
 
-    setRules((prev) => [...prev, newRule]);
-    setName('');
-    setTriggerValue('');
-    setShowModal(false);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRule),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setRules((prev) => [...prev, created]);
+        setName('');
+        setTriggerValue('');
+        setShowModal(false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const toggleRule = (id: string) => {
-    setRules((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, is_active: !r.is_active } : r))
-    );
+  const toggleRule = async (id: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}/toggle`, {
+        method: 'PATCH',
+      });
+      if (res.ok) {
+        setRules((prev) => prev.map((r) => (r.id === id ? { ...r, is_active: !r.is_active } : r)));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deleteRule = (id: string) => {
-    setRules((prev) => prev.filter((r) => r.id !== id));
+  const deleteRule = async (id: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setRules((prev) => prev.filter((r) => r.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -116,7 +152,7 @@ export function AutomationBuilder() {
                     <span className="bg-[#141722] px-1 py-0.2 rounded text-slate-300 border border-[#242A3C]">#{rule.trigger_value}</span>
                   )}
                   <span>&bull;</span>
-                  <span>Action: <strong className="text-indigo-300">{rule.action_type}</strong></span>
+                  <span>Action: <strong className="text-teal-300">{rule.action_type}</strong></span>
                 </div>
               </div>
             </div>
@@ -158,7 +194,7 @@ export function AutomationBuilder() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Extract TODO tags..."
-                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                 />
               </div>
 
@@ -183,7 +219,7 @@ export function AutomationBuilder() {
                     value={triggerValue}
                     onChange={(e) => setTriggerValue(e.target.value)}
                     placeholder="e.g. project or urgent (without #)"
-                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                   />
                 </div>
               )}

@@ -125,7 +125,7 @@ export function NoteEditor({
     if (!content.trim()) {
       return (
         <div className="flex flex-col items-center justify-center h-64 text-[#64748B] text-xs font-mono">
-          <FileText className="w-8 h-8 mb-2 opacity-30 text-indigo-400" />
+          <FileText className="w-8 h-8 mb-2 opacity-30 text-teal-400" />
           Markdown live preview will appear here...
         </div>
       );
@@ -136,23 +136,23 @@ export function NoteEditor({
       <div className="p-4 space-y-2 text-[#CBD5E1] text-xs font-sans leading-relaxed">
         {lines.map((line, i) => {
           if (line.startsWith('# ')) return <h1 key={i} className="text-base font-bold text-white border-b border-[#242A3C] pb-1 my-2 font-mono">{line.slice(2)}</h1>;
-          if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-semibold text-indigo-300 border-b border-[#1E2333] pb-0.5 my-1.5 font-mono">{line.slice(3)}</h2>;
+          if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-semibold text-teal-300 border-b border-[#1E2333] pb-0.5 my-1.5 font-mono">{line.slice(3)}</h2>;
           if (line.startsWith('### ')) return <h3 key={i} className="text-xs font-semibold text-sky-300 my-1 font-mono">{line.slice(4)}</h3>;
           if (line.startsWith('- [ ] ')) return (
             <div key={i} className="flex items-center gap-2 text-[#CBD5E1]">
-              <input type="checkbox" disabled className="rounded border-[#2E354A] bg-[#090A0F] text-indigo-500" />
+              <input type="checkbox" disabled className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500" />
               <span>{line.slice(6)}</span>
             </div>
           );
           if (line.startsWith('- [x] ')) return (
             <div key={i} className="flex items-center gap-2 text-[#64748B] line-through">
-              <input type="checkbox" checked disabled className="rounded border-[#2E354A] bg-[#090A0F] text-indigo-500" />
+              <input type="checkbox" checked disabled className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500" />
               <span>{line.slice(6)}</span>
             </div>
           );
           if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 list-disc text-[#CBD5E1]">{line.slice(2)}</li>;
           if (line.startsWith('> ')) return (
-            <blockquote key={i} className="border-l-2 border-indigo-500 pl-2.5 py-0.5 text-[#94A3B8] italic bg-[#131622] rounded-r">
+            <blockquote key={i} className="border-l-2 border-teal-500 pl-2.5 py-0.5 text-[#94A3B8] italic bg-[#131622] rounded-r">
               {line.slice(2)}
             </blockquote>
           );
@@ -161,8 +161,8 @@ export function NoteEditor({
           if (line.includes('::')) {
             const parts = line.split('::');
             return (
-              <div key={i} className="p-2 my-1 bg-[#161A28] border border-purple-500/30 rounded text-xs">
-                <span className="text-purple-300 font-semibold font-mono">Q: {parts[0]}</span>
+              <div key={i} className="p-2 my-1 bg-[#161A28] border border-teal-500/30 rounded text-xs">
+                <span className="text-teal-300 font-semibold font-mono">Q: {parts[0]}</span>
                 <div className="text-slate-300 mt-0.5">A: {parts.slice(1).join('::')}</div>
               </div>
             );
@@ -178,10 +178,10 @@ export function NoteEditor({
                   return (
                     <span
                       key={pIdx}
-                      className="inline-flex items-center gap-1 px-1.5 py-0.2 mx-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 text-[11px] font-mono cursor-pointer hover:bg-indigo-500/25"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.2 mx-0.5 rounded bg-teal-500/15 text-teal-300 border border-teal-500/30 text-[11px] font-mono cursor-pointer hover:bg-teal-500/25"
                       title={`Jump to [[${target}]]`}
                     >
-                      <Link2 className="w-2.5 h-2.5 text-indigo-400" />
+                      <Link2 className="w-2.5 h-2.5 text-teal-400" />
                       {target}
                     </span>
                   );
@@ -200,7 +200,7 @@ export function NoteEditor({
       {/* 1. Header Toolbar */}
       <div className="h-11 px-3 border-b border-[#1F2433] flex items-center justify-between gap-3 bg-[#12151E]">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <FileText className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+          <FileText className="w-4 h-4 text-teal-400 flex-shrink-0" />
           <input
             type="text"
             placeholder="Untitled Note..."
@@ -245,7 +245,7 @@ export function NoteEditor({
         <button
           onClick={() => setShowOutline(!showOutline)}
           className={`p-1.5 rounded-md border text-xs transition-colors ${
-            showOutline ? 'bg-[#1D2230] text-indigo-300 border-indigo-500/40' : 'border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#181C26]'
+            showOutline ? 'bg-[#1D2230] text-teal-300 border-teal-500/40' : 'border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#181C26]'
           }`}
           title="Document Outline"
         >
@@ -322,7 +322,7 @@ export function NoteEditor({
           </button>
           <button
             onClick={() => insertFormatting('Question::Answer')}
-            className="p-1 hover:bg-[#181C26] rounded text-purple-400 hover:text-purple-300"
+            className="p-1 hover:bg-[#181C26] rounded text-teal-400 hover:text-teal-300"
             title="Spaced Repetition Q::A Flashcard"
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -348,7 +348,7 @@ export function NoteEditor({
         {tags.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#161A24] border border-[#242A3C] text-[11px] font-mono text-indigo-300"
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#161A24] border border-[#242A3C] text-[11px] font-mono text-teal-300"
           >
             #{t}
             <button
@@ -428,8 +428,8 @@ export function NoteEditor({
                 </h4>
                 <div className="space-y-1">
                   {wikiLinks.map((link) => (
-                    <div key={link} className="flex items-center gap-1 text-[11px] font-mono text-indigo-300 truncate">
-                      <Link2 className="w-2.5 h-2.5 text-indigo-400" />
+                    <div key={link} className="flex items-center gap-1 text-[11px] font-mono text-teal-300 truncate">
+                      <Link2 className="w-2.5 h-2.5 text-teal-400" />
                       <span>{link}</span>
                     </div>
                   ))}

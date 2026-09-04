@@ -28,7 +28,7 @@ Add the following to your `claude_desktop_config.json`:
         "app.cli",
         "mcp"
       ],
-      "cwd": "C:/Users/frimp/Documents/neuro/backend",
+      "cwd": "/path/to/neuro/backend",
       "env": {
         "DATABASE_URL": "sqlite+aiosqlite:///./neuro.db",
         "PYTHONUNBUFFERED": "1"
@@ -50,7 +50,7 @@ Add the server in Cursor Settings -> **Features** -> **MCP**:
 ```bash
 python -m app.cli mcp
 ```
-5. Working Directory: `<YOUR_PATH_TO_NEURO>/backend`
+5. Working Directory: `/path/to/neuro/backend`
 
 ---
 
@@ -63,7 +63,7 @@ Add to `~/.codeium/windsurf/mcp_config.json` or `%USERPROFILE%\.codeium\windsurf
     "neuro": {
       "command": "python",
       "args": ["-m", "app.cli", "mcp"],
-      "cwd": "<YOUR_PATH_TO_NEURO>/backend"
+      "cwd": "/path/to/neuro/backend"
     }
   }
 }
@@ -75,7 +75,7 @@ Add to `~/.codeium/windsurf/mcp_config.json` or `%USERPROFILE%\.codeium\windsurf
 
 | Tool Name | Description | Example Prompt |
 | :--- | :--- | :--- |
-| `search_notes` | Semantic and keyword retrieval across all notes | *"Search my notes on system architecture"* |
-| `get_graph_impact` | Computes blast radius and dependency ripple effects | *"What functions depend on NoteService?"* |
-| `generate_learning_roadmap` | Synthesizes a prerequisite learning DAG | *"Create a roadmap for learning Rust Async"* |
-| `lint_obsidian_vault` | Audits vault for dead wikilinks and orphan notes | *"Run a diagnostic health check on my vault"* |
+| `neuro_search_notes` | Semantic and keyword retrieval across all notes | *"Search my notes on system architecture"* |
+| `neuro_get_graph_impact` | Computes blast radius and dependency ripple effects | *"What functions depend on NoteService?"* |
+| `neuro_generate_learning_roadmap` | Synthesizes a prerequisite learning DAG | *"Create a roadmap for learning Rust Async"* |
+| `neuro_lint_obsidian_vault` | Audits vault for dead wikilinks and orphan notes | *"Run a diagnostic health check on my vault"* |

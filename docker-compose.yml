@@ -18,7 +18,7 @@ services:
       - .env
     environment:
       - NEURO_ENV=${NEURO_ENV:-development}
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///./data/neuro.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./data/neuro.db}
       - REDIS_URL=redis://redis:6379/0
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
@@ -34,6 +34,33 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # Worker — Celery task worker
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neuro-worker
+    command: celery -A app.workers.tasks.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - backend-data:/app/data
+    env_file:
+      - .env
+    environment:
+      - NEURO_ENV=${NEURO_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./data/neuro.db}
+      - REDIS_URL=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
 
   # ---------------------------------------------------------------------------
   # Redis — Task queue & cache

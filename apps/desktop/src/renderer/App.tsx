@@ -11,6 +11,7 @@ import IngestPage from './pages/IngestPage';
 import JarvisHUD from './components/JarvisHUD';
 import DesktopNeonOrb from './components/DesktopNeonOrb';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Toaster } from 'react-hot-toast';
 
 type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings' | 'vault-health' | 'ingest';
 
@@ -92,6 +93,7 @@ export default function App() {
         isOpen={isJarvisOpen}
         onClose={() => setIsJarvisOpen(false)}
       />
+      <Toaster position="bottom-right" />
     </ErrorBoundary>
   );
 }

@@ -256,19 +256,19 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
     switch (orbState) {
       case 'listening':
         return {
-          glow: 'rgba(0, 245, 255, 0.65)',
-          glowWide: 'rgba(0, 245, 255, 0.28)',
-          glowUltra: 'rgba(56, 189, 248, 0.15)',
+          glow: 'rgba(16, 185, 129, 0.65)',
+          glowWide: 'rgba(16, 185, 129, 0.28)',
+          glowUltra: 'rgba(16, 185, 129, 0.15)',
           primary: '#00F5FF',
           secondary: '#38BDF8',
           border: '#00F5FF',
-          accent: '#06B6D4',
+          accent: '#10B981',
           status: 'Listening Active',
         };
       case 'processing':
         return {
-          glow: 'rgba(168, 85, 247, 0.75)',
-          glowWide: 'rgba(192, 132, 252, 0.32)',
+          glow: 'rgba(20, 184, 166, 0.75)',
+          glowWide: 'rgba(45, 212, 191, 0.32)',
           glowUltra: 'rgba(236, 72, 153, 0.18)',
           primary: '#C084FC',
           secondary: '#E879F9',
@@ -290,12 +290,12 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
       case 'idle':
       default:
         return {
-          glow: 'rgba(99, 102, 241, 0.45)',
-          glowWide: 'rgba(99, 102, 241, 0.18)',
-          glowUltra: 'rgba(129, 140, 248, 0.1)',
-          primary: '#818CF8',
+          glow: 'rgba(20, 184, 166, 0.45)',
+          glowWide: 'rgba(20, 184, 166, 0.18)',
+          glowUltra: 'rgba(45, 212, 191, 0.1)',
+          primary: '#2DD4BF',
           secondary: '#A5B4FC',
-          border: '#6366F1',
+          border: '#14B8A6',
           accent: '#4F46E5',
           status: isMuted ? 'Muted / Standby' : 'Online · Ready',
         };
@@ -356,15 +356,15 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           onClick={() => setIsMinimized(false)}
           title="Click to Expand Neuro Desktop Orb"
         >
-          <div className="relative w-16 h-16 rounded-full flex items-center justify-center bg-[#05070f]/95 border-2 border-cyan-400 shadow-[0_0_25px_rgba(0,245,255,0.75)] group hover:scale-110 active:scale-95 transition-all">
-            <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center">
+          <div className="relative w-16 h-16 rounded-full flex items-center justify-center bg-[#05070f]/95 border-2 border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.75)] group hover:scale-110 active:scale-95 transition-all">
+            <div className="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
               {isListening ? (
-                <span className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
+                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
               ) : (
-                <Zap className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+                <Zap className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
               )}
             </div>
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f5ff] animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#00f5ff] animate-pulse" />
           </div>
         </div>
       );
@@ -409,21 +409,21 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                 <div className="flex items-center bg-black/50 border border-white/10 rounded-lg p-0.5 text-[10px]">
                   <button
                     onClick={() => handleSetSizeMode('compact')}
-                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                     title="Compact Size"
                   >
                     S
                   </button>
                   <button
                     onClick={() => handleSetSizeMode('big')}
-                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                     title="Big Size (Default)"
                   >
                     M
                   </button>
                   <button
                     onClick={() => handleSetSizeMode('giant')}
-                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-purple-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                    className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                     title="Giant Titan Size"
                   >
                     L
@@ -437,12 +437,12 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                   }}
                   className={`p-1.5 rounded-lg border transition-all ${
                     isListening
-                      ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300 shadow-[0_0_12px_rgba(0,245,255,0.4)] animate-pulse'
-                      : 'bg-white/[0.05] border-white/10 text-zinc-400 hover:text-white hover:border-cyan-500/30'
+                      ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.4)] animate-pulse'
+                      : 'bg-white/[0.05] border-white/10 text-zinc-400 hover:text-white hover:border-emerald-500/30'
                   }`}
                   title={isListening ? 'Microphone Active (Click to Pause)' : 'Open Microphone'}
                 >
-                  {isListening ? <Mic className="w-3.5 h-3.5 text-cyan-400" /> : <MicOff className="w-3.5 h-3.5" />}
+                  {isListening ? <Mic className="w-3.5 h-3.5 text-emerald-400" /> : <MicOff className="w-3.5 h-3.5" />}
                 </button>
 
                 {/* Minimize to Mini-Orb */}
@@ -494,22 +494,22 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                        voiceLevel === 'loud' ? 'Loud Audio ⏷' : 'Listening for Voice...'}
                     </span>
                   </div>
-                  <span className="text-cyan-400 font-bold">{audioVolume}%</span>
+                  <span className="text-emerald-400 font-bold">{audioVolume}%</span>
                 </div>
 
                 {/* Multi-segment Level Bar with Activation Threshold Indicator */}
                 <div className="relative w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden flex items-center border border-white/[0.06]">
                   {/* Activation Threshold Marker at 18% */}
                   <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 z-10 opacity-75"
+                    className="absolute top-0 bottom-0 w-0.5 bg-emerald-400 z-10 opacity-75"
                     style={{ left: `${activationThreshold}%` }}
                     title={`Activation Threshold (${activationThreshold}%)`}
                   />
                   {/* Real-time Voice Volume Fill */}
                   <div
                     className={`h-full transition-all duration-75 rounded-full ${
-                      audioVolume >= 75 ? 'bg-gradient-to-r from-cyan-500 via-emerald-400 to-rose-500' :
-                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
+                      audioVolume >= 75 ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-rose-500' :
+                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-emerald-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
                       'bg-amber-500/60'
                     }`}
                     style={{ width: `${Math.max(3, audioVolume)}%` }}
@@ -520,11 +520,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
             {/* Live Heard Transcript / Output */}
             {transcript ? (
-              <div className="bg-cyan-950/30 border border-cyan-500/30 rounded-xl p-2.5 mb-2">
-                <div className="text-[10px] text-cyan-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
-                  <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> Voice Heard:
+              <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-2.5 mb-2">
+                <div className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
+                  <Radio className="w-3 h-3 text-emerald-400 animate-pulse" /> Voice Heard:
                 </div>
-                <p className="text-xs text-cyan-200 font-sans italic leading-relaxed">
+                <p className="text-xs text-emerald-200 font-sans italic leading-relaxed">
                   "{transcript}"
                 </p>
               </div>
@@ -549,9 +549,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                       <button
                         key={i}
                         onClick={() => handleExecuteQuickAction(act.cmd)}
-                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-cyan-300 transition-all font-sans"
+                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-emerald-300 transition-all font-sans"
                       >
-                        <Icon className="w-2.5 h-2.5 text-cyan-400" />
+                        <Icon className="w-2.5 h-2.5 text-emerald-400" />
                         <span>{act.label}</span>
                       </button>
                     );
@@ -603,10 +603,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           <div
             className={`absolute ${sizeCfg.outerRingClass} rounded-full border-2 border-dashed transition-all duration-500 pointer-events-none ${
               orbState === 'processing'
-                ? 'animate-spin border-purple-400/80'
+                ? 'animate-spin border-teal-400/80'
                 : orbState === 'listening'
-                ? 'animate-pulse border-cyan-400'
-                : 'border-indigo-500/50'
+                ? 'animate-pulse border-emerald-400'
+                : 'border-teal-500/50'
             }`}
             style={{
               borderColor: colors.border,
@@ -616,10 +616,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
           {/* Satellite Orbit Nodes (4 Cardinal Points) */}
           <div className={`absolute ${sizeCfg.outerRingClass} rounded-full pointer-events-none ${orbState === 'processing' ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_20s_linear_infinite]'}`}>
-            <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_12px_#ffffff] border border-cyan-400" />
-            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f5ff]" />
-            <span className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_10px_#818cf8]" />
-            <span className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-cyan-300 shadow-[0_0_10px_#67e8f9]" />
+            <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_12px_#ffffff] border border-emerald-400" />
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#00f5ff]" />
+            <span className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_10px_#2DD4BF]" />
+            <span className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-emerald-300 shadow-[0_0_10px_#67e8f9]" />
           </div>
 
           {/* Middle Precision SVG Tachyon Dial */}
@@ -736,15 +736,15 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
             <div className="flex flex-col items-center justify-center gap-1.5">
               {orbState === 'listening' ? (
                 <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-6 bg-cyan-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite] shadow-[0_0_8px_#00f5ff]" />
-                  <span className="w-1.5 h-10 bg-cyan-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s] shadow-[0_0_10px_#67e8f9]" />
-                  <span className="w-1.5 h-8 bg-cyan-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s] shadow-[0_0_8px_#00f5ff]" />
-                  <span className="w-1.5 h-5 bg-cyan-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s] shadow-[0_0_6px_#67e8f9]" />
+                  <span className="w-1.5 h-6 bg-emerald-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite] shadow-[0_0_8px_#00f5ff]" />
+                  <span className="w-1.5 h-10 bg-emerald-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s] shadow-[0_0_10px_#67e8f9]" />
+                  <span className="w-1.5 h-8 bg-emerald-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s] shadow-[0_0_8px_#00f5ff]" />
+                  <span className="w-1.5 h-5 bg-emerald-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s] shadow-[0_0_6px_#67e8f9]" />
                 </div>
               ) : orbState === 'processing' ? (
                 <div className="relative flex items-center justify-center">
-                  <Sparkles className="w-9 h-9 text-purple-400 animate-pulse" />
-                  <span className="absolute inset-0 w-9 h-9 border-2 border-purple-400/50 border-t-purple-300 rounded-full animate-spin" />
+                  <Sparkles className="w-9 h-9 text-teal-400 animate-pulse" />
+                  <span className="absolute inset-0 w-9 h-9 border-2 border-teal-400/50 border-t-teal-300 rounded-full animate-spin" />
                 </div>
               ) : orbState === 'speaking' ? (
                 <div className="flex items-center gap-1">
@@ -760,8 +760,8 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-1">
-                  <Mic className="w-8 h-8 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
-                  <span className="text-[9px] font-mono text-indigo-300 tracking-wider">VOICE</span>
+                  <Mic className="w-8 h-8 text-teal-400 group-hover:text-emerald-300 transition-colors" />
+                  <span className="text-[9px] font-mono text-teal-300 tracking-wider">VOICE</span>
                 </div>
               )}
             </div>
@@ -816,19 +816,19 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               <div className="flex items-center bg-black/50 border border-white/10 rounded-lg p-0.5 text-[10px]">
                 <button
                   onClick={() => handleSetSizeMode('compact')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   S
                 </button>
                 <button
                   onClick={() => handleSetSizeMode('big')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   M
                 </button>
                 <button
                   onClick={() => handleSetSizeMode('giant')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-purple-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   L
                 </button>
@@ -854,11 +854,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           </div>
 
           {transcript ? (
-            <div className="bg-cyan-950/30 border border-cyan-500/30 rounded-xl p-2.5 mb-2">
-              <div className="text-[10px] text-cyan-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
-                <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> Voice Heard:
+            <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-2.5 mb-2">
+              <div className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
+                <Radio className="w-3 h-3 text-emerald-400 animate-pulse" /> Voice Heard:
               </div>
-              <p className="text-xs text-cyan-200 font-sans italic leading-relaxed">
+              <p className="text-xs text-emerald-200 font-sans italic leading-relaxed">
                 "{transcript}"
               </p>
             </div>
@@ -883,9 +883,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                     <button
                       key={i}
                       onClick={() => handleExecuteQuickAction(act.cmd)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-cyan-300 transition-all font-sans"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-emerald-300 transition-all font-sans"
                     >
-                      <Icon className="w-2.5 h-2.5 text-cyan-400" />
+                      <Icon className="w-2.5 h-2.5 text-emerald-400" />
                       <span>{act.label}</span>
                     </button>
                   );
@@ -916,10 +916,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
         <div
           className={`absolute ${sizeCfg.outerRingClass} rounded-full border-2 border-dashed transition-all duration-500 pointer-events-none ${
             orbState === 'processing'
-              ? 'animate-spin border-purple-400'
+              ? 'animate-spin border-teal-400'
               : orbState === 'listening'
-              ? 'animate-pulse border-cyan-400'
-              : 'border-indigo-500/50'
+              ? 'animate-pulse border-emerald-400'
+              : 'border-teal-500/50'
           }`}
           style={{
             borderColor: colors.border,
@@ -969,19 +969,19 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           <div className="flex items-center gap-1">
             {orbState === 'listening' ? (
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-6 bg-cyan-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" />
-                <span className="w-1.5 h-9 bg-cyan-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s]" />
-                <span className="w-1.5 h-7 bg-cyan-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s]" />
-                <span className="w-1.5 h-5 bg-cyan-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" />
+                <span className="w-1.5 h-6 bg-emerald-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" />
+                <span className="w-1.5 h-9 bg-emerald-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s]" />
+                <span className="w-1.5 h-7 bg-emerald-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s]" />
+                <span className="w-1.5 h-5 bg-emerald-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" />
               </div>
             ) : orbState === 'processing' ? (
-              <Sparkles className="w-9 h-9 text-purple-400 animate-pulse" />
+              <Sparkles className="w-9 h-9 text-teal-400 animate-pulse" />
             ) : orbState === 'speaking' ? (
               <Volume2 className="w-8 h-8 text-emerald-400 animate-pulse" />
             ) : isMuted ? (
               <MicOff className="w-8 h-8 text-slate-500 group-hover:text-slate-300 transition-colors" />
             ) : (
-              <Mic className="w-8 h-8 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
+              <Mic className="w-8 h-8 text-teal-400 group-hover:text-emerald-300 transition-colors" />
             )}
           </div>
 

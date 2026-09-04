@@ -72,7 +72,7 @@ export function useJarvisAgent() {
     soundEngine.playProcessingHum();
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/agent/execute', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/agent/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input_text: command }),
@@ -357,7 +357,7 @@ export function useJarvisAgent() {
 
       // Save note locally to backend or local mock
       try {
-        fetch('http://127.0.0.1:8000/api/v1/notes', {
+        fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/notes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: noteTitle, content: noteContent, tags: ['voice-capture'] }),
@@ -491,7 +491,7 @@ export function useJarvisAgent() {
     try {
       const fd = new FormData();
       fd.append('file', blob, 'speech.webm');
-      const res = await fetch('http://127.0.0.1:8000/api/v1/voice/transcribe', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/voice/transcribe`, {
         method: 'POST',
         body: fd,
       });

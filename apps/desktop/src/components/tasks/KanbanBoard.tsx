@@ -7,6 +7,7 @@ import { Plus, GripVertical } from 'lucide-react';
 const COLUMNS = [
   { id: 'todo', title: 'To Do' },
   { id: 'in_progress', title: 'In Progress' },
+  { id: 'review', title: 'Review' },
   { id: 'done', title: 'Done' },
 ];
 
@@ -76,8 +77,16 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
           return (
             <div key={column.id} className="flex flex-col w-80 shrink-0">
               <div className="flex items-center justify-between mb-4 px-2">
-                <h2 className="text-lg font-semibold text-white/90">{column.title}</h2>
-                <span className="bg-purple-900/50 text-purple-200 text-xs py-1 px-2 rounded-full">
+                <h2 className={`text-lg font-semibold ${
+                  column.id === 'todo' ? 'text-emerald-400' :
+                  column.id === 'in_progress' ? 'text-teal-400' :
+                  column.id === 'review' ? 'text-amber-400' :
+                  column.id === 'done' ? 'text-emerald-500' :
+                  'text-white/90'
+                }`}>
+                  {column.title}
+                </h2>
+                <span className="bg-emerald-900/50 text-emerald-200 text-xs py-1 px-2 rounded-full">
                   {colTasks.length}
                 </span>
               </div>
@@ -88,7 +97,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={`flex-1 rounded-xl p-3 min-h-[500px] transition-colors border border-white/5 bg-white/5 backdrop-blur-md ${
-                      snapshot.isDraggingOver ? 'bg-purple-900/20 border-purple-500/30' : ''
+                      snapshot.isDraggingOver ? 'bg-teal-900/20 border-teal-500/30' : ''
                     }`}
                   >
                     <div className="flex flex-col gap-3">
@@ -99,7 +108,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               className={`group relative rounded-lg p-4 bg-black/60 border border-white/10 shadow-lg backdrop-blur-sm transition-all ${
-                                snapshot.isDragging ? 'shadow-purple-500/20 border-purple-500/50 rotate-2' : 'hover:border-white/20'
+                                snapshot.isDragging ? 'shadow-teal-500/20 border-teal-500/50 rotate-2' : 'hover:border-white/20'
                               }`}
                             >
                               <div 
@@ -133,7 +142,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                     
                     <button
                       onClick={() => handleCreateTask(column.id as Task['status'])}
-                      className="mt-4 flex items-center gap-2 text-white/40 hover:text-purple-400 transition-colors text-sm px-2 py-2 w-full rounded hover:bg-white/5"
+                      className="mt-4 flex items-center gap-2 text-white/40 hover:text-teal-400 transition-colors text-sm px-2 py-2 w-full rounded hover:bg-white/5"
                     >
                       <Plus size={16} /> Add Task
                     </button>

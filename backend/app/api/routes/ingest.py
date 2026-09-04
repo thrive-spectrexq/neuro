@@ -64,7 +64,6 @@ async def import_url(
         title=title,
         content=f"Source: {url_str}\n\n{content}",
         user_id=current_user.id,
-        metadata_=res.get("metadata", {}),
     )
     session.add(note)
     await session.commit()
@@ -86,6 +85,13 @@ async def import_vault(
         )
 
     clean_path = os.path.abspath(data.source_path.strip())
+    allowed_dir = os.path.abspath(os.getenv("ALLOWED_INGEST_DIR", "/tmp/neuro_ingest"))
+    if not clean_path.startswith(allowed_dir):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Path traversal detected or directory not allowed.",
+        )
+        
     if not os.path.exists(clean_path) or not os.path.isdir(clean_path):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

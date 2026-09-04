@@ -54,6 +54,24 @@ class AutomationEngine:
         url = action.get("url")
         if url:
             try:
+                from urllib.parse import urlparse
+                import ipaddress
+                import socket
+                
+                parsed = urlparse(url)
+                if parsed.scheme not in ("http", "https"):
+                    raise ValueError("Invalid URL scheme")
+                    
+                hostname = parsed.hostname
+                if not hostname:
+                    raise ValueError("Invalid URL hostname")
+                    
+                ip_addr = socket.gethostbyname(hostname)
+                ip = ipaddress.ip_address(ip_addr)
+                
+                if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_unspecified:
+                    raise ValueError("URL resolves to internal/private IP")
+
                 async with httpx.AsyncClient() as client:
                     response = await client.post(url, json=context, timeout=5.0)
                     response.raise_for_status()
@@ -113,7 +131,7 @@ class AutomationEngine:
             result = await db.execute(statement)
             tag = result.scalars().first()
             if not tag:
-                tag = Tag(name=tag_name, user_id=note.user_id)
+                tag = Tag(name=tag_name)
                 db.add(tag)
                 await db.commit()
                 await db.refresh(tag)

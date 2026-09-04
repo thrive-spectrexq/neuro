@@ -18,7 +18,7 @@ router = APIRouter()
 async def resolve_comment(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     comment = await session.get(Comment, id)
     if not comment:

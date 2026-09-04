@@ -138,7 +138,7 @@ export default function SettingsPage() {
             <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
               System Settings & AI Hub
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[11px] font-mono">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-mono">
               v1.2.0 Active
             </span>
           </div>
@@ -149,7 +149,7 @@ export default function SettingsPage() {
 
         <button
           onClick={handleSave}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-[0_0_20px_rgba(0,245,255,0.3)] transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all"
         >
           {saved ? <CheckCircle2 size={14} className="text-emerald-300" /> : <Save size={14} />}
           <span>{saved ? 'Saved Successfully' : 'Save Changes'}</span>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
       {/* 1. Neuro OS Voice Agent Settings */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
-          <Zap size={14} className="text-cyan-400" />
+          <Zap size={14} className="text-emerald-400" />
           <span>Neuro Voice Agent</span>
         </h2>
 
@@ -173,7 +173,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={wakeWordEnabled}
               onChange={(e) => setWakeWordEnabled(e.target.checked)}
-              className="w-4 h-4 accent-cyan-500 cursor-pointer"
+              className="w-4 h-4 accent-emerald-500 cursor-pointer"
             />
           </div>
 
@@ -186,7 +186,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={voiceResponses}
               onChange={(e) => setVoiceResponses(e.target.checked)}
-              className="w-4 h-4 accent-cyan-500 cursor-pointer"
+              className="w-4 h-4 accent-emerald-500 cursor-pointer"
             />
           </div>
 
@@ -199,7 +199,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={sfxEnabled}
               onChange={(e) => setSfxEnabled(e.target.checked)}
-              className="w-4 h-4 accent-cyan-500 cursor-pointer"
+              className="w-4 h-4 accent-emerald-500 cursor-pointer"
             />
           </div>
 
@@ -208,7 +208,7 @@ export default function SettingsPage() {
               <h3 className="text-xs font-semibold text-zinc-200">Global Shortcut</h3>
               <p className="text-[11px] text-zinc-400">Summon agent HUD from any application</p>
             </div>
-            <span className="px-2 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[11px] text-cyan-400 font-mono">
+            <span className="px-2 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[11px] text-emerald-400 font-mono">
               Ctrl + Space
             </span>
           </div>
@@ -219,7 +219,7 @@ export default function SettingsPage() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
-            <Cpu size={14} className="text-purple-400" />
+            <Cpu size={14} className="text-teal-400" />
             <span>Local Multi-LLM Engine (Ollama / DeepSeek / Llama)</span>
           </h2>
 
@@ -235,7 +235,7 @@ export default function SettingsPage() {
               disabled={isScanningOllama}
               className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-[10px] text-zinc-300 font-mono transition-all"
             >
-              <RefreshCw size={10} className={isScanningOllama ? 'animate-spin text-cyan-400' : ''} />
+              <RefreshCw size={10} className={isScanningOllama ? 'animate-spin text-emerald-400' : ''} />
               <span>Scan Models</span>
             </button>
           </div>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
               <select
                 value={aiProvider}
                 onChange={(e) => setAiProvider(e.target.value)}
-                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-cyan-500/50 cursor-pointer"
+                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-emerald-500/50 cursor-pointer"
               >
                 <option value="Local Ollama (Offline)">Local Ollama (100% Offline & Private)</option>
                 <option value="OpenAI">OpenAI (GPT-4o)</option>
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                 <select
                   value={ollamaModel}
                   onChange={(e) => setOllamaModel(e.target.value)}
-                  className="w-full bg-[#070910] border border-cyan-500/40 rounded-xl px-3.5 py-2 text-xs text-cyan-200 outline-none focus:border-cyan-500 cursor-pointer font-mono"
+                  className="w-full bg-[#070910] border border-emerald-500/40 rounded-xl px-3.5 py-2 text-xs text-emerald-200 outline-none focus:border-emerald-500 cursor-pointer font-mono"
                 >
                   {detectedModels.map((m) => (
                     <option key={m} value={m}>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                   value={ollamaModel}
                   onChange={(e) => setOllamaModel(e.target.value)}
                   placeholder="deepseek-r1:8b, llama3.3, mistral..."
-                  className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-cyan-500 font-mono"
+                  className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-emerald-500 font-mono"
                 />
               )}
             </div>
@@ -299,7 +299,7 @@ export default function SettingsPage() {
             <button
               onClick={handleBenchmark}
               disabled={benchmarking}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/40 text-purple-300 text-xs font-mono transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-950/60 hover:bg-teal-900/60 border border-teal-500/40 text-teal-300 text-xs font-mono transition-all shadow-sm"
             >
               <Play size={11} className={benchmarking ? 'animate-spin' : ''} />
               <span>{benchmarking ? 'Benchmarking...' : 'Test AI Speed'}</span>

@@ -23,15 +23,15 @@ export const SystemIndicator: React.FC = () => {
     >
       <div className="flex items-center gap-1.5">
         {isStreaming ? (
-          <Radio className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+          <Radio className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
         ) : (
-          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <Sparkles className="w-3.5 h-3.5 text-teal-400" />
         )}
         <span className="hidden sm:inline">Assistant</span>
       </div>
 
       {suggestionsCount > 0 && (
-        <span className="px-1.5 py-0.2 text-[10px] font-mono font-semibold bg-indigo-600 text-white rounded-full">
+        <span className="px-1.5 py-0.2 text-[10px] font-mono font-semibold bg-teal-600 text-white rounded-full">
           {suggestionsCount}
         </span>
       )}

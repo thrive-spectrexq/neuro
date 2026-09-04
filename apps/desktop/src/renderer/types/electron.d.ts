@@ -32,4 +32,13 @@ declare global {
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
   }
+
+  interface ImportMetaEnv {
+    readonly VITE_API_URL?: string;
+    [key: string]: any;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
 }

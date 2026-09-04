@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Network, 
   Plus, 
@@ -19,9 +19,9 @@ const OBSIDIAN_COLORS = [
   { name: 'Orange', hex: '#d19a66' },
   { name: 'Yellow', hex: '#e5c07b' },
   { name: 'Green', hex: '#98c379' },
-  { name: 'Cyan', hex: '#56b6c2' },
-  { name: 'Purple', hex: '#c678dd' },
-  { name: 'Indigo', hex: '#6366f1' },
+  { name: 'emerald', hex: '#56b6c2' },
+  { name: 'teal', hex: '#c678dd' },
+  { name: 'teal', hex: '#14B8A6' },
 ];
 
 interface CanvasNode {
@@ -82,7 +82,7 @@ export function VaultCanvasStudio() {
       y: 80,
       width: 280,
       height: 140,
-      color: '#6366f1',
+      color: '#14B8A6',
     },
     {
       id: 'node-2',
@@ -93,7 +93,7 @@ export function VaultCanvasStudio() {
       y: 60,
       width: 290,
       height: 140,
-      color: '#06b6d4',
+      color: '#10B981',
     },
     {
       id: 'node-3',
@@ -124,14 +124,14 @@ export function VaultCanvasStudio() {
       fromNode: 'node-1',
       toNode: 'node-2',
       label: 'powers',
-      color: '#818cf8',
+      color: '#2DD4BF',
     },
     {
       id: 'edge-2-3',
       fromNode: 'node-2',
       toNode: 'node-3',
       label: 'yields',
-      color: '#22d3ee',
+      color: '#34D399',
     },
     {
       id: 'edge-1-4',
@@ -141,6 +141,43 @@ export function VaultCanvasStudio() {
       color: '#fbbf24',
     },
   ]);
+
+  // Load initial canvas state
+  useEffect(() => {
+    let mounted = true;
+    const fetchCanvas = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`);
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted && data.nodes && data.nodes.length > 0) {
+            setNodes(data.nodes);
+            setEdges(data.edges || []);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load canvas state:', err);
+      }
+    };
+    fetchCanvas();
+    return () => { mounted = false; };
+  }, []);
+
+  // Debounced auto-save
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nodes, edges }),
+        });
+      } catch (err) {
+        console.error('Failed to auto-save canvas:', err);
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [nodes, edges]);
 
   // Add new text card
   const handleAddTextCard = () => {
@@ -169,7 +206,7 @@ export function VaultCanvasStudio() {
       y: Math.round(-pan.y + 200 + Math.random() * 80),
       width: 280,
       height: 130,
-      color: '#06b6d4',
+      color: '#10B981',
     };
     setNodes((prev) => [...prev, newNode]);
     setSelectedNodeId(newNode.id);
@@ -239,7 +276,7 @@ export function VaultCanvasStudio() {
           y: 100 + Math.floor(idx / 3) * 180,
           width: 280,
           height: 130,
-          color: idx === 0 ? '#6366f1' : idx === (data.nodes.length - 1) ? '#10b981' : '#06b6d4',
+          color: idx === 0 ? '#14B8A6' : idx === (data.nodes.length - 1) ? '#10b981' : '#10B981',
         }));
 
         const generatedEdges: CanvasEdge[] = (data.edges || []).map((edge: any, idx: number) => ({
@@ -247,7 +284,7 @@ export function VaultCanvasStudio() {
           fromNode: edge.source || edge.from,
           toNode: edge.target || edge.to,
           label: edge.label || 'unlocks',
-          color: '#818cf8',
+          color: '#2DD4BF',
         }));
 
         if (generatedNodes.length > 0) {
@@ -312,13 +349,13 @@ export function VaultCanvasStudio() {
       {/* Canvas Top Action HUD */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[#1F2433] bg-[#0F1117] z-30">
         <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-[#161A24] border border-[#242A3C] rounded-lg text-indigo-400">
+          <div className="p-1.5 bg-[#161A24] border border-[#242A3C] rounded-lg text-teal-400">
             <Network className="w-3.5 h-3.5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xs font-bold text-white tracking-wide font-mono">JSON Canvas Studio</h2>
-              <span className="px-1.5 py-0.5 text-[9px] font-mono bg-[#161A24] text-indigo-300 border border-[#282E40] rounded">
+              <span className="px-1.5 py-0.5 text-[9px] font-mono bg-[#161A24] text-teal-300 border border-[#282E40] rounded">
                 JSON Canvas 1.0
               </span>
             </div>
@@ -335,7 +372,7 @@ export function VaultCanvasStudio() {
               onChange={(e) => setRoadmapGoal(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleGenerateRoadmapCanvas()}
               placeholder="Synthesize roadmap nodes (e.g. Master Rust)..."
-              className="w-64 bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+              className="w-64 bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
             />
           </div>
           <button
@@ -343,7 +380,7 @@ export function VaultCanvasStudio() {
             disabled={isGenerating || !roadmapGoal.trim()}
             className="flex items-center gap-1 px-3 py-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-medium disabled:opacity-50 transition-colors shadow-sm"
           >
-            <Sparkles className="w-3 h-3 text-indigo-200" />
+            <Sparkles className="w-3 h-3 text-teal-200" />
             <span>{isGenerating ? 'Synthesizing...' : 'Generate'}</span>
           </button>
         </div>
@@ -363,7 +400,7 @@ export function VaultCanvasStudio() {
             className="flex items-center gap-1 px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-[#CBD5E1] hover:text-white border border-[#242A3C] rounded-md text-xs font-medium transition-colors"
             title="Add Sticky Text Node"
           >
-            <Type className="w-3 h-3 text-purple-400" />
+            <Type className="w-3 h-3 text-teal-400" />
             <span>Text</span>
           </button>
           {/* Node Customization Palette when a Node is Selected */}
@@ -384,7 +421,7 @@ export function VaultCanvasStudio() {
                 onClick={() => setEditingNodeId(editingNodeId === selectedNodeId ? null : selectedNodeId)}
                 className={`p-1 rounded-lg text-xs transition-all ${
                   editingNodeId === selectedNodeId
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-teal-600 text-white'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
                 title="Edit Card Markdown"
@@ -434,7 +471,7 @@ export function VaultCanvasStudio() {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 1 L 8 5 L 0 9 z" fill="#818cf8" />
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#2DD4BF" />
             </marker>
           </defs>
           {edges.map((edge) => {
@@ -457,7 +494,7 @@ export function VaultCanvasStudio() {
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={edge.color || '#6366f1'}
+                  stroke={edge.color || '#14B8A6'}
                   strokeWidth={2 * zoom}
                   strokeDasharray="4 4"
                   markerEnd="url(#canvas-arrow)"
@@ -496,7 +533,7 @@ export function VaultCanvasStudio() {
                 onMouseDown={(e) => handleNodeMouseDown(e, node)}
                 className={`canvas-node-card absolute pointer-events-auto rounded-lg border transition-all cursor-move flex flex-col overflow-hidden ${
                   isSelected
-                    ? 'border-indigo-400 ring-1 ring-indigo-500 shadow-xl'
+                    ? 'border-teal-400 ring-1 ring-teal-500 shadow-xl'
                     : 'border-[#242A3C] hover:border-[#38415C]'
                 }`}
                 style={{
@@ -517,7 +554,7 @@ export function VaultCanvasStudio() {
                   <div className="flex items-center gap-1.5 truncate">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: node.color || '#6366f1' }}
+                      style={{ backgroundColor: node.color || '#14B8A6' }}
                     />
                     <span className="text-[11px] font-mono font-bold text-white truncate">
                       {node.file || (node.type === 'note' ? 'Vault Note' : 'Text Card')}
@@ -544,7 +581,7 @@ export function VaultCanvasStudio() {
                         onMouseDown={(e) => e.stopPropagation()}
                         autoFocus
                         rows={5}
-                        className="w-full p-2 bg-[#090A0F] border border-indigo-500 rounded text-xs text-white font-mono focus:outline-none resize-none"
+                        className="w-full p-2 bg-[#090A0F] border border-teal-500 rounded text-xs text-white font-mono focus:outline-none resize-none"
                       />
                       <button
                         onClick={(e) => {

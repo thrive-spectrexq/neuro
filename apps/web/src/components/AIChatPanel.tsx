@@ -105,7 +105,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
       {/* Header & Model Selector */}
       <div className="flex flex-wrap items-center justify-between px-3.5 py-2 border-b border-[#1F2433] bg-[#0F1117] gap-2">
         <div className="flex items-center gap-2">
-          <div className="p-1 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+          <div className="p-1 bg-[#18162B] border border-[#302856] rounded-md text-teal-400">
             <Sparkles className="w-3.5 h-3.5" />
           </div>
           <div>
@@ -135,14 +135,14 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="bg-[#141722] text-indigo-300 text-[10px] font-mono border border-[#242A3C] rounded px-2 py-0.5 outline-none appearance-none pr-5 cursor-pointer hover:border-[#38415C]"
+              className="bg-[#141722] text-teal-300 text-[10px] font-mono border border-[#242A3C] rounded px-2 py-0.5 outline-none appearance-none pr-5 cursor-pointer hover:border-[#38415C]"
             >
               <option value="ollama:llama3.2">Ollama (Llama 3.2)</option>
               <option value="ollama:mistral">Ollama (Mistral 7B)</option>
               <option value="openai:gpt-4o">OpenAI (GPT-4o)</option>
               <option value="anthropic:claude-3-5">Anthropic (Claude 3.5)</option>
             </select>
-            <ChevronDown className="w-2.5 h-2.5 text-indigo-400 absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-2.5 h-2.5 text-teal-400 absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {onClose && (
@@ -164,7 +164,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             className={`flex gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ai' && (
-              <div className="w-6 h-6 rounded-md bg-[#18162B] border border-[#302856] flex items-center justify-center flex-shrink-0 mt-0.5 text-indigo-400">
+              <div className="w-6 h-6 rounded-md bg-[#18162B] border border-[#302856] flex items-center justify-center flex-shrink-0 mt-0.5 text-teal-400">
                 <Bot className="w-3 h-3" />
               </div>
             )}
@@ -187,7 +187,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
                       {msg.sources.map((src) => (
                         <span
                           key={src.id}
-                          className="px-1.5 py-0.2 text-[9px] font-mono bg-[#141722] text-indigo-300 rounded border border-[#242A3C] flex items-center gap-1"
+                          className="px-1.5 py-0.2 text-[9px] font-mono bg-[#141722] text-teal-300 rounded border border-[#242A3C] flex items-center gap-1"
                         >
                           {src.title}
                           {src.score && <span className="text-[8px] text-[#64748B]">({Math.round(src.score * 100)}%)</span>}
@@ -199,7 +199,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
               </div>
               <div className="flex items-center gap-1.5 mt-0.5 px-1 text-[9px] font-mono text-[#64748B]">
                 <span>{msg.timestamp}</span>
-                {msg.modelUsed && <span className="text-indigo-400">• {msg.modelUsed}</span>}
+                {msg.modelUsed && <span className="text-teal-400">• {msg.modelUsed}</span>}
               </div>
             </div>
             {msg.sender === 'user' && (
@@ -213,10 +213,10 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
         {isLoading && (
           <div className="flex gap-2 items-center">
             <div className="w-6 h-6 rounded-md bg-[#18162B] border border-[#302856] flex items-center justify-center flex-shrink-0">
-              <Bot className="w-3 h-3 text-indigo-400" />
+              <Bot className="w-3 h-3 text-teal-400" />
             </div>
             <div className="bg-[#0F1117] p-2 rounded-lg text-xs text-[#64748B] border border-[#1F2433] flex items-center gap-1.5 font-mono">
-              <RefreshCw className="w-3 h-3 animate-spin text-indigo-400" />
+              <RefreshCw className="w-3 h-3 animate-spin text-teal-400" />
               Generating with {selectedModel}...
             </div>
           </div>
@@ -254,7 +254,7 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Query knowledge base..."
-            className="flex-1 bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+            className="flex-1 bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
           />
           <button
             type="submit"

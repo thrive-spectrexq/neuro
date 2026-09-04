@@ -41,7 +41,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: 'Neuro — AI Second Brain',
-    backgroundColor: '#07080c',
+    backgroundColor: '#060810',
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       nodeIntegration: false,

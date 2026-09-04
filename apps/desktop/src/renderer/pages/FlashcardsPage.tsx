@@ -159,7 +159,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
       <div className="flex items-center justify-between border-b border-white/[0.06] pb-5 mb-6">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
+            <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
               <Brain size={16} />
             </div>
             <div>
@@ -183,7 +183,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
           <button
             onClick={handleGenerateCardsFromNotes}
             disabled={isGenerating}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-sans text-xs font-semibold shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-sans text-xs font-semibold shadow-[0_0_15px_rgba(20, 184, 166,0.3)] transition-all"
             title="Generate flashcards from note definitions (::) and headers"
           >
             <Sparkles size={13} className={isGenerating ? 'animate-spin' : ''} />
@@ -198,23 +198,23 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
           {/* Card Progress Indicator */}
           <div className="w-full max-w-lg flex items-center justify-between text-xs text-zinc-500 font-mono mb-3">
             <span>Card {currentIndex + 1} of {cards.length}</span>
-            <span className="text-purple-400">SRS Interval: {currentCard.intervalDays}d</span>
+            <span className="text-teal-400">SRS Interval: {currentCard.intervalDays}d</span>
           </div>
 
           {/* 3D Flipping Card Container */}
           <div
             onClick={handleFlip}
-            className="w-full max-w-lg min-h-[300px] p-8 rounded-3xl bg-[#0d101d] hover:bg-[#111526] border border-white/[0.08] hover:border-purple-500/40 shadow-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between relative group"
+            className="w-full max-w-lg min-h-[300px] p-8 rounded-3xl bg-[#0d101d] hover:bg-[#111526] border border-white/[0.08] hover:border-teal-500/40 shadow-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between relative group"
             style={{
               boxShadow: isFlipped
-                ? '0 16px 40px rgba(0,0,0,0.8), 0 0 24px rgba(168,85,247,0.2)'
+                ? '0 16px 40px rgba(0,0,0,0.8), 0 0 24px rgba(20, 184, 166,0.2)'
                 : '0 12px 32px rgba(0,0,0,0.7)',
             }}
           >
             {/* Top Card Badge */}
             <div className="flex items-center justify-between text-xs font-mono">
               <span className={`px-2.5 py-0.5 rounded-full uppercase tracking-wider text-[10px] font-bold ${
-                isFlipped ? 'bg-purple-950/80 text-purple-300 border border-purple-500/40' : 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40'
+                isFlipped ? 'bg-teal-950/80 text-teal-300 border border-teal-500/40' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
               }`}>
                 {isFlipped ? 'Answer' : 'Question / Prompt'}
               </span>
@@ -238,7 +238,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
                   e.stopPropagation();
                   handleJumpToNote(currentCard.sourceNoteId);
                 }}
-                className="flex items-center gap-1 text-cyan-400 hover:text-cyan-200 cursor-pointer hover:underline"
+                className="flex items-center gap-1 text-emerald-400 hover:text-emerald-200 cursor-pointer hover:underline"
               >
                 <BookOpen size={11} />
                 <span>Source: {currentCard.sourceNoteTitle}</span>
@@ -269,10 +269,10 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
 
               <button
                 onClick={() => handleGrade('good')}
-                className="py-2.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
+                className="py-2.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
               >
                 <span>Good</span>
-                <span className="text-[9px] text-cyan-400/80 font-normal mt-0.5">7d</span>
+                <span className="text-[9px] text-emerald-400/80 font-normal mt-0.5">7d</span>
               </button>
 
               <button
@@ -297,7 +297,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
       ) : (
         /* Session Completed Screen */
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center my-8">
-          <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 mb-4 shadow-[0_0_24px_rgba(168,85,247,0.3)]">
+          <div className="w-16 h-16 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 mb-4 shadow-[0_0_24px_rgba(20, 184, 166,0.3)]">
             <Award size={32} />
           </div>
           <h2 className="text-2xl font-bold text-white font-sans mb-1">
@@ -322,7 +322,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
 
           <button
             onClick={handleResetSession}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold font-sans shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold font-sans shadow-[0_0_20px_rgba(20, 184, 166,0.3)] transition-all"
           >
             <RefreshCw size={13} />
             <span>Review Deck Again</span>

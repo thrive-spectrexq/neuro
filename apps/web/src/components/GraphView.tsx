@@ -123,7 +123,7 @@ export default function GraphView() {
   if (isPending) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-[#090A0F] text-slate-400 gap-2 text-xs font-mono">
-        <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+        <RefreshCw className="w-4 h-4 animate-spin text-teal-400" />
         Rendering Knowledge Graph...
       </div>
     );
@@ -142,7 +142,7 @@ export default function GraphView() {
       {/* Header & Filter Controls Overlay */}
       <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2 bg-[#0F1117] px-3 py-1.5 rounded-lg border border-[#1F2433] shadow-md">
         <div className="flex items-center gap-2">
-          <Network className="w-3.5 h-3.5 text-indigo-400" />
+          <Network className="w-3.5 h-3.5 text-teal-400" />
           <div>
             <h2 className="text-xs font-bold text-white tracking-wide font-mono">Vault Graph</h2>
             <p className="text-[10px] text-[#64748B] font-mono">
@@ -185,10 +185,10 @@ export default function GraphView() {
         {/* Prerequisite Roadmap Generator Button */}
         <button
           onClick={() => setShowRoadmapModal(true)}
-          className="flex items-center gap-1 px-2.5 py-1 bg-[#181C28] hover:bg-[#202638] text-indigo-300 border border-indigo-500/30 rounded-md text-xs font-medium transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1 bg-[#181C28] hover:bg-[#202638] text-teal-300 border border-teal-500/30 rounded-md text-xs font-medium transition-colors"
           title="Generate Learning Roadmap DAG"
         >
-          <Map className="w-3 h-3 text-indigo-400" />
+          <Map className="w-3 h-3 text-teal-400" />
           <span>Roadmap</span>
         </button>
 
@@ -238,12 +238,12 @@ export default function GraphView() {
 
       {/* Selected Node Inspector Drawer */}
       {selectedNode && (
-        <div className="absolute bottom-3 left-3 z-10 bg-[#0F1117] p-3 rounded-lg border border-indigo-500/40 max-w-xs text-xs space-y-1 shadow-xl">
+        <div className="absolute bottom-3 left-3 z-10 bg-[#0F1117] p-3 rounded-lg border border-teal-500/40 max-w-xs text-xs space-y-1 shadow-xl">
           <div className="flex items-center justify-between gap-2">
             <span className="font-bold text-white text-xs truncate font-mono">{selectedNode.name}</span>
             <button onClick={() => setSelectedNode(null)} className="text-[#64748B] hover:text-white font-bold">&times;</button>
           </div>
-          <p className="text-[10px] text-indigo-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
+          <p className="text-[10px] text-teal-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
           <p className="text-[10px] text-[#64748B]">Isolated subgraph ({activeNeighbors.size} connections)</p>
         </div>
       )}
@@ -254,7 +254,7 @@ export default function GraphView() {
           <div className="bg-[#0F1117] w-full max-w-2xl max-h-[85vh] rounded-lg border border-[#1F2433] overflow-hidden flex flex-col shadow-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#1F2433] bg-[#090A0F]">
               <div className="flex items-center gap-2">
-                <div className="p-1 bg-[#18162B] border border-[#302856] rounded text-indigo-400">
+                <div className="p-1 bg-[#18162B] border border-[#302856] rounded text-teal-400">
                   <Sparkles className="w-3.5 h-3.5" />
                 </div>
                 <h3 className="font-bold text-white text-xs font-mono">Learning Path & Prerequisite DAG Generator</h3>
@@ -272,7 +272,7 @@ export default function GraphView() {
                   value={roadmapGoal}
                   onChange={(e) => setRoadmapGoal(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleGenerateRoadmap()}
-                  className="flex-1 bg-[#090A0F] border border-[#1F2433] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                  className="flex-1 bg-[#090A0F] border border-[#1F2433] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                 />
                 <button
                   onClick={handleGenerateRoadmap}
@@ -291,7 +291,7 @@ export default function GraphView() {
                       <h4 className="text-xs font-bold text-white font-mono">{roadmapData.subject}</h4>
                       <p className="text-[10px] text-[#64748B] font-mono">Total estimated duration: ~{roadmapData.total_estimated_hours} hours</p>
                     </div>
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-[#18162B] text-indigo-300 rounded border border-[#302856]">
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-[#18162B] text-teal-300 rounded border border-[#302856]">
                       {roadmapData.nodes.length} Stages · {roadmapData.edges.length} Dependencies
                     </span>
                   </div>
@@ -303,7 +303,7 @@ export default function GraphView() {
                         <div key={node.id} className="p-3 bg-[#090A0F] border border-[#1F2433] rounded-md space-y-1 hover:border-[#2E364B] transition-colors">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="w-4 h-4 rounded bg-[#18162B] border border-[#302856] text-indigo-300 text-[9px] font-bold flex items-center justify-center font-mono">
+                              <span className="w-4 h-4 rounded bg-[#18162B] border border-[#302856] text-teal-300 text-[9px] font-bold flex items-center justify-center font-mono">
                                 {idx + 1}
                               </span>
                               <span className="text-xs font-bold text-white font-mono">{node.title}</span>
@@ -341,12 +341,12 @@ export default function GraphView() {
         nodeRelSize={6}
         linkColor={(link: any) => {
           const active = selectedNode || hoverNode;
-          if (!active) return 'rgba(99, 102, 241, 0.15)';
+          if (!active) return 'rgba(20, 184, 166, 0.15)';
           const sId = link.source.id || link.source;
           const tId = link.target.id || link.target;
           return (sId === active.id || tId === active.id)
-            ? 'rgba(99, 102, 241, 0.85)'
-            : 'rgba(99, 102, 241, 0.03)';
+            ? 'rgba(20, 184, 166, 0.85)'
+            : 'rgba(20, 184, 166, 0.03)';
         }}
         linkWidth={(link: any) => {
           const active = selectedNode || hoverNode;
@@ -364,7 +364,7 @@ export default function GraphView() {
           ctx.font = `${fontSize}px "Plus Jakarta Sans", sans-serif`;
           
           const isNote = node.type === 'note';
-          const nodeColor = isNote ? '#818CF8' : '#38BDF8';
+          const nodeColor = isNote ? '#2DD4BF' : '#38BDF8';
           const nodeRadius = isNote ? 5.5 : 3.8;
           
           const isTargetActive = (selectedNode && selectedNode.id === node.id) || (hoverNode && hoverNode.id === node.id);
@@ -375,7 +375,7 @@ export default function GraphView() {
           if (isTargetActive) {
             ctx.beginPath();
             ctx.arc(node.x, node.y, nodeRadius * 2.2, 0, 2 * Math.PI, false);
-            ctx.fillStyle = isNote ? 'rgba(129, 140, 248, 0.3)' : 'rgba(56, 189, 248, 0.3)';
+            ctx.fillStyle = isNote ? 'rgba(45, 212, 191, 0.3)' : 'rgba(16, 185, 129, 0.3)';
             ctx.fill();
           }
 

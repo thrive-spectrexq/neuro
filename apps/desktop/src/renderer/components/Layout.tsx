@@ -58,7 +58,7 @@ function NavButton({
     >
       {/* Active indicator bar — slides in */}
       <span
-        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-brand-cyan shadow-glow-cyan transition-all duration-200 ease-out-expo ${
+        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-brand-emerald shadow-glow-emerald transition-all duration-200 ease-out-expo ${
           isActive ? 'h-4 opacity-100' : 'h-0 opacity-0'
         }`}
       />
@@ -66,7 +66,7 @@ function NavButton({
         size={18}
         className={`transition-all duration-200 ${
           isActive
-            ? 'text-brand-cyan-light scale-105'
+            ? 'text-brand-emerald-light scale-105'
             : 'group-hover:scale-105 group-hover:text-zinc-200'
         }`}
       />
@@ -90,13 +90,13 @@ function BrandMark({ onClick }: { onClick: () => void }) {
   return (
     <div
       onClick={onClick}
-      className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan/20 via-brand-primary/15 to-brand-cyan/5 border border-brand-cyan/25 flex items-center justify-center cursor-pointer hover:border-brand-cyan/50 transition-all duration-200 group relative no-drag"
+      className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-emerald/20 via-brand-primary/15 to-brand-emerald/5 border border-brand-emerald/25 flex items-center justify-center cursor-pointer hover:border-brand-emerald/50 transition-all duration-200 group relative no-drag"
       title="Neuro — AI Second Brain"
     >
       {/* Outer pulse ring */}
-      <div className="absolute inset-0 rounded-xl bg-brand-cyan/10 animate-pulse-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 rounded-xl bg-brand-emerald/10 animate-pulse-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
       {/* Inner core */}
-      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-cyan to-brand-primary flex items-center justify-center shadow-glow-cyan group-hover:scale-110 transition-transform duration-200">
+      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-emerald to-brand-primary flex items-center justify-center shadow-glow-emerald group-hover:scale-110 transition-transform duration-200">
         <div className="w-1.5 h-1.5 rounded-full bg-white" />
       </div>
     </div>
@@ -107,11 +107,11 @@ function AgentSummonButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full aspect-square rounded-xl bg-gradient-to-b from-brand-cyan/15 to-brand-primary/8 border border-brand-cyan/25 text-brand-cyan hover:border-brand-cyan/50 hover:shadow-glow-cyan transition-all duration-200 flex items-center justify-center group relative"
+      className="w-full aspect-square rounded-xl bg-gradient-to-b from-brand-emerald/15 to-brand-primary/8 border border-brand-emerald/25 text-brand-emerald hover:border-brand-emerald/50 hover:shadow-glow-emerald transition-all duration-200 flex items-center justify-center group relative"
       title="Summon Neuro Agent (Ctrl+Space / 'Hey Neuro')"
     >
-      <Zap size={17} className="group-hover:scale-110 transition-transform text-brand-cyan" />
-      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-brand-cyan animate-pulse shadow-glow-cyan" />
+      <Zap size={17} className="group-hover:scale-110 transition-transform text-brand-emerald" />
+      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-brand-emerald animate-pulse shadow-glow-emerald" />
     </button>
   );
 }
@@ -213,7 +213,7 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
               onClick={onOpenJarvis}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded-button bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.1] text-zinc-400 hover:text-zinc-200 text-xs transition-all duration-150 group"
             >
-              <Search size={12} className="text-zinc-500 group-hover:text-brand-cyan transition-colors" />
+              <Search size={12} className="text-zinc-500 group-hover:text-brand-emerald transition-colors" />
               <span className="text-[11px] font-sans">Command & Voice Agent...</span>
               <kbd className="text-[9px] px-1.5 py-0.5 bg-black/30 rounded border border-white/[0.06] text-zinc-500 font-mono">
                 Ctrl+Space
@@ -226,10 +226,10 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
             {/* Desktop Orb Button */}
             <button
               onClick={() => (window as any).electronAPI?.createOrbWindow()}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-cyan-950/30 border border-cyan-500/20 text-cyan-400 text-[10px] font-mono hover:bg-cyan-900/30 hover:border-cyan-500/35 transition-all duration-150"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono hover:bg-emerald-900/30 hover:border-emerald-500/35 transition-all duration-150"
               title="Spawn Floating Neon Desktop Orb"
             >
-              <Radio size={9} className="text-cyan-400 animate-pulse" />
+              <Radio size={9} className="text-emerald-400 animate-pulse" />
               <span>Orb</span>
             </button>
 

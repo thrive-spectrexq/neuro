@@ -161,10 +161,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
     try {
       // Execute via Neuro OS FastAPI Backend
-      const res = await fetch('http://localhost:8000/api/v1/agent/execute', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command: rawText, include_voice: true }),
+        body: JSON.stringify({ input_text: rawText, include_voice: true }),
       });
 
       if (res.ok) {
@@ -328,18 +328,18 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
     switch (orbState) {
       case 'listening':
         return {
-          glow: 'rgba(0, 245, 255, 0.65)',
-          glowWide: 'rgba(0, 245, 255, 0.28)',
+          glow: 'rgba(16, 185, 129, 0.65)',
+          glowWide: 'rgba(16, 185, 129, 0.28)',
           primary: '#00F5FF',
           secondary: '#38BDF8',
           border: '#00F5FF',
-          accent: '#06B6D4',
+          accent: '#10B981',
           status: 'Listening Active',
         };
       case 'processing':
         return {
-          glow: 'rgba(168, 85, 247, 0.75)',
-          glowWide: 'rgba(192, 132, 252, 0.32)',
+          glow: 'rgba(20, 184, 166, 0.75)',
+          glowWide: 'rgba(45, 212, 191, 0.32)',
           primary: '#C084FC',
           secondary: '#E879F9',
           border: '#A855F7',
@@ -359,11 +359,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
       case 'idle':
       default:
         return {
-          glow: 'rgba(99, 102, 241, 0.45)',
-          glowWide: 'rgba(99, 102, 241, 0.18)',
-          primary: '#818CF8',
+          glow: 'rgba(20, 184, 166, 0.45)',
+          glowWide: 'rgba(20, 184, 166, 0.18)',
+          primary: '#2DD4BF',
           secondary: '#A5B4FC',
-          border: '#6366F1',
+          border: '#14B8A6',
           accent: '#4F46E5',
           status: isMuted ? 'Muted / Standby' : 'Ready',
         };
@@ -407,10 +407,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
         <div
           className={`absolute ${sizeCfg.outerRingClass} rounded-full border-2 border-dashed transition-all duration-700 pointer-events-none ${
             orbState === 'processing'
-              ? 'animate-spin border-purple-400'
+              ? 'animate-spin border-teal-400'
               : orbState === 'listening'
-              ? 'animate-pulse border-cyan-400'
-              : 'border-indigo-500/50'
+              ? 'animate-pulse border-emerald-400'
+              : 'border-teal-500/50'
           }`}
           style={{
             borderColor: colors.border,
@@ -498,19 +498,19 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           <div className="flex items-center gap-1">
             {orbState === 'listening' ? (
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-6 bg-cyan-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" />
-                <span className="w-1.5 h-9 bg-cyan-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s]" />
-                <span className="w-1.5 h-7 bg-cyan-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s]" />
-                <span className="w-1.5 h-5 bg-cyan-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" />
+                <span className="w-1.5 h-6 bg-emerald-400 rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" />
+                <span className="w-1.5 h-9 bg-emerald-300 rounded-full animate-[bounce_0.4s_ease-in-out_infinite_0.1s]" />
+                <span className="w-1.5 h-7 bg-emerald-400 rounded-full animate-[bounce_0.5s_ease-in-out_infinite_0.2s]" />
+                <span className="w-1.5 h-5 bg-emerald-300 rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" />
               </div>
             ) : orbState === 'processing' ? (
-              <Sparkles className="w-9 h-9 text-purple-400 animate-pulse" />
+              <Sparkles className="w-9 h-9 text-teal-400 animate-pulse" />
             ) : orbState === 'speaking' ? (
               <Volume2 className="w-8 h-8 text-emerald-400 animate-pulse" />
             ) : isMuted ? (
               <MicOff className="w-8 h-8 text-rose-400 group-hover:text-rose-300 transition-colors" />
             ) : (
-              <Mic className="w-8 h-8 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
+              <Mic className="w-8 h-8 text-teal-400 group-hover:text-emerald-300 transition-colors" />
             )}
           </div>
 
@@ -551,19 +551,19 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               <div className="flex items-center bg-black/50 border border-white/10 rounded-lg p-0.5 text-[10px]">
                 <button
                   onClick={() => handleSetSizeMode('compact')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'compact' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   S
                 </button>
                 <button
                   onClick={() => handleSetSizeMode('big')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'big' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   M
                 </button>
                 <button
                   onClick={() => handleSetSizeMode('giant')}
-                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-purple-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-1.5 py-0.5 rounded ${sizeMode === 'giant' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
                 >
                   L
                 </button>
@@ -590,11 +590,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
           {/* Transcript / Output */}
           {transcript ? (
-            <div className="bg-cyan-950/30 border border-cyan-500/30 rounded-xl p-2.5 mb-2">
-              <div className="text-[10px] text-cyan-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
-                <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> Voice Heard:
+            <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-2.5 mb-2">
+              <div className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
+                <Radio className="w-3 h-3 text-emerald-400 animate-pulse" /> Voice Heard:
               </div>
-              <p className="text-xs text-cyan-200 font-sans italic leading-relaxed">
+              <p className="text-xs text-emerald-200 font-sans italic leading-relaxed">
                 "{transcript}"
               </p>
             </div>
@@ -619,9 +619,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                     <button
                       key={i}
                       onClick={() => handleFinalCommand(act.cmd)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-cyan-300 transition-all font-sans"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.06] text-[10px] text-zinc-300 hover:text-emerald-300 transition-all font-sans"
                     >
-                      <Icon className="w-2.5 h-2.5 text-cyan-400" />
+                      <Icon className="w-2.5 h-2.5 text-emerald-400" />
                       <span>{act.label}</span>
                     </button>
                   );

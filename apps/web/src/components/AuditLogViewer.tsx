@@ -66,7 +66,7 @@ export function AuditLogViewer() {
           </button>
           <button
             onClick={() => handleExport('json')}
-            className="flex items-center gap-1 px-2.5 py-1 bg-[#18162B] hover:bg-[#231F3D] text-purple-300 border border-[#302856] rounded-md text-xs font-mono transition-colors shadow-sm"
+            className="flex items-center gap-1 px-2.5 py-1 bg-[#18162B] hover:bg-[#231F3D] text-teal-300 border border-[#302856] rounded-md text-xs font-mono transition-colors shadow-sm"
           >
             <FileCode className="w-3 h-3" />
             <span>JSON</span>
@@ -98,7 +98,7 @@ export function AuditLogViewer() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white font-mono">{log.action}</span>
-                    <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#18162B] text-purple-300 rounded border border-[#302856]">
+                    <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#18162B] text-teal-300 rounded border border-[#302856]">
                       {log.entity_type}
                     </span>
                   </div>

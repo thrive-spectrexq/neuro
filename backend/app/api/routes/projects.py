@@ -28,7 +28,7 @@ router = APIRouter()
 async def create_project(
     project_in: ProjectCreate,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     project = Project(**project_in.model_dump(), user_id=user_uuid)
@@ -41,7 +41,7 @@ async def create_project(
 @router.get("", response_model=list[ProjectResponse])
 async def list_projects(
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
 
@@ -60,11 +60,18 @@ async def list_projects(
 async def get_project(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+        
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    if project.user_id != user_uuid:
+        member = await session.get(ProjectMember, (id, user_uuid))
+        if not member:
+            raise HTTPException(status_code=403, detail="Not authorized")
+            
     return project
 
 
@@ -73,11 +80,17 @@ async def update_project(
     id: uuid.UUID,
     project_in: ProjectUpdate,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+        
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    if project.user_id != user_uuid:
+        member = await session.get(ProjectMember, (id, user_uuid))
+        if not member or member.role not in (Role.owner, Role.admin):
+            raise HTTPException(status_code=403, detail="Not authorized")
 
     update_data = project_in.model_dump(exclude_unset=True)
     for key, value in update_data.items():
@@ -93,11 +106,15 @@ async def update_project(
 async def delete_project(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    if project.user_id != user_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized")
 
     await session.delete(project)
     await session.commit()
@@ -109,11 +126,17 @@ async def list_project_notes(
     skip: int = 0,
     limit: int = 20,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    if project.user_id != user_uuid:
+        member = await session.get(ProjectMember, (id, user_uuid))
+        if not member:
+            raise HTTPException(status_code=403, detail="Not authorized")
 
     stmt = select(Note).where(Note.project_id == id).offset(skip).limit(limit)
     result = await session.execute(stmt)
@@ -141,7 +164,7 @@ async def add_member(
     id: uuid.UUID,
     member_in: ProjectMemberCreate,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
@@ -176,7 +199,7 @@ async def remove_member(
     id: uuid.UUID,
     user_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:
@@ -197,7 +220,7 @@ async def remove_member(
 async def get_project_audit_log(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     project = await session.get(Project, id)
     if not project:

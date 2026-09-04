@@ -70,7 +70,7 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#1F2433] pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+            <div className="p-1.5 bg-[#18162B] border border-[#302856] rounded-md text-teal-400">
               <FolderPlus className="w-3.5 h-3.5" />
             </div>
             <div>
@@ -106,7 +106,7 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
                       : 'bg-[#090A0F] border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#141722]'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                  <Icon className="w-3.5 h-3.5 text-teal-400" />
                   <span className="text-[10px]">{item.label}</span>
                 </button>
               );
@@ -115,7 +115,7 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
         </div>
 
         {/* Drop Zone */}
-        <div className="border border-dashed border-[#242A3C] hover:border-indigo-500/50 rounded-lg p-5 text-center bg-[#090A0F] transition-colors cursor-pointer relative">
+        <div className="border border-dashed border-[#242A3C] hover:border-teal-500/50 rounded-lg p-5 text-center bg-[#090A0F] transition-colors cursor-pointer relative">
           <input
             type="file"
             multiple
@@ -123,11 +123,11 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
             onChange={handleFileChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          <Upload className="w-6 h-6 text-indigo-400 mx-auto mb-1.5 opacity-80" />
+          <Upload className="w-6 h-6 text-teal-400 mx-auto mb-1.5 opacity-80" />
           <p className="text-xs font-bold text-white font-mono">Select or drag files to ingest</p>
           <p className="text-[10px] text-[#64748B] font-mono mt-0.5">Supports .md and .txt markdown files</p>
           {files.length > 0 && (
-            <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 bg-[#18162B] text-indigo-300 border border-[#302856] rounded text-[10px] font-mono">
+            <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 bg-[#18162B] text-teal-300 border border-[#302856] rounded text-[10px] font-mono">
               <FileText className="w-3 h-3" />
               {files.length} {files.length === 1 ? 'file' : 'files'} selected
             </div>

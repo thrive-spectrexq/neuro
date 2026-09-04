@@ -133,31 +133,31 @@ async def delete_user_account_and_data(
         )
 
     user_id = current_user.id
+    from app.models.sync import SyncBlob, DeviceKey
+    from app.models.audit import AuditLog
+    from app.models.automation import AutomationRule
+    from app.models.project import Project
 
-    # 1. Delete user memories
-    await session.execute(delete(Memory).where(Memory.user_id == user_id))
-
-    # 2. Delete user tasks
+    await session.execute(delete(SyncBlob).where(SyncBlob.user_id == user_id))
+    await session.execute(delete(DeviceKey).where(DeviceKey.user_id == user_id))
+    await session.execute(delete(AuditLog).where(AuditLog.user_id == user_id))
+    await session.execute(delete(Comment).where(Comment.user_id == user_id))
     await session.execute(delete(Task).where(Task.user_id == user_id))
 
-    # 3. Delete user comments
-    await session.execute(delete(Comment).where(Comment.user_id == user_id))
-
-    # 4. Delete user notes & associations
     notes_stmt = select(Note.id).where(Note.user_id == user_id)
     user_note_ids = (await session.execute(notes_stmt)).scalars().all()
-
     if user_note_ids:
         await session.execute(
             delete(NoteLink).where((NoteLink.source_id.in_(user_note_ids)) | (NoteLink.target_id.in_(user_note_ids)))
         )
         await session.execute(delete(NoteTag).where(NoteTag.note_id.in_(user_note_ids)))
-        await session.execute(delete(Note).where(Note.user_id == user_id))
+    await session.execute(delete(Note).where(Note.user_id == user_id))
 
-    # 5. Delete project memberships
     await session.execute(delete(ProjectMember).where(ProjectMember.user_id == user_id))
+    await session.execute(delete(Project).where(Project.user_id == user_id))
+    await session.execute(delete(Memory).where(Memory.user_id == user_id))
+    await session.execute(delete(AutomationRule).where(AutomationRule.user_id == user_id))
 
-    # 6. Delete user account
     await session.execute(delete(User).where(User.id == user_id))
 
     await session.commit()

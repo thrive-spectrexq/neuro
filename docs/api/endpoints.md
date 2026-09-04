@@ -246,3 +246,75 @@ Process voice inputs for transcription and commands.
 - **WebSocket /api/v1/voice/stream**
   - **Description**: Real-time voice streaming for live transcription.
   - **Auth**: Token required in connection request.
+
+## 15. Agent Subsystem (`/api/v1/agent`)
+Agent execution and preview endpoints.
+
+- **POST /api/v1/agent/execute**
+  - **Description**: Trigger an agent action.
+  - **Request Body**: `{"action": "summarize", "context": {}}`
+  - **Response**: `{"task_id": "uuid", "status": "pending"}`
+  - **Auth**: Required
+
+- **GET /api/v1/agent/preview**
+  - **Description**: Preview what an agent would do before execution.
+  - **Response**: `{"plan": ["step 1", "step 2"]}`
+  - **Auth**: Required
+
+## 16. Long-term Memory (`/api/v1/memory`)
+Long-term agent memory CRUD.
+
+- **GET /api/v1/memory**
+  - **Description**: Retrieve stored memories.
+  - **Response**: `{"memories": [{"id": "uuid", "key": "preference", "value": "..."}]}`
+  - **Auth**: Required
+
+- **POST /api/v1/memory**
+  - **Description**: Add a new memory entry.
+  - **Request Body**: `{"key": "concept", "value": "details", "memory_type": "semantic"}`
+  - **Response**: Created Memory object.
+  - **Auth**: Required
+
+## 17. Privacy & GDPR (`/api/v1/privacy`)
+GDPR data export and account deletion.
+
+- **POST /api/v1/privacy/export**
+  - **Description**: Request a full data export.
+  - **Response**: `{"export_id": "uuid", "status": "processing"}`
+  - **Auth**: Required
+
+- **DELETE /api/v1/privacy/account**
+  - **Description**: Permanently delete user account and all data.
+  - **Response**: `204 No Content`
+  - **Auth**: Required
+
+## 18. Roadmap Generation (`/api/v1/roadmap`)
+Pedagogical prerequisite DAG generation.
+
+- **POST /api/v1/roadmap/generate**
+  - **Description**: Generate a learning roadmap for a topic.
+  - **Request Body**: `{"topic": "Quantum Computing", "depth": 3}`
+  - **Response**: DAG of prerequisite nodes.
+  - **Auth**: Required
+
+## 19. Obsidian Integration (`/api/v1/obsidian`)
+Vault linting, health, canvas, routing, transactions, spaced repetition.
+
+- **GET /api/v1/obsidian/health**
+  - **Description**: Check vault integrity and broken links.
+  - **Response**: `{"status": "ok", "broken_links": []}`
+  - **Auth**: Required
+
+- **POST /api/v1/obsidian/lint**
+  - **Description**: Lint and format notes according to vault rules.
+  - **Response**: `{"formatted_files": 5}`
+  - **Auth**: Required
+
+## 20. Graph Intelligence (`/api/v1/graph-intel`)
+Codebase AST extraction, Louvain communities, blast radius, wiki generation.
+
+- **POST /api/v1/graph-intel/extract**
+  - **Description**: Extract AST and generate community graphs.
+  - **Request Body**: `{"path": "./src"}`
+  - **Response**: Graph intel results.
+  - **Auth**: Required

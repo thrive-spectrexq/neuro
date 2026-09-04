@@ -133,7 +133,7 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
       let command = `start "" "${sanitizedAppName}"`;
 
       if (normalized.includes('antigravity')) {
-        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { Write-Host '⚡ Launching Antigravity Assistant in ${projectDir}...' -ForegroundColor Cyan; code . }"`;
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { Write-Host '⚡ Launching Antigravity Assistant in ${projectDir}...' -ForegroundColor emerald; code . }"`;
       } else if (normalized.includes('claude') || normalized.includes('claude code')) {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command claude -ErrorAction SilentlyContinue) { claude } else { Write-Host '⚡ Launching Claude Code in ${projectDir}...' -ForegroundColor Magenta; npx @anthropic-ai/claude-code }"`;
       } else if (normalized.includes('codex') || normalized.includes('openai codex')) {
@@ -141,7 +141,7 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
       } else if (normalized.includes('aider')) {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command aider -ErrorAction SilentlyContinue) { aider } else { Write-Host '⚡ Launching Aider AI in ${projectDir}...' -ForegroundColor Yellow; code . }"`;
       } else if (normalized.includes('coding') || normalized.includes('code_session') || normalized.includes('resume coding')) {
-        command = `start powershell -NoExit -Command "cd '${projectDir}'; Write-Host '🚀 Resuming AI Coding Session in ${projectDir}...' -ForegroundColor Cyan; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { code . }"`;
+        command = `start powershell -NoExit -Command "cd '${projectDir}'; Write-Host '🚀 Resuming AI Coding Session in ${projectDir}...' -ForegroundColor emerald; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { code . }"`;
       } else if (normalized === 'cursor' || normalized.includes('cursor')) {
         command = `start cursor "${projectDir}" || cursor .`;
       } else if (normalized === 'windsurf' || normalized.includes('windsurf')) {

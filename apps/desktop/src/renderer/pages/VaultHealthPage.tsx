@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiClient } from '../../lib/api';
 import {
   Activity,
   Shield,
@@ -50,6 +52,24 @@ const MOCK_ACTIVITY = [
 export default function VaultHealthPage() {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
+  const { data: stats = MOCK_STATS, refetch: refetchStats } = useQuery({
+    queryKey: ['vault-health'],
+    queryFn: () => apiClient.get('/obsidian/health-summary').then(res => res.data)
+  });
+
+  const { data: issues = MOCK_ISSUES, refetch: refetchIssues, isFetching: isLinting } = useQuery({
+    queryKey: ['vault-lint'],
+    queryFn: () => apiClient.get('/obsidian/lint?path=.').then(res => res.data)
+  });
+
+  const fixDeadLinksMutation = useMutation({
+    mutationFn: () => apiClient.post('/obsidian/auto-heal'),
+    onSuccess: () => {
+      refetchStats();
+      refetchIssues();
+    }
+  });
+
   const toggleCategory = (category: string) => {
     setExpandedCategories(prev => ({
       ...prev,
@@ -63,17 +83,17 @@ export default function VaultHealthPage() {
     return 'text-rose-500 stroke-rose-500';
   };
 
-  const scoreColor = getScoreColor(MOCK_STATS.healthScore);
+  const scoreColor = getScoreColor(stats.healthScore || 0);
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (MOCK_STATS.healthScore / 100) * circumference;
+  const strokeDashoffset = circumference - ((stats.healthScore || 0) / 100) * circumference;
 
   return (
     <div className="page-container animate-fade-in">
       <div className="page-header flex justify-between items-end mb-8">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <Activity className="w-8 h-8 text-brand-cyan" />
+            <Activity className="w-8 h-8 text-brand-emerald" />
             Vault Health & Diagnostics
           </h1>
           <p className="page-subtitle mt-1">
@@ -81,9 +101,9 @@ export default function VaultHealthPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="btn-secondary flex items-center gap-2">
-            <RefreshCw className="w-4 h-4" />
-            Run Full Lint
+          <button className="btn-secondary flex items-center gap-2" onClick={() => refetchIssues()} disabled={isLinting}>
+            <RefreshCw className={`w-4 h-4 ${isLinting ? 'animate-spin' : ''}`} />
+            {isLinting ? 'Linting...' : 'Run Full Lint'}
           </button>
         </div>
       </div>
@@ -114,7 +134,7 @@ export default function VaultHealthPage() {
             </svg>
             <div className="absolute flex flex-col items-center">
               <span className={`text-4xl font-bold ${scoreColor.split(' ')[0]}`}>
-                {MOCK_STATS.healthScore}
+                {stats.healthScore}
               </span>
               <span className="text-text-muted text-sm mt-1">/ 100</span>
             </div>
@@ -132,28 +152,28 @@ export default function VaultHealthPage() {
               <FileText className="w-5 h-5" />
               <span className="font-medium">Total Notes</span>
             </div>
-            <span className="text-3xl font-bold text-text-primary">{MOCK_STATS.totalNotes}</span>
+            <span className="text-3xl font-bold text-text-primary">{stats.totalNotes}</span>
           </div>
           <div className="card-surface-static p-6 flex flex-col">
             <div className="flex items-center gap-2 text-text-muted mb-4">
               <Link className="w-5 h-5" />
               <span className="font-medium">Total Links</span>
             </div>
-            <span className="text-3xl font-bold text-text-primary">{MOCK_STATS.totalLinks}</span>
+            <span className="text-3xl font-bold text-text-primary">{stats.totalLinks}</span>
           </div>
           <div className="card-surface-static p-6 flex flex-col">
             <div className="flex items-center gap-2 text-amber-500 mb-4">
               <AlertTriangle className="w-5 h-5" />
               <span className="font-medium">Orphan Notes</span>
             </div>
-            <span className="text-3xl font-bold text-text-primary">{MOCK_STATS.orphanNotes}</span>
+            <span className="text-3xl font-bold text-text-primary">{stats.orphanNotes}</span>
           </div>
           <div className="card-surface-static p-6 flex flex-col">
             <div className="flex items-center gap-2 text-rose-500 mb-4">
               <Unlink className="w-5 h-5" />
               <span className="font-medium">Dead Links</span>
             </div>
-            <span className="text-3xl font-bold text-text-primary">{MOCK_STATS.deadLinks}</span>
+            <span className="text-3xl font-bold text-text-primary">{stats.deadLinks}</span>
           </div>
         </div>
       </div>
@@ -169,7 +189,9 @@ export default function VaultHealthPage() {
         </div>
         <div className="flex gap-3">
           <button className="btn-secondary">Generate Frontmatter</button>
-          <button className="btn-primary">Fix Dead Links</button>
+          <button className="btn-primary" onClick={() => fixDeadLinksMutation.mutate()} disabled={fixDeadLinksMutation.isPending}>
+            {fixDeadLinksMutation.isPending ? 'Fixing...' : 'Fix Dead Links'}
+          </button>
         </div>
       </div>
 
@@ -194,14 +216,14 @@ export default function VaultHealthPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="badge-rose">{MOCK_ISSUES.deadLinks.length}</span>
+                <span className="badge-rose">{issues.deadLinks.length}</span>
                 {expandedCategories['deadLinks'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
               </div>
             </button>
             {expandedCategories['deadLinks'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-3">
-                  {MOCK_ISSUES.deadLinks.map(issue => (
+                  {issues.deadLinks.map((issue: any) => (
                     <li key={issue.id} className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors">
                       <span className="text-text-primary font-medium">{issue.file}</span>
                       <span className="text-text-muted flex items-center gap-1">
@@ -230,14 +252,14 @@ export default function VaultHealthPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="badge-amber">{MOCK_ISSUES.orphanNotes.length}</span>
+                <span className="badge-amber">{issues.orphanNotes.length}</span>
                 {expandedCategories['orphanNotes'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
               </div>
             </button>
             {expandedCategories['orphanNotes'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
-                  {MOCK_ISSUES.orphanNotes.map(issue => (
+                  {issues.orphanNotes.map((issue: any) => (
                     <li key={issue.id} className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors">
                       {issue.file}
                     </li>
@@ -254,7 +276,7 @@ export default function VaultHealthPage() {
               onClick={() => toggleCategory('missingFrontmatter')}
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                <div className="p-2 bg-teal-500/10 rounded-lg text-teal-400">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="text-left">
@@ -263,14 +285,14 @@ export default function VaultHealthPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">{MOCK_ISSUES.missingFrontmatter.length}</span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-400 border border-teal-500/20">{issues.missingFrontmatter.length}</span>
                 {expandedCategories['missingFrontmatter'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
               </div>
             </button>
             {expandedCategories['missingFrontmatter'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
-                  {MOCK_ISSUES.missingFrontmatter.map(issue => (
+                  {issues.missingFrontmatter.map((issue: any) => (
                     <li key={issue.id} className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors">
                       {issue.file}
                     </li>
@@ -303,7 +325,7 @@ export default function VaultHealthPage() {
             {expandedCategories['emptySections'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
-                  {MOCK_ISSUES.emptySections.map(issue => (
+                  {MOCK_ISSUES.emptySections.map((issue: any) => (
                     <li key={issue.id} className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors">
                       <span className="text-text-primary">{issue.file}</span>
                       <span className="text-text-muted text-xs">Header: {issue.header}</span>
@@ -322,7 +344,7 @@ export default function VaultHealthPage() {
             <div className="relative pl-6 border-l-2 border-surface-elevated space-y-8">
               {MOCK_ACTIVITY.map((activity, idx) => (
                 <div key={activity.id} className="relative">
-                  <div className={`absolute -left-[35px] bg-panel p-1 rounded-full border-2 border-surface-elevated ${activity.type === 'fix' ? 'text-brand-cyan' : 'text-emerald-500'}`}>
+                  <div className={`absolute -left-[35px] bg-panel p-1 rounded-full border-2 border-surface-elevated ${activity.type === 'fix' ? 'text-brand-emerald' : 'text-emerald-500'}`}>
                     {activity.type === 'fix' ? <Wrench className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                   </div>
                   <div>

@@ -16,7 +16,7 @@ from app.services.graph_intelligence_service import (
     graph_wiki_gen,
 )
 
-router = APIRouter(prefix="/graph-intelligence", tags=["graph-intelligence"])
+router = APIRouter(tags=["graph-intelligence"])
 
 
 class ExtractGraphRequest(BaseModel):

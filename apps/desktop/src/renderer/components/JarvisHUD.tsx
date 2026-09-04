@@ -202,12 +202,12 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
           const x = gap + i * (barWidth + gap);
           const y = centerY - wave / 2;
 
-          // Gradient color from Cyan to Neural Violet
+          // Gradient color from emerald to Neural Violet
           const gradient = canvasCtx.createLinearGradient(0, y, 0, y + wave);
           if (isListening) {
-            gradient.addColorStop(0, '#22d3ee');
-            gradient.addColorStop(0.5, '#6366f1');
-            gradient.addColorStop(1, '#818cf8');
+            gradient.addColorStop(0, '#34D399');
+            gradient.addColorStop(0.5, '#14B8A6');
+            gradient.addColorStop(1, '#2DD4BF');
           } else {
             gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
@@ -296,7 +296,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                         isProcessing 
                           ? 'bg-brand-amber animate-ping' 
                           : isListening 
-                          ? 'bg-brand-cyan animate-pulse shadow-glow-cyan' 
+                          ? 'bg-brand-emerald animate-pulse shadow-glow-emerald' 
                           : 'bg-zinc-500'
                       }`} 
                     />
@@ -367,7 +367,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
               }}
               className={`p-1.5 rounded-lg transition-colors ${
                 isListening
-                  ? 'text-brand-cyan bg-brand-cyan/10 ring-1 ring-brand-cyan/30'
+                  ? 'text-brand-emerald bg-brand-emerald/10 ring-1 ring-brand-emerald/30'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]'
               }`}
               title={isListening ? 'Stop listening' : 'Start microphone listening'}
@@ -397,14 +397,14 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
           {/* Transcript / State Display */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Radio size={12} className={isListening ? 'text-brand-cyan animate-pulse' : 'text-zinc-500'} />
+              <Radio size={12} className={isListening ? 'text-brand-emerald animate-pulse' : 'text-zinc-500'} />
               <span className="text-[11px] font-mono tracking-wider uppercase text-zinc-500">
                 {isProcessing ? 'Agent Active' : isListening ? 'Voice Stream' : 'Ready'}
               </span>
             </div>
 
             {transcript ? (
-              <p className="text-sm font-medium text-brand-cyan-light tracking-tight truncate font-sans">
+              <p className="text-sm font-medium text-brand-emerald-light tracking-tight truncate font-sans">
                 "{transcript}"
               </p>
             ) : isListening ? (
@@ -438,20 +438,20 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                      voiceLevel === 'quiet' ? 'Speak Louder ⏶' :
                      voiceLevel === 'loud' ? 'Loud Audio ⏷' : 'Listening...'}
                   </span>
-                  <span className="text-cyan-400 font-bold ml-1">{audioVolume}%</span>
+                  <span className="text-emerald-400 font-bold ml-1">{audioVolume}%</span>
                 </div>
 
                 <div className="relative w-28 h-1.5 bg-zinc-900 rounded-full overflow-hidden flex items-center border border-white/[0.06]">
                   {/* Activation threshold indicator line */}
                   <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 z-10 opacity-75"
+                    className="absolute top-0 bottom-0 w-0.5 bg-emerald-400 z-10 opacity-75"
                     style={{ left: `${activationThreshold}%` }}
                     title={`Activation Threshold (${activationThreshold}%)`}
                   />
                   <div
                     className={`h-full transition-all duration-75 rounded-full ${
-                      audioVolume >= 75 ? 'bg-gradient-to-r from-cyan-500 via-emerald-400 to-rose-500' :
-                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
+                      audioVolume >= 75 ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-rose-500' :
+                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-emerald-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
                       'bg-amber-500/60'
                     }`}
                     style={{ width: `${Math.max(3, audioVolume)}%` }}
@@ -504,7 +504,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                       </span>
 
                       {item.is_offline_native && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20">
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20">
                           Native
                         </span>
                       )}
@@ -551,7 +551,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                     className="p-3 rounded-xl bg-[#0e121d] border border-white/[0.06] hover:border-brand-primary/40 hover:bg-[#121626] transition-all flex items-center justify-between text-left group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-400 group-hover:text-brand-cyan transition-colors">
+                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-400 group-hover:text-brand-emerald transition-colors">
                         <Icon size={14} />
                       </div>
                       <div className="min-w-0">

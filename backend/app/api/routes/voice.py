@@ -26,20 +26,18 @@ def transcribe_audio_payload(audio_bytes: bytes, content_type: str = "audio/webm
 
     # 1. Native HTTP speech gateway
     try:
+        import httpx
         url = "https://www.google.com/speech-api/v2/recognize?client=chromium&lang=en-US"
-        req = urllib.request.Request(url, data=audio_bytes, headers={"Content-Type": content_type or "audio/webm"})
-        with urllib.request.urlopen(req, timeout=7) as resp:
-            raw = resp.read().decode("utf-8")
+        with httpx.Client(timeout=7.0) as client:
+            resp = client.post(url, content=audio_bytes, headers={"Content-Type": content_type or "audio/webm"})
+            resp.raise_for_status()
+            raw = resp.text
             for line in raw.strip().split("\n"):
                 if line.strip():
-                    try:
-                        data = json.loads(line)
-                        if "result" in data and len(data["result"]) > 0:
-                            alt = data["result"][0].get("alternative", [])
-                            if alt and "transcript" in alt[0]:
-                                return alt[0]["transcript"].strip()
-                    except Exception:
-                        pass
+                    data = json.loads(line)
+                    if "result" in data and data["result"]:
+                        transcript = data["result"][0]["alternative"][0]["transcript"]
+                        return transcript.strip()
     except Exception:
         # Fallback local notice
         pass

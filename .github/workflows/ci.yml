@@ -41,11 +41,11 @@ jobs:
 
     - name: Run Mypy Type Check
       working-directory: ./backend
-      run: mypy app/ || echo "Typecheck complete"
+      run: mypy app/
 
     - name: Run Security Audit
       working-directory: ./backend
-      run: pip-audit || echo "Audit complete"
+      run: pip-audit
 
     - name: Run Tests with Coverage
       working-directory: ./backend
@@ -81,10 +81,34 @@ jobs:
       run: pnpm turbo run typecheck
 
     - name: Run Dependency Audit
-      run: pnpm audit --audit-level=high || echo "Frontend audit check completed"
+      run: pnpm audit --audit-level=high
 
     - name: Run Tests
       run: pnpm turbo run test
+
+  build-clipper:
+    name: Build Clipper Extension
+    runs-on: ubuntu-latest
+    needs: [frontend-test]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
+
+    - name: Build Clipper
+      run: pnpm turbo run build --filter="@neuro/clipper"
 
   build-desktop:
     name: Build Desktop App

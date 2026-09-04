@@ -119,7 +119,7 @@ export const AssistantDrawer: React.FC = () => {
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
-            className="bg-[#141722] text-[#CBD5E1] text-[11px] font-mono border border-[#242A3C] rounded px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="bg-[#141722] text-[#CBD5E1] text-[11px] font-mono border border-[#242A3C] rounded px-2 py-1 focus:outline-none focus:border-teal-500 cursor-pointer"
           >
             <option value="ollama:llama3.2">llama3.2 (Local)</option>
             <option value="ollama:deepseek-r1:8b">deepseek-r1:8b (Local)</option>
@@ -133,7 +133,7 @@ export const AssistantDrawer: React.FC = () => {
           onClick={() => setUseRag(!useRag)}
           className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono border transition-colors ${
             useRag
-              ? 'bg-[#1E1B4B] border-[#3730A3] text-indigo-300'
+              ? 'bg-[#1E1B4B] border-[#3730A3] text-teal-300'
               : 'bg-[#141722] border-[#242A3C] text-[#64748B]'
           }`}
           title="Toggle Vault RAG Grounding"
@@ -146,18 +146,35 @@ export const AssistantDrawer: React.FC = () => {
       {/* Suggestion Feed & Streaming Area */}
       <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
         {/* Voice control integration */}
-        <VoiceControl />
+        <VoiceControl onAudioReady={async (blob: Blob) => {
+          try {
+            const fd = new FormData();
+            fd.append('file', blob, 'speech.webm');
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/voice/transcribe`, {
+              method: 'POST',
+              body: fd,
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.text) {
+                setPrompt(data.text);
+              }
+            }
+          } catch (err) {
+            console.error('Voice transcribe error:', err);
+          }
+        }} />
 
         {/* Live Streaming State */}
         {isStreaming && (
           <div
             role="status"
             aria-live="polite"
-            className="bg-[#12151E] border border-indigo-950/60 rounded-lg p-3 flex flex-col gap-2 animate-fadeIn"
+            className="bg-[#12151E] border border-teal-950/60 rounded-lg p-3 flex flex-col gap-2 animate-fadeIn"
           >
-            <div className="flex items-center justify-between text-xs text-indigo-400 font-mono">
+            <div className="flex items-center justify-between text-xs text-teal-400 font-mono">
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-teal-500 animate-ping" />
                 <span>Thinking & Streaming...</span>
               </span>
               <button
@@ -177,7 +194,7 @@ export const AssistantDrawer: React.FC = () => {
         {/* Suggestions List */}
         {suggestions.length === 0 && !isStreaming ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-[#64748B]">
-            <Info className="w-8 h-8 mb-2 opacity-50 text-indigo-400" />
+            <Info className="w-8 h-8 mb-2 opacity-50 text-teal-400" />
             <p className="text-xs font-medium text-[#94A3B8]">No active suggestions</p>
             <p className="text-[11px] mt-1">
               Ask questions about your vault or request note summaries and linting fixes.
@@ -221,7 +238,7 @@ export const AssistantDrawer: React.FC = () => {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Ask vault or prompt assistant..."
           disabled={isStreaming}
-          className="flex-1 h-8 bg-[#141722] border border-[#242A3C] focus:border-indigo-500 rounded-md px-3 text-xs text-[#F1F5F9] placeholder-[#64748B] outline-none disabled:opacity-50"
+          className="flex-1 h-8 bg-[#141722] border border-[#242A3C] focus:border-teal-500 rounded-md px-3 text-xs text-[#F1F5F9] placeholder-[#64748B] outline-none disabled:opacity-50"
         />
         <button
           type="submit"

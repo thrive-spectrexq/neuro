@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,21 +11,24 @@ from app.services.agent.tools import agent_tools_registry
 logger = logging.getLogger(__name__)
 
 
-async def create_note(args: dict[str, Any]) -> str:
+async def create_note(args: dict[str, Any], user_id: uuid.UUID = None) -> str:
     """Create a new note in Neuro."""
     title = args.get("title", "Untitled Note")
     content = args.get("content", "")
     project_id = args.get("project_id", None)
+    
+    if user_id is None:
+        user_id = args.get("user_id") or uuid.UUID(int=0)
 
     async with AsyncSession(engine) as session:
-        import uuid
+        import uuid as _uuid
 
         note = Note(
-            id=uuid.uuid4(),
+            id=_uuid.uuid4(),
             title=title,
             content=content or f"# {title}\n\n*Created via Voice*",
             project_id=project_id,
-            user_id=uuid.UUID("00000000-0000-0000-0000-000000000000"),
+            user_id=user_id,
         )
         session.add(note)
         await session.commit()

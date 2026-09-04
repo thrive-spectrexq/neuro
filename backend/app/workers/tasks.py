@@ -37,7 +37,7 @@ def process_pdf_task(file_bytes: bytes, filename: str, user_id: str):
                 title=filename,
                 content=result["content"],
                 user_id=user_id,
-                metadata_=result["metadata"],
+
             )
             session.add(note)
             await session.commit()
@@ -56,7 +56,7 @@ def process_markdown_task(content: str, filename: str, user_id: str):
                 title=result["metadata"].get("title", filename),
                 content=result["content"],
                 user_id=user_id,
-                metadata_=result["metadata"],
+
             )
             session.add(note)
             await session.commit()
@@ -88,7 +88,7 @@ def process_import_task(source_path: str, format: str, user_id: str):
                     title=result["metadata"].get("title", "Untitled Note"),
                     content=result["content"],
                     user_id=user_id,
-                    metadata_=result["metadata"],
+    
                 )
                 session.add(note)
                 await session.commit()

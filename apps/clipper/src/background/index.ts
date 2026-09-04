@@ -32,7 +32,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     };
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/ingest', {
+      const { apiUrl } = await chrome.storage.local.get('apiUrl');
+      const baseApiUrl = apiUrl || 'http://localhost:8000';
+      const res = await fetch(`${baseApiUrl}/api/v1/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

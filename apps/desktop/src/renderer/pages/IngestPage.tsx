@@ -35,10 +35,39 @@ export default function IngestPage() {
     setIsDragging(false);
   };
   
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
-    // Handle drop mock
+    const file = e.dataTransfer.files?.[0];
+    if (file) await uploadFile(file);
+  };
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/ingest/file`, {
+        method: 'POST',
+        body: formData,
+      });
+      // trigger success toast here if needed
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleCaptureUrl = async () => {
+    if (!urlInput) return;
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/ingest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlInput }),
+      });
+      setUrlInput('');
+      // trigger success toast here if needed
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -55,7 +84,7 @@ export default function IngestPage() {
         <div className="flex flex-col gap-6">
           <div 
             className={`card-surface-static flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 min-h-[300px] transition-colors duration-200 ${
-              isDragging ? 'border-brand-cyan bg-brand-cyan/5' : 'border-[var(--surface-elevated)]'
+              isDragging ? 'border-brand-emerald bg-brand-emerald/5' : 'border-[var(--surface-elevated)]'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -68,9 +97,15 @@ export default function IngestPage() {
             <p className="text-[var(--text-secondary)] text-sm mb-6 text-center">
               Drag and drop your documents to begin ingestion.
             </p>
-            <button className="btn-primary">
+            <label className="btn-primary cursor-pointer">
               Browse Files
-            </button>
+              <input type="file" className="hidden" onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  uploadFile(file);
+                }
+              }} />
+            </label>
           </div>
 
           <div className="card-surface-static p-4 flex flex-col gap-3">
@@ -86,7 +121,7 @@ export default function IngestPage() {
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
               />
-              <button className="btn-secondary whitespace-nowrap">
+              <button className="btn-secondary whitespace-nowrap" onClick={handleCaptureUrl}>
                 Capture
               </button>
             </div>
@@ -104,7 +139,7 @@ export default function IngestPage() {
         {/* Right Column - Processing Pipeline */}
         <div className="card-surface-static p-6 flex flex-col">
           <div className="flex items-center gap-2 mb-6">
-            <Shield className="w-5 h-5 text-brand-cyan" />
+            <Shield className="w-5 h-5 text-brand-emerald" />
             <h2 className="text-lg font-medium text-[var(--text-primary)]">Active Pipeline</h2>
           </div>
 
@@ -129,20 +164,20 @@ export default function IngestPage() {
             {/* Step 2: Active */}
             <div className="flex gap-4 items-start">
               <div className="relative flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-brand-cyan/10 border border-brand-cyan/30 flex items-center justify-center shrink-0 z-10 relative">
-                  <div className="absolute inset-0 rounded-full animate-ping bg-brand-cyan/20"></div>
-                  <FileSearch className="w-5 h-5 text-brand-cyan relative z-10" />
+                <div className="w-10 h-10 rounded-full bg-brand-emerald/10 border border-brand-emerald/30 flex items-center justify-center shrink-0 z-10 relative">
+                  <div className="absolute inset-0 rounded-full animate-ping bg-brand-emerald/20"></div>
+                  <FileSearch className="w-5 h-5 text-brand-emerald relative z-10" />
                 </div>
                 <div className="absolute top-10 bottom-[-24px] w-[2px] bg-[var(--surface-elevated)]"></div>
               </div>
               <div className="flex-1 pt-2">
                 <div className="flex justify-between items-center mb-1">
                   <h3 className="font-medium text-[var(--text-primary)]">Extract</h3>
-                  <span className="text-xs text-brand-cyan font-medium animate-pulse">Processing...</span>
+                  <span className="text-xs text-brand-emerald font-medium animate-pulse">Processing...</span>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)]">Content extracted & parsed</p>
                 <div className="mt-3 w-full bg-[var(--surface-elevated)] h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-brand-cyan h-full w-[65%] rounded-full"></div>
+                  <div className="bg-brand-emerald h-full w-[65%] rounded-full"></div>
                 </div>
               </div>
             </div>
@@ -197,13 +232,13 @@ export default function IngestPage() {
                   {source.type === 'HTML' && <Code className="w-5 h-5 text-amber-400" />}
                 </div>
                 <div>
-                  <h4 className="font-medium text-[var(--text-primary)] text-sm mb-1 group-hover:text-brand-cyan transition-colors">
+                  <h4 className="font-medium text-[var(--text-primary)] text-sm mb-1 group-hover:text-brand-emerald transition-colors">
                     {source.name}
                   </h4>
                   <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
                     <span className={
                       source.type === 'PDF' ? 'badge-rose' :
-                      source.type === 'URL' ? 'badge-cyan' :
+                      source.type === 'URL' ? 'badge-emerald' :
                       source.type === 'Markdown' ? 'badge-emerald' : 'badge-amber'
                     }>
                       {source.type}
@@ -239,7 +274,7 @@ export default function IngestPage() {
 
       {/* Provenance info callout */}
       <div className="mt-4 p-4 rounded-lg bg-[var(--surface-elevated)] border border-[var(--panel)] flex gap-4 items-start">
-        <Shield className="w-5 h-5 text-brand-cyan shrink-0 mt-0.5" />
+        <Shield className="w-5 h-5 text-brand-emerald shrink-0 mt-0.5" />
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
           <strong className="text-[var(--text-primary)] font-medium">Provenance Tracking:</strong> Every source is content-addressed with SHA-256, timestamped, and linked back to generated notes for full provenance tracking.
         </p>

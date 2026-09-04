@@ -66,7 +66,7 @@ export const VoiceControl: React.FC<VoiceControlProps> = ({ onAudioReady }) => {
         <div className="flex-1 flex items-center gap-1">
           <div className="flex-1 h-2 bg-[#181C26] rounded-full overflow-hidden border border-[#242938]">
             <div
-              className="h-full bg-indigo-500 transition-all duration-75"
+              className="h-full bg-teal-500 transition-all duration-75"
               style={{ width: `${Math.round(audioLevel * 100)}%` }}
             />
           </div>

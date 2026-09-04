@@ -13,7 +13,7 @@
   }
 
   body:not(.mode-orb) {
-    background-color: #07080c;
+    background-color: #060810;
   }
 
   body {
@@ -40,7 +40,7 @@
 
   /* Focus-visible ring for keyboard nav */
   *:focus-visible {
-    @apply outline-none ring-2 ring-brand-cyan/50 ring-offset-1 ring-offset-background;
+    @apply outline-none ring-2 ring-brand-primary/50 ring-offset-1 ring-offset-background;
   }
 }
 
@@ -51,45 +51,46 @@
 @layer components {
   /* ─── Card Surfaces ─── */
   .card-surface {
-    @apply bg-panel rounded-card border border-white/[0.06]
-           hover:border-white/[0.12] hover:bg-panel-hover
+    @apply bg-panel rounded-card border border-white/[0.04]
+           hover:border-brand-primary/20 hover:bg-panel-hover
+           active:animate-neural-pulse
            transition-all duration-200 ease-out
            shadow-card hover:shadow-card-hover;
   }
 
   .card-surface-static {
-    @apply bg-panel rounded-card border border-white/[0.06] shadow-card;
+    @apply bg-panel rounded-card border border-white/[0.04] shadow-card;
   }
 
   /* ─── Glass Surfaces ─── */
   .glass-surface {
-    background: rgba(14, 17, 26, 0.72);
+    background: rgba(10, 14, 22, 0.72);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(16, 185, 129, 0.07);
   }
 
   .glass-surface-elevated {
-    background: rgba(20, 23, 36, 0.85);
+    background: rgba(16, 21, 32, 0.85);
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(16, 185, 129, 0.06);
   }
 
   .glass-panel {
-    background: rgba(16, 19, 28, 0.65);
+    background: rgba(12, 16, 24, 0.65);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.06);
   }
 
   /* ─── Buttons ─── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-1.5 px-4 py-2
-           bg-brand-cyan hover:bg-brand-cyan-light
+           bg-brand-primary hover:bg-brand-primary-light hover:text-amber-100
            text-white text-xs font-semibold
-           rounded-button shadow-glow-cyan
+           rounded-button shadow-glow-emerald
            transition-all duration-150 ease-out
            active:scale-[0.97];
   }
@@ -97,7 +98,7 @@
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2
            bg-white/[0.04] hover:bg-white/[0.08]
-           border border-white/[0.08] hover:border-white/[0.14]
+           border border-white/[0.08] hover:border-brand-primary/40
            text-zinc-300 hover:text-white text-xs font-semibold
            rounded-button shadow-inner-glow
            transition-all duration-150 ease-out
@@ -106,8 +107,8 @@
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5
-           text-zinc-400 hover:text-zinc-200
-           hover:bg-white/[0.04]
+           text-zinc-400 hover:text-brand-primary
+           hover:bg-brand-primary/10
            text-xs font-medium
            rounded-button
            transition-all duration-150 ease-out;
@@ -126,7 +127,7 @@
   .input-base {
     @apply w-full bg-background-secondary border border-white/[0.08] rounded-input
            px-3 py-2 text-xs text-zinc-200 placeholder-zinc-500
-           focus:outline-none focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan/20
+           focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/20
            transition-all duration-150 font-sans;
   }
 
@@ -136,12 +137,12 @@
            rounded-pill text-[10px] font-mono font-medium;
   }
 
-  .badge-cyan {
-    @apply badge bg-cyan-950/50 border border-cyan-500/25 text-cyan-400;
-  }
-
   .badge-emerald {
     @apply badge bg-emerald-950/50 border border-emerald-500/25 text-emerald-400;
+  }
+
+  .badge-gold {
+    @apply badge bg-amber-950/50 border border-amber-500/25 text-amber-400;
   }
 
   .badge-amber {
@@ -226,7 +227,7 @@
   }
 
   .hud-glow {
-    box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.1);
   }
 
   /* Text gradient */
@@ -235,15 +236,40 @@
   }
 
   .text-gradient-brand {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary-light to-brand-cyan-light;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-accent-teal;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-secondary to-accent-amber;
+  }
+
+  .text-gradient-neural {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-brand-secondary;
+  }
+
+  /* Neural specific utilities */
+  .neural-border {
+    @apply border border-brand-primary/20 shadow-[0_0_15px_-3px_rgba(16,185,129,0.15)];
+  }
+
+  .neural-card {
+    @apply bg-panel border border-brand-primary/10 shadow-glow-emerald rounded-card;
+  }
+
+  .neural-active {
+    @apply bg-brand-primary/10 border-brand-primary/40 animate-neural-pulse;
+  }
+
+  .neural-bg-pattern {
+    background-image: radial-gradient(circle at center, rgba(16,185,129,0.03) 0%, transparent 70%);
   }
 
   /* Shimmer loading effect */
   .shimmer {
     background: linear-gradient(90deg,
-      rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.04) 50%,
-      rgba(255,255,255,0) 100%);
+      rgba(16,185,129,0) 0%,
+      rgba(16,185,129,0.08) 50%,
+      rgba(16,185,129,0) 100%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite linear;
   }
@@ -268,7 +294,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(16, 185, 129, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════════

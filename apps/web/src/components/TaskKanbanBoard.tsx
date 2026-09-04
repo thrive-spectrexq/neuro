@@ -167,7 +167,7 @@ export function TaskKanbanBoard() {
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-[#141722] border border-[#242A3C] rounded-md text-indigo-400">
+          <div className="p-1.5 bg-[#141722] border border-[#242A3C] rounded-md text-teal-400">
             <Clock className="w-3.5 h-3.5" />
           </div>
           <div>
@@ -354,7 +354,7 @@ export function TaskKanbanBoard() {
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
                   placeholder="Task title..."
-                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                 />
               </div>
 
@@ -365,7 +365,7 @@ export function TaskKanbanBoard() {
                   onChange={(e) => setNewTaskDesc(e.target.value)}
                   placeholder="Task details & specifications..."
                   rows={3}
-                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono resize-none"
+                  className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono resize-none"
                 />
               </div>
 

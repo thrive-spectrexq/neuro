@@ -12,7 +12,7 @@ import { useAuthStore } from './stores/authStore';
 import { useUIStore, ActiveTab } from './stores/uiStore';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from './services/apiClient';
-import { 
+import {
   Network, 
   LayoutGrid, 
   CheckSquare, 
@@ -31,6 +31,7 @@ import {
   FolderGit2,
   Loader2
 } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
 // Code-split heavy studios for faster initial load
 const TaskKanbanBoard = lazy(() => import('./components/TaskKanbanBoard').then(m => ({ default: m.TaskKanbanBoard })));
@@ -42,7 +43,7 @@ const AuditLogViewer = lazy(() => import('./components/AuditLogViewer').then(m =
 
 const StudioLoadingSkeleton: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#090A0F] text-[#64748B]">
-    <Loader2 className="w-6 h-6 animate-spin text-indigo-500 mb-2" />
+    <Loader2 className="w-6 h-6 animate-spin text-teal-500 mb-2" />
     <span className="text-xs font-mono">Loading {title}...</span>
   </div>
 );
@@ -137,7 +138,7 @@ export default function App() {
             className="w-full h-8 px-3 bg-[#141722] hover:bg-[#1A1E2B] border border-[#242A3C] hover:border-[#38415C] rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center justify-between text-xs group"
           >
             <div className="flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-[#64748B] group-hover:text-indigo-400 transition-colors" />
+              <Search className="w-3.5 h-3.5 text-[#64748B] group-hover:text-teal-400 transition-colors" />
               <span>Search vault, commands, or jump to note...</span>
             </div>
             <div className="flex items-center gap-1">
@@ -154,7 +155,7 @@ export default function App() {
             className="h-8 px-2.5 bg-[#141722] hover:bg-[#1D2230] border border-[#242A3C] rounded-lg text-[#94A3B8] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
             title="Import Markdown, Obsidian or Notion"
           >
-            <FolderPlus className="w-3.5 h-3.5 text-indigo-400" />
+            <FolderPlus className="w-3.5 h-3.5 text-teal-400" />
             <span className="hidden sm:inline">Import</span>
           </button>
 
@@ -199,10 +200,10 @@ export default function App() {
                     : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#12151E]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-400' : 'text-[#64748B]'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-teal-400' : 'text-[#64748B]'}`} />
                 <span>{item.label}</span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                 )}
               </button>
             );
@@ -294,7 +295,7 @@ export default function App() {
       <footer className="h-6 flex-shrink-0 bg-[#0B0C12] border-t border-[#1C202C] px-3 flex items-center justify-between text-[11px] font-mono text-[#64748B] z-30">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 text-slate-300">
-            <HardDrive className="w-3 h-3 text-indigo-400" />
+            <HardDrive className="w-3 h-3 text-teal-400" />
             <span>neuro-vault: ~/notes</span>
           </div>
           <span className="text-[#282E40]">|</span>
@@ -327,6 +328,7 @@ export default function App() {
       />
 
       <VoiceAssistant />
+      <Toaster position="bottom-right" />
     </div>
   );
 }

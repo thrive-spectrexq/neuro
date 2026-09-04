@@ -5,9 +5,6 @@ import logging
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlmodel import select
-
-from app.core.config import settings
 from app.models.note import Note, NoteLink
 from app.models.tag import NoteTag, Tag
 from app.services.agent.tools import ToolRegistry
@@ -15,8 +12,14 @@ from app.services.roadmap_service import RoadmapService
 
 logger = logging.getLogger(__name__)
 
-# Dedicated engine for MCP queries
-engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI, echo=False)
+from app.core.config import get_settings
+settings = get_settings()
+
+from sqlmodel import select
+
+# Minimal sync/async DB setup for tools
+# In a real setup, you'd likely reuse the app's db.py.
+engine = create_async_engine(str(settings.DATABASE_URL), echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
@@ -334,7 +337,8 @@ async def handle_create_note(arguments: dict[str, Any]) -> str:
     tags = arguments.get("tags", [])
 
     async with AsyncSessionLocal() as session:
-        new_note = Note(title=title, content=content)
+        import uuid
+        new_note = Note(title=title, content=content, user_id=uuid.UUID(int=0))
         session.add(new_note)
         await session.commit()
         await session.refresh(new_note)
@@ -368,7 +372,8 @@ async def handle_execute_system_command(arguments: dict[str, Any]) -> str:
     command = arguments.get("command", "")
     from app.services.agent.intent_parser import IntentParser
 
-    intent = IntentParser.parse(command)
+    parser = IntentParser()
+    intent = parser.parse(command)
     result = await ToolRegistry.execute_intent(intent)
     return json.dumps(result, indent=2)
 
@@ -382,7 +387,7 @@ async def handle_get_system_status(_arguments: dict[str, Any]) -> str:
         {
             "status": "online",
             "agent": "Neuro Autonomous Voice & Second-Brain Agent",
-            "version": "0.1.1",
+            "version": "0.1.3",
             "database": {
                 "type": "SQLite / SQLModel",
                 "notes_count": notes_count,

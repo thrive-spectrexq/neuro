@@ -8,49 +8,65 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#07080c',
-        'background-secondary': '#0a0c14',
-        canvas: '#0b0d13',
-        panel: '#0e111a',
-        'panel-hover': '#121628',
-        surface: '#141724',
-        'surface-elevated': '#1a1e2e',
-        'surface-highlight': '#23283c',
-        'surface-active': '#1e2340',
+        // Neural depth layers (organic gradient from deepest to lightest)
+        background: '#060810',
+        'background-secondary': '#0A0E16',
+        canvas: '#0C1018',
+        panel: '#101520',
+        'panel-hover': '#141A28',
+        surface: '#182030',
+        'surface-elevated': '#1E2838',
+        'surface-highlight': '#243040',
+        'surface-active': '#1A2E38',
+        
+        // Border system
         border: {
-          subtle: 'rgba(255, 255, 255, 0.05)',
-          DEFAULT: 'rgba(255, 255, 255, 0.09)',
-          strong: 'rgba(255, 255, 255, 0.16)',
-          focus: 'rgba(6, 182, 212, 0.5)',
+          subtle: 'rgba(255, 255, 255, 0.04)',
+          DEFAULT: 'rgba(255, 255, 255, 0.08)',
+          strong: 'rgba(255, 255, 255, 0.14)',
+          focus: 'rgba(16, 185, 129, 0.5)',
         },
+        
+        // Text hierarchy
         text: {
-          primary: '#f4f4f5',
-          secondary: '#a1a1aa',
-          tertiary: '#71717a',
-          muted: '#52525b',
+          primary: '#E8ECF0',
+          secondary: '#94A3B8',
+          tertiary: '#64748B',
+          muted: '#475569',
         },
+        
+        // Brand colors — Emerald + Gold neural identity
         brand: {
-          primary: '#6366f1',
-          'primary-light': '#818cf8',
-          'primary-dark': '#4f46e5',
-          cyan: '#06b6d4',
-          'cyan-light': '#22d3ee',
-          'cyan-dark': '#0891b2',
-          emerald: '#10b981',
-          'emerald-light': '#34d399',
-          amber: '#f59e0b',
-          rose: '#f43f5e',
+          primary: '#10B981',
+          'primary-light': '#34D399',
+          'primary-dark': '#059669',
+          secondary: '#FBBF24',
+          'secondary-light': '#FCD34D',
+          'secondary-dark': '#D97706',
+          glow: '#10B981',
         },
+        
         accent: {
-          purple: '#6366f1',
-          blue: '#3b82f6',
-          cyan: '#06b6d4',
+          emerald: '#10B981',
+          teal: '#14B8A6',
+          gold: '#FBBF24',
+          amber: '#F59E0B',
         },
+        
         status: {
-          success: '#10b981',
-          warning: '#f59e0b',
-          error: '#ef4444',
-          info: '#3b82f6',
+          success: '#10B981',
+          warning: '#FBBF24',
+          error: '#EF4444',
+          info: '#38BDF8',
+        },
+        
+        // Neural-specific
+        neural: {
+          glow: 'rgba(16, 185, 129, 0.15)',
+          'glow-strong': 'rgba(16, 185, 129, 0.25)',
+          'glow-gold': 'rgba(251, 191, 36, 0.15)',
+          synapse: 'rgba(16, 185, 129, 0.4)',
+          dendrite: 'rgba(20, 184, 166, 0.3)',
         },
       },
       spacing: {
@@ -73,13 +89,16 @@ export default {
         'xxs': ['0.625rem', { lineHeight: '0.875rem' }],
       },
       boxShadow: {
-        'glow-primary': '0 0 24px -4px rgba(99, 102, 241, 0.25)',
-        'glow-cyan': '0 0 24px -4px rgba(6, 182, 212, 0.25)',
-        'glow-emerald': '0 0 24px -4px rgba(16, 185, 129, 0.25)',
-        'elevated': '0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08)',
-        'card': '0 4px 16px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)',
-        'card-hover': '0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08)',
-        'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+        'glow-emerald': '0 0 24px -4px rgba(16, 185, 129, 0.3)',
+        'glow-emerald-lg': '0 0 40px -8px rgba(16, 185, 129, 0.25)',
+        'glow-gold': '0 0 24px -4px rgba(251, 191, 36, 0.2)',
+        'glow-teal': '0 0 20px -4px rgba(20, 184, 166, 0.2)',
+        'neural-pulse': '0 0 30px -5px rgba(16, 185, 129, 0.2), 0 0 60px -10px rgba(16, 185, 129, 0.1)',
+        'elevated': '0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(16, 185, 129, 0.06)',
+        'card': '0 4px 16px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04)',
+        'card-hover': '0 8px 28px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(16, 185, 129, 0.12)',
+        'inner-glow': 'inset 0 1px 0 0 rgba(16, 185, 129, 0.06)',
+        'neural-border': '0 0 0 1px rgba(16, 185, 129, 0.08)',
       },
       animation: {
         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -91,6 +110,10 @@ export default {
         'shimmer': 'shimmer 2s infinite linear',
         'spin-slow': 'spin 3s linear infinite',
         'bounce-subtle': 'bounceSoft 1s ease-in-out infinite',
+        'neural-pulse': 'neuralPulse 4s ease-in-out infinite',
+        'glow-breathe': 'glowBreathe 3s ease-in-out infinite',
+        'synapse-fire': 'synapseFire 0.6s ease-out',
+        'dendrite-grow': 'dendriteGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -120,6 +143,23 @@ export default {
         bounceSoft: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-2px)' },
+        },
+        neuralPulse: {
+          '0%, 100%': { boxShadow: '0 0 20px -5px rgba(16, 185, 129, 0.15)' },
+          '50%': { boxShadow: '0 0 35px -5px rgba(16, 185, 129, 0.3)' },
+        },
+        glowBreathe: {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' },
+        },
+        synapseFire: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '50%': { transform: 'scale(1.02)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        dendriteGrow: {
+          '0%': { transform: 'scaleX(0)', transformOrigin: 'left' },
+          '100%': { transform: 'scaleX(1)', transformOrigin: 'left' },
         },
       },
       backdropBlur: {

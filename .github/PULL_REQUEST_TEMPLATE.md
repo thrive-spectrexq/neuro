@@ -15,4 +15,4 @@
 - [ ] Lint passes
 - [ ] New code has test coverage
 - [ ] Docs updated if behavior/API changed
-- [ ] Branch up to date with dev
+- [ ] Branch up to date with develop

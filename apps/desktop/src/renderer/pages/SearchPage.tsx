@@ -102,7 +102,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
       <>
         {parts.map((part, i) =>
           part.toLowerCase() === q.toLowerCase() ? (
-            <mark key={i} className="bg-cyan-500/30 text-cyan-200 px-0.5 rounded font-semibold">
+            <mark key={i} className="bg-emerald-500/30 text-emerald-200 px-0.5 rounded font-semibold">
               {part}
             </mark>
           ) : (
@@ -119,10 +119,10 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
       <div className="page-header">
         <div className="flex items-center gap-2.5">
           <h1 className="page-title">
-            <Search className="text-brand-cyan" size={20} />
+            <Search className="text-brand-emerald" size={20} />
             Knowledge Vault Search
           </h1>
-          <span className="badge-cyan">
+          <span className="badge-emerald">
             Hybrid Semantic & BM25
           </span>
         </div>
@@ -133,13 +133,13 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
 
       {/* Search Bar */}
       <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-cyan" size={18} />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-emerald" size={18} />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by keywords, concepts, tasks, or [[wikilinks]]..."
-          className="input-base pl-12 pr-20 py-3.5 text-sm rounded-card shadow-card focus:border-brand-cyan/60"
+          className="input-base pl-12 pr-20 py-3.5 text-sm rounded-card shadow-card focus:border-brand-emerald/60"
           autoFocus
         />
         {query && (
@@ -169,7 +169,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
             }}
             className={`px-3 py-1.5 rounded-button capitalize font-medium transition-all duration-150 ${
               filterType === t
-                ? 'bg-brand-cyan text-background font-bold shadow-glow-cyan'
+                ? 'bg-brand-emerald text-background font-bold shadow-glow-emerald'
                 : 'text-text-secondary hover:text-text-primary bg-surface border border-white/[0.05] hover:bg-surface-elevated'
             }`}
           >
@@ -182,7 +182,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
       <div className="flex-1 space-y-3 pb-8">
         {isSearching && (
           <div className="text-xs text-text-secondary py-12 text-center flex items-center justify-center gap-2 font-mono">
-            <Sparkles size={14} className="text-brand-cyan animate-spin" />
+            <Sparkles size={14} className="text-brand-emerald animate-spin" />
             <span>Scanning second brain knowledge topology...</span>
           </div>
         )}
@@ -206,15 +206,15 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
               <div className="space-y-2 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText size={15} className="text-brand-cyan flex-shrink-0" />
-                    <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-cyan-light transition-colors truncate font-sans">
+                    <FileText size={15} className="text-brand-emerald flex-shrink-0" />
+                    <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-emerald-light transition-colors truncate font-sans">
                       {highlightMatch(item.title || 'Untitled Note', query)}
                     </h3>
                   </div>
 
                   {/* Match Relevance Score Badge */}
-                  <div className="badge-cyan">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <div className="badge-emerald">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>{item.score}% Match</span>
                   </div>
                 </div>
@@ -229,7 +229,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
                       {item.tags.map((tag: string) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 bg-surface text-brand-cyan text-[10px] rounded-md flex items-center gap-0.5 border border-white/[0.06]"
+                          className="px-2 py-0.5 bg-surface text-brand-emerald text-[10px] rounded-md flex items-center gap-0.5 border border-white/[0.06]"
                         >
                           <Hash size={10} />
                           {tag}
@@ -246,7 +246,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
                 </div>
               </div>
 
-              <div className="flex items-center text-text-muted group-hover:text-brand-cyan group-hover:translate-x-1 transition-all pt-1">
+              <div className="flex items-center text-text-muted group-hover:text-brand-emerald group-hover:translate-x-1 transition-all pt-1">
                 <ArrowRight size={16} />
               </div>
             </div>

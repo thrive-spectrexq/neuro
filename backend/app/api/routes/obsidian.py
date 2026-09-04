@@ -358,10 +358,10 @@ async def get_vault_health_summary(
     empty_sections_count = 0
 
     for link in links:
-        if str(link.source_note_id) in note_ids:
-            orphan_note_ids.discard(str(link.source_note_id))
-        if str(link.target_note_id) in note_ids:
-            orphan_note_ids.discard(str(link.target_note_id))
+        if str(link.source_id) in note_ids:
+            orphan_note_ids.discard(str(link.source_id))
+        if str(link.target_id) in note_ids:
+            orphan_note_ids.discard(str(link.target_id))
         else:
             dead_links_count += 1
 
@@ -464,10 +464,10 @@ async def auto_heal_vault(
         note_ids = {str(n.id) for n in notes}
 
         for link in links:
-            if str(link.target_note_id) not in note_ids:
+            if str(link.target_id) not in note_ids:
                 await session.delete(link)
                 fixed_count += 1
-                details.append(f"Removed dead link: {link.source_note_id} → {link.target_note_id}")
+                details.append(f"Removed dead link: {link.source_id} → {link.target_id}")
 
     await session.commit()
 

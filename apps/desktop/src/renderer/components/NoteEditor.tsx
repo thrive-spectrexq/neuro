@@ -259,10 +259,10 @@ export default function NoteEditor() {
             return <h1 key={idx} className="text-2xl font-bold text-white border-b border-white/[0.08] pb-2 pt-2">{line.slice(2)}</h1>;
           }
           if (line.startsWith('## ')) {
-            return <h2 key={idx} className="text-xl font-bold text-cyan-300 pt-2">{line.slice(3)}</h2>;
+            return <h2 key={idx} className="text-xl font-bold text-emerald-300 pt-2">{line.slice(3)}</h2>;
           }
           if (line.startsWith('### ')) {
-            return <h3 key={idx} className="text-base font-semibold text-purple-300 pt-1">{line.slice(4)}</h3>;
+            return <h3 key={idx} className="text-base font-semibold text-teal-300 pt-1">{line.slice(4)}</h3>;
           }
           if (line.startsWith('- [ ] ') || line.startsWith('- [x] ')) {
             const isChecked = line.startsWith('- [x] ');
@@ -277,7 +277,7 @@ export default function NoteEditor() {
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => {}}
-                  className="w-4 h-4 rounded accent-cyan-500 cursor-pointer"
+                  className="w-4 h-4 rounded accent-emerald-500 cursor-pointer"
                 />
                 <span className={isChecked ? 'line-through text-zinc-500' : 'text-zinc-200'}>
                   {taskText}
@@ -290,7 +290,7 @@ export default function NoteEditor() {
           }
           if (line.startsWith('> ')) {
             return (
-              <blockquote key={idx} className="border-l-2 border-cyan-500 pl-3 py-1 bg-cyan-950/20 text-cyan-200 italic rounded-r-md">
+              <blockquote key={idx} className="border-l-2 border-emerald-500 pl-3 py-1 bg-emerald-950/20 text-emerald-200 italic rounded-r-md">
                 {line.slice(2)}
               </blockquote>
             );
@@ -336,7 +336,7 @@ export default function NoteEditor() {
           <div className="flex items-center bg-black/50 border border-white/10 rounded-lg p-0.5 text-[11px]">
             <button
               onClick={() => setViewMode('edit')}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'edit' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'edit' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
               title="Markdown Code Editor"
             >
               <Code size={11} />
@@ -344,7 +344,7 @@ export default function NoteEditor() {
             </button>
             <button
               onClick={() => setViewMode('split')}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'split' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'split' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
               title="Split Code & Live Preview"
             >
               <Columns size={11} />
@@ -352,7 +352,7 @@ export default function NoteEditor() {
             </button>
             <button
               onClick={() => setViewMode('preview')}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'preview' ? 'bg-cyan-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded ${viewMode === 'preview' ? 'bg-emerald-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
               title="Rich Markdown Preview"
             >
               <Eye size={11} />
@@ -370,7 +370,7 @@ export default function NoteEditor() {
           </button>
 
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400/80" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
             <span>{wordCount} words</span>
           </div>
 
@@ -388,25 +388,25 @@ export default function NoteEditor() {
       {/* AI Copilot & Voice Dictation Action Bar */}
       <div className="px-8 py-2 border-b border-white/[0.04] bg-[#080911] flex items-center justify-between gap-2 overflow-x-auto select-none">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase font-mono font-bold text-cyan-400 flex items-center gap-1 mr-1">
-            <Sparkles size={11} className="text-cyan-400" /> AI Tools:
+          <span className="text-[10px] uppercase font-mono font-bold text-emerald-400 flex items-center gap-1 mr-1">
+            <Sparkles size={11} className="text-emerald-400" /> AI Tools:
           </span>
 
           <button
             onClick={() => handleAiAction('polish')}
             disabled={isAiProcessing || !content.trim()}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-cyan-500/10 border border-white/[0.06] hover:border-cyan-500/30 text-zinc-300 hover:text-cyan-300 text-[11px] font-sans transition-all disabled:opacity-40"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-emerald-500/10 border border-white/[0.06] hover:border-emerald-500/30 text-zinc-300 hover:text-emerald-300 text-[11px] font-sans transition-all disabled:opacity-40"
           >
-            <Wand2 size={11} className="text-cyan-400" />
+            <Wand2 size={11} className="text-emerald-400" />
             <span>Polish & Fix</span>
           </button>
 
           <button
             onClick={() => handleAiAction('summarize')}
             disabled={isAiProcessing || !content.trim()}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-purple-500/10 border border-white/[0.06] hover:border-purple-500/30 text-zinc-300 hover:text-purple-300 text-[11px] font-sans transition-all disabled:opacity-40"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-teal-500/10 border border-white/[0.06] hover:border-teal-500/30 text-zinc-300 hover:text-teal-300 text-[11px] font-sans transition-all disabled:opacity-40"
           >
-            <FileCheck size={11} className="text-purple-400" />
+            <FileCheck size={11} className="text-teal-400" />
             <span>Summarize</span>
           </button>
 
@@ -422,9 +422,9 @@ export default function NoteEditor() {
           <button
             onClick={() => handleAiAction('table')}
             disabled={isAiProcessing || !content.trim()}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-indigo-500/10 border border-white/[0.06] hover:border-indigo-500/30 text-zinc-300 hover:text-indigo-300 text-[11px] font-sans transition-all disabled:opacity-40"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-teal-500/10 border border-white/[0.06] hover:border-teal-500/30 text-zinc-300 hover:text-teal-300 text-[11px] font-sans transition-all disabled:opacity-40"
           >
-            <Table size={11} className="text-indigo-400" />
+            <Table size={11} className="text-teal-400" />
             <span>To Table</span>
           </button>
         </div>
@@ -446,7 +446,7 @@ export default function NoteEditor() {
               </>
             ) : (
               <>
-                <Mic size={12} className="text-cyan-400" />
+                <Mic size={12} className="text-emerald-400" />
                 <span>Voice Dictate</span>
               </>
             )}

@@ -179,12 +179,12 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`page-container ${
-        isDraggingFile ? 'bg-cyan-950/20 ring-2 ring-cyan-400 ring-inset' : ''
+        isDraggingFile ? 'bg-emerald-950/20 ring-2 ring-emerald-400 ring-inset' : ''
       }`}
     >
       {/* Drag & Drop Overlay Feedback */}
       {isDraggingFile && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-brand-cyan pointer-events-none animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-brand-emerald pointer-events-none animate-fade-in">
           <FileUp size={48} className="animate-bounce mb-3" />
           <p className="text-lg font-bold">Drop Markdown (.md) files to import into Neuro</p>
           <p className="text-xs text-text-muted mt-1">Files will be indexed and linked to your knowledge vault</p>
@@ -247,7 +247,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             className="btn-secondary"
             title="Import Markdown Files or Obsidian Notes"
           >
-            <Upload size={14} className="text-brand-cyan" />
+            <Upload size={14} className="text-brand-emerald" />
             <span>Import</span>
           </button>
 
@@ -291,7 +291,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
               onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
                 selectedTag === tag
-                  ? 'badge-cyan'
+                  ? 'badge-emerald'
                   : 'bg-surface text-text-secondary hover:text-text-primary border border-surface hover:border-surface-elevated'
               }`}
             >
@@ -339,7 +339,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-cyan transition-colors line-clamp-1">
+                  <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-emerald transition-colors line-clamp-1">
                     {note.title || 'Untitled Note'}
                   </h3>
                   <button
@@ -386,7 +386,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
       {/* Floating Action Button for Mobile */}
       <button
         onClick={() => handleCreateNote()}
-        className="md:hidden fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 bg-brand-cyan hover:bg-cyan-500 text-background rounded-full shadow-[0_0_20px_rgba(0,245,255,0.3)] transition-transform hover:scale-105 active:scale-95 z-40 font-semibold text-sm"
+        className="md:hidden fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 bg-brand-emerald hover:bg-emerald-500 text-background rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-transform hover:scale-105 active:scale-95 z-40 font-semibold text-sm"
       >
         <Plus size={18} />
         <span>Quick Note</span>

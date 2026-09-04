@@ -30,6 +30,19 @@ export default function GraphView() {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: any) => {
+      switch (e.detail?.action) {
+        case 'zoomIn': handleZoomIn(); break;
+        case 'zoomOut': handleZoomOut(); break;
+        case 'fit': handleResetZoom(); break;
+        // Optional: refresh data could be added if refetch was available
+      }
+    };
+    window.addEventListener('graph-action', handler);
+    return () => window.removeEventListener('graph-action', handler);
+  }, []);
+
   // Filtered graph data
   const filteredData = useMemo(() => {
     if (!data) return { nodes: [], links: [] };
@@ -106,7 +119,7 @@ export default function GraphView() {
       {/* Floating Graph Header & Search Filter */}
       <div className="absolute top-6 left-6 z-10 flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+          <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
             <Network size={16} />
           </div>
           <div>
@@ -135,19 +148,19 @@ export default function GraphView() {
           <div className="flex items-center bg-black/40 border border-white/[0.06] rounded-lg p-0.5 text-[10px]">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-2 py-1 rounded ${filterType === 'all' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-2 py-1 rounded ${filterType === 'all' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               All
             </button>
             <button
               onClick={() => setFilterType('notes')}
-              className={`px-2 py-1 rounded ${filterType === 'notes' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-2 py-1 rounded ${filterType === 'notes' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               Notes
             </button>
             <button
               onClick={() => setFilterType('tags')}
-              className={`px-2 py-1 rounded ${filterType === 'tags' ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-2 py-1 rounded ${filterType === 'tags' ? 'bg-teal-600 text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               Tags
             </button>
@@ -188,7 +201,7 @@ export default function GraphView() {
         graphData={filteredData}
         nodeLabel="name"
         nodeRelSize={5}
-        linkColor={() => 'rgba(99, 102, 241, 0.25)'}
+        linkColor={() => 'rgba(20, 184, 166, 0.25)'}
         linkWidth={1.2}
         backgroundColor="#07080c"
         onNodeClick={handleNodeClick}
@@ -198,13 +211,13 @@ export default function GraphView() {
           ctx.font = `${fontSize}px "Plus Jakarta Sans", sans-serif`;
           
           const isNote = node.type === 'note';
-          const nodeColor = isNote ? '#6366f1' : '#06b6d4';
+          const nodeColor = isNote ? '#14B8A6' : '#10B981';
           const nodeRadius = isNote ? 5.5 : 4;
 
           // Draw outer glow aura
           ctx.beginPath();
           ctx.arc(node.x, node.y, nodeRadius + 3, 0, 2 * Math.PI, false);
-          ctx.fillStyle = isNote ? 'rgba(99, 102, 241, 0.2)' : 'rgba(6, 182, 212, 0.2)';
+          ctx.fillStyle = isNote ? 'rgba(20, 184, 166, 0.2)' : 'rgba(16, 185, 129, 0.2)';
           ctx.fill();
 
           // Draw node core

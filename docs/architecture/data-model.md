@@ -129,3 +129,22 @@ System activity logging for compliance and activity tracking.
 - `user_id`: `UUID`
 - `details`: `JSON`
 - `timestamp`: `datetime`
+
+### 11. Memory (`app.models.memory`)
+Long-term agent state and user preferences.
+- `id`: `UUID` (Primary Key)
+- `user_id`: `UUID` (Foreign Key -> `User.id`)
+- `key`: `str`
+- `value`: `str`
+- `memory_type`: `str`
+- `created_at`: `datetime`
+- `updated_at`: `datetime`
+
+### 12. DeviceKey (`app.models.device_key`)
+Cryptographic identity for client devices.
+- `id`: `UUID` (Primary Key)
+- `user_id`: `UUID` (Foreign Key -> `User.id`)
+- `device_id`: `str`
+- `public_key`: `str`
+- `device_name`: `Optional[str]`
+- `created_at`: `datetime`

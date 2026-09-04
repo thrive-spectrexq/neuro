@@ -81,7 +81,7 @@ export default function AuthForm() {
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#090A0F] text-white p-4">
       <div className="w-full max-w-sm p-6 bg-[#0F1117] border border-[#1F2433] rounded-lg shadow-2xl space-y-5">
         <div className="flex items-center gap-3 border-b border-[#1F2433] pb-4">
-          <div className="p-2 bg-[#18162B] border border-[#302856] rounded-md text-indigo-400">
+          <div className="p-2 bg-[#18162B] border border-[#302856] rounded-md text-teal-400">
             <Brain className="w-5 h-5" />
           </div>
           <div>
@@ -113,7 +113,7 @@ export default function AuthForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                  className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                   placeholder="operator@neuro.local"
                 />
               </div>
@@ -131,7 +131,7 @@ export default function AuthForm() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                 placeholder="root"
               />
             </div>
@@ -148,7 +148,7 @@ export default function AuthForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                className="block w-full pl-8 pr-3 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                 placeholder="••••••••"
               />
             </div>

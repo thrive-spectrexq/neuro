@@ -2,7 +2,7 @@ name: Security Scanning
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
   schedule:
@@ -38,9 +38,9 @@ jobs:
       - name: Install security tools
         run: pip install bandit pip-audit
       - name: Run Bandit
-        run: bandit -r app/ -c pyproject.toml || true
+        run: bandit -r app/ -c pyproject.toml
       - name: Run pip-audit
-        run: pip-audit . || true
+        run: pip-audit .
 
   js-security:
     name: JS/TS Security
@@ -53,4 +53,4 @@ jobs:
         with:
           version: 9
       - name: Run pnpm audit
-        run: pnpm audit --audit-level=high || true
+        run: pnpm audit --audit-level=high

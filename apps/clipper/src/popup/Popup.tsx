@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-const API_URL = 'http://localhost:8000/api/v1/ingest';
+const getApiUrl = async () => {
+  const { apiUrl } = await chrome.storage.local.get('apiUrl');
+  return apiUrl || 'http://localhost:8000';
+};
 
 const Popup = () => {
   const [url, setUrl] = useState('');

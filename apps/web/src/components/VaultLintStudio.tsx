@@ -283,7 +283,7 @@ export function VaultLintStudio() {
                     <Link2Off className="w-3.5 h-3.5 text-rose-400" />
                     Broken [[Wikilinks]]
                   </h3>
-                  <button className="text-[11px] text-indigo-400 hover:text-indigo-300 font-mono flex items-center gap-1">
+                  <button className="text-[11px] text-teal-400 hover:text-teal-300 font-mono flex items-center gap-1">
                     <Wrench className="w-3 h-3" /> Auto-Heal
                   </button>
                 </div>
@@ -360,7 +360,7 @@ export function VaultLintStudio() {
                     onChange={(e) => setBm25Query(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleRunBM25()}
                     placeholder="Search vault terms (e.g. 'local embedding vector')..."
-                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                   />
                 </div>
                 <button
@@ -382,7 +382,7 @@ export function VaultLintStudio() {
                 >
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-white font-mono flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                      <FileText className="w-3.5 h-3.5 text-teal-400" />
                       {res.title}
                     </h4>
                     <span className="px-1.5 py-0.2 text-[10px] font-mono font-bold bg-[#102319] text-emerald-300 border border-[#1B432C] rounded">
@@ -427,7 +427,7 @@ export function VaultLintStudio() {
                     value={routeTitle}
                     onChange={(e) => setRouteTitle(e.target.value)}
                     placeholder="e.g. Q3 Engineering OKRs..."
-                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-[#090A0F] border border-[#242A3C] rounded-md px-3 py-1.5 text-xs text-white placeholder-[#475569] focus:outline-none focus:border-teal-500 font-mono"
                   />
                 </div>
 
@@ -457,7 +457,7 @@ export function VaultLintStudio() {
             {/* Routing Result */}
             {routeSuggestion && (
               <div className="bg-[#0F1117] p-4 rounded-lg border border-[#242A3C] space-y-3">
-                <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs font-mono">
+                <div className="flex items-center gap-1.5 text-teal-400 font-bold text-xs font-mono">
                   <FolderTree className="w-3.5 h-3.5" /> Recommended File Hierarchy
                 </div>
 
@@ -474,7 +474,7 @@ export function VaultLintStudio() {
 
                 <div className="p-2.5 bg-[#090A0F] rounded-md border border-[#1F2433] text-xs">
                   <span className="text-[#64748B] font-mono text-[9px] uppercase">Recommended Parent MOC Link</span>
-                  <p className="font-mono text-purple-300 font-bold mt-0.5 text-[11px]">{routeSuggestion.recommended_moc}</p>
+                  <p className="font-mono text-teal-300 font-bold mt-0.5 text-[11px]">{routeSuggestion.recommended_moc}</p>
                 </div>
 
                 <p className="text-[11px] text-[#94A3B8] font-mono">

@@ -166,12 +166,12 @@ async def create_note(
         await session.commit()
         return NoteResponse(**response_data)
     except Exception:
-        import traceback
-
-        tb = traceback.format_exc()
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.exception("Error creating note")
         from fastapi.responses import JSONResponse
 
-        return JSONResponse(status_code=500, content={"detail": tb})
+        return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 @router.get("", response_model=NoteListResponse)
@@ -180,17 +180,19 @@ async def list_notes(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     stmt = select(Note)
     count_stmt = select(func.count()).select_from(Note)
+    
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
 
     if project_id:
-        stmt = stmt.where(Note.project_id == project_id)
-        count_stmt = count_stmt.where(Note.project_id == project_id)
+        stmt = stmt.where(Note.project_id == project_id).where(Note.user_id == user_uuid)
+        count_stmt = count_stmt.where(Note.project_id == project_id).where(Note.user_id == user_uuid)
     else:
-        stmt = stmt.where(Note.project_id.is_(None))
-        count_stmt = count_stmt.where(Note.project_id.is_(None))
+        stmt = stmt.where(Note.project_id.is_(None)).where(Note.user_id == user_uuid)
+        count_stmt = count_stmt.where(Note.project_id.is_(None)).where(Note.user_id == user_uuid)
 
     stmt = stmt.offset(skip).limit(limit)
     result = await session.execute(stmt)
@@ -216,7 +218,7 @@ async def list_notes(
 async def get_note(
     id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     note = await session.get(Note, id)
     if not note:
@@ -239,7 +241,7 @@ async def update_note(
     id: uuid.UUID,
     note_in: NoteUpdate,
     session: AsyncSession = Depends(get_session),
-    current_user: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     note = await session.get(Note, id)
     if not note:
@@ -320,10 +322,17 @@ async def delete_note(
 
 
 @router.post("/{id}/extract-entities", status_code=202)
-async def extract_entities(id: uuid.UUID, session: AsyncSession = Depends(get_session)):
+async def extract_entities(
+    id: uuid.UUID, 
+    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+):
     note = await session.get(Note, id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
+        
+    user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
+    await _check_note_permission(session, note, user_uuid)
 
     from app.workers.tasks import extract_entities_task
 

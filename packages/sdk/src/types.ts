@@ -1,4 +1,4 @@
-import type { PluginContext } from './plugin';
+import type { PluginContext } from './index';
 
 export type PluginPermission =
   | 'notes:read'

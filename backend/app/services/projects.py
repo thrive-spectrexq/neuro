@@ -85,7 +85,7 @@ class ProjectService:
         member_stmt = select(ProjectMember).where(
             ProjectMember.project_id == project_id,
             ProjectMember.user_id == user_id,
-            ProjectMember.role == Role.OWNER,
+            ProjectMember.role == Role.owner,
         )
         member_res = await session.execute(member_stmt)
         if not member_res.scalar_one_or_none():
@@ -119,7 +119,7 @@ class ProjectService:
         admin_stmt = select(ProjectMember).where(
             ProjectMember.project_id == project_id,
             ProjectMember.user_id == user_id,
-            ProjectMember.role.in_([Role.OWNER, Role.ADMIN]),
+            ProjectMember.role.in_([Role.owner, Role.admin]),
         )
         admin_res = await session.execute(admin_stmt)
         if not admin_res.scalar_one_or_none():
@@ -162,7 +162,7 @@ class ProjectService:
             admin_stmt = select(ProjectMember).where(
                 ProjectMember.project_id == project_id,
                 ProjectMember.user_id == user_id,
-                ProjectMember.role.in_([Role.OWNER, Role.ADMIN]),
+                ProjectMember.role.in_([Role.owner, Role.admin]),
             )
             admin_res = await session.execute(admin_stmt)
             if not admin_res.scalar_one_or_none():

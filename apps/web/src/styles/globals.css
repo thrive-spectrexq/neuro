@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    --bg-root: #090A0F;
-    --bg-surface-1: #0F1117;
-    --bg-surface-2: #151821;
-    --bg-surface-3: #1D212D;
-    --bg-surface-hover: #242938;
-    --bg-surface-active: #2D3345;
+    --bg-root: #060810;
+    --bg-surface-1: #0C1018;
+    --bg-surface-2: #101520;
+    --bg-surface-3: #182030;
+    --bg-surface-hover: #141A28;
+    --bg-surface-active: #1A2E38;
     
-    --border-subtle: #1C202C;
-    --border-default: #262B3B;
-    --border-focus: #434B63;
-    --border-accent: #6366F1;
+    --border-subtle: rgba(255, 255, 255, 0.04);
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-focus: rgba(16, 185, 129, 0.5);
+    --border-accent: #10B981;
 
-    --text-primary: #F1F5F9;
+    --text-primary: #E8ECF0;
     --text-secondary: #94A3B8;
     --text-muted: #64748B;
     --text-dim: #475569;
@@ -25,7 +25,7 @@
   body {
     background-color: var(--bg-root);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
+    font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -37,64 +37,66 @@
   }
 }
 
-/* Professional Solid Surfaces (No Blur, High Precision) */
+/* Professional Solid Surfaces */
 .pro-surface-1 {
-  background-color: #0F1117;
-  border: 1px solid #1F2433;
+  background-color: #0C1018;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .pro-surface-2 {
-  background-color: #151821;
-  border: 1px solid #242A3C;
+  background-color: #101520;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .pro-surface-3 {
-  background-color: #1D212D;
-  border: 1px solid #2C3349;
+  background-color: #182030;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .pro-card {
-  background-color: #12151D;
-  border: 1px solid #202636;
+  background-color: #101520;
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 10px;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .pro-card:hover {
-  background-color: #161A24;
-  border-color: #2F374E;
+  background-color: #141A28;
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .pro-card-active {
-  background-color: #181C28;
-  border-color: #6366F1;
+  background-color: #1A2E38;
+  border-color: #10B981;
 }
 
 /* Crisp Button Hierarchy */
 .pro-button-primary {
-  background-color: #4F46E5;
+  background-color: #10B981;
   color: #FFFFFF;
-  border: 1px solid #6366F1;
+  border: 1px solid #10B981;
   font-weight: 500;
   border-radius: 8px;
   padding: 6px 14px;
   transition: all 0.12s ease;
+  box-shadow: 0 0 24px -4px rgba(16, 185, 129, 0.3);
 }
 
 .pro-button-primary:hover {
-  background-color: #4338CA;
-  border-color: #818CF8;
+  background-color: #34D399;
+  border-color: #34D399;
+  color: #FEF3C7; /* Amber 100 */
 }
 
 .pro-button-primary:active {
-  background-color: #3730A3;
+  background-color: #059669;
   transform: translateY(0.5px);
 }
 
 .pro-button-secondary {
-  background-color: #151822;
+  background-color: rgba(255, 255, 255, 0.04);
   color: #CBD5E1;
-  border: 1px solid #262C3E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-weight: 500;
   border-radius: 8px;
   padding: 6px 12px;
@@ -102,13 +104,13 @@
 }
 
 .pro-button-secondary:hover {
-  background-color: #1D2230;
-  border-color: #38415C;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
   color: #FFFFFF;
 }
 
 .pro-button-secondary:active {
-  background-color: #242A3C;
+  background-color: rgba(16, 185, 129, 0.1);
 }
 
 .pro-button-ghost {
@@ -121,30 +123,30 @@
 }
 
 .pro-button-ghost:hover {
-  background-color: #181C26;
-  color: #F1F5F9;
-  border-color: #262B3A;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border-color: transparent;
 }
 
 .pro-button-danger {
-  background-color: #2D141A;
-  border: 1px solid #4D1D28;
+  background-color: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.2);
   color: #FB7185;
   border-radius: 8px;
   transition: all 0.12s ease;
 }
 
 .pro-button-danger:hover {
-  background-color: #3B1822;
-  border-color: #6E2637;
+  background-color: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.4);
   color: #FFE4E6;
 }
 
 /* Professional Input Fields */
 .pro-input {
-  background-color: #0E1017;
-  border: 1px solid #232838;
-  color: #F1F5F9;
+  background-color: #0A0E16;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #E8ECF0;
   border-radius: 8px;
   font-size: 13px;
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
@@ -152,9 +154,9 @@
 
 .pro-input:focus {
   outline: none;
-  border-color: #6366F1;
-  box-shadow: 0 0 0 1px #6366F1;
-  background-color: #12151E;
+  border-color: #10B981;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+  background-color: #101520;
 }
 
 .pro-input::placeholder {
@@ -170,9 +172,9 @@
   font-size: 11px;
   font-weight: 500;
   border-radius: 5px;
-  border: 1px solid #282E40;
-  background-color: #131620;
-  color: #94A3B8;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
 }
 
 .pro-kbd {
@@ -184,10 +186,9 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-weight: 600;
   border-radius: 4px;
-  border: 1px solid #2C3347;
-  background-color: #161A24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.04);
   color: #94A3B8;
-  box-shadow: 0 1px 0 0 #090A0F;
 }
 
 /* Clean Custom Scrollbars */
@@ -196,14 +197,14 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090A0F;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #202636;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #313A52;
+  background: rgba(16, 185, 129, 0.4);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -216,15 +217,15 @@
 
 /* Grid & Canvas Backgrounds */
 .pro-dot-grid {
-  background-color: #090A0F;
-  background-image: radial-gradient(#1E2333 1px, transparent 1px);
+  background-color: #060810;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
   background-size: 18px 18px;
 }
 
 .pro-line-grid {
-  background-color: #090A0F;
+  background-color: #060810;
   background-image: 
-    linear-gradient(to right, #141722 1px, transparent 1px),
-    linear-gradient(to bottom, #141722 1px, transparent 1px);
+    linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
   background-size: 24px 24px;
 }

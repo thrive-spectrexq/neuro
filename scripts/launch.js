@@ -223,8 +223,24 @@ async function main() {
 
   // Clean exit handlers
   process.on('SIGINT', () => {
-    if (backendProc) backendProc.kill();
-    viteProc.kill();
+    if (backendProc) {
+      if (isWindows && backendProc.pid) {
+        try {
+          execSync(`taskkill /f /t /pid ${backendProc.pid}`);
+        } catch(e) {}
+      } else {
+        backendProc.kill('SIGTERM');
+      }
+    }
+    if (viteProc && viteProc.pid) {
+        if (isWindows) {
+           try { execSync(`taskkill /f /t /pid ${viteProc.pid}`); } catch(e){}
+        } else {
+           viteProc.kill('SIGTERM');
+        }
+    } else {
+       viteProc.kill();
+    }
     process.exit(0);
   });
 }

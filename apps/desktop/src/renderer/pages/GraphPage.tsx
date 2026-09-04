@@ -28,21 +28,21 @@ export default function GraphPage() {
       <div className="absolute top-4 left-4 z-10 glass-surface p-2 rounded-lg border border-white/10 flex items-center gap-2 animate-fade-in shadow-xl">
         <div className="flex items-center gap-1 bg-black/20 rounded-md p-1">
           <button 
-            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'force' ? 'bg-indigo-500/20 text-indigo-400' : 'btn-ghost'}`}
+            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'force' ? 'bg-teal-500/20 text-teal-400' : 'btn-ghost'}`}
             onClick={() => setLayoutMode('force')}
             title="Force Layout"
           >
             <Atom size={16} />
           </button>
           <button 
-            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'radial' ? 'bg-indigo-500/20 text-indigo-400' : 'btn-ghost'}`}
+            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'radial' ? 'bg-teal-500/20 text-teal-400' : 'btn-ghost'}`}
             onClick={() => setLayoutMode('radial')}
             title="Radial Layout"
           >
             <CircleDot size={16} />
           </button>
           <button 
-            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'grid' ? 'bg-indigo-500/20 text-indigo-400' : 'btn-ghost'}`}
+            className={`p-1.5 rounded-md transition-colors ${layoutMode === 'grid' ? 'bg-teal-500/20 text-teal-400' : 'btn-ghost'}`}
             onClick={() => setLayoutMode('grid')}
             title="Grid Layout"
           >
@@ -54,7 +54,7 @@ export default function GraphPage() {
         
         <div className="relative">
           <button 
-            className={`p-1.5 rounded-md transition-colors flex items-center gap-1.5 ${showFilters ? 'bg-indigo-500/20 text-indigo-400' : 'btn-ghost'}`}
+            className={`p-1.5 rounded-md transition-colors flex items-center gap-1.5 ${showFilters ? 'bg-teal-500/20 text-teal-400' : 'btn-ghost'}`}
             onClick={() => setShowFilters(!showFilters)}
             title="Filters"
           >
@@ -72,14 +72,14 @@ export default function GraphPage() {
         <div className="w-[1px] h-6 bg-white/10" />
 
         <div className="flex items-center gap-1 bg-black/20 rounded-md p-1">
-          <button className="btn-ghost p-1.5 rounded-md" title="Zoom In"><ZoomIn size={16} /></button>
-          <button className="btn-ghost p-1.5 rounded-md" title="Zoom Out"><ZoomOut size={16} /></button>
-          <button className="btn-ghost p-1.5 rounded-md" title="Fit to Screen"><Maximize2 size={16} /></button>
+          <button className="btn-ghost p-1.5 rounded-md" title="Zoom In" onClick={() => window.dispatchEvent(new CustomEvent('graph-action', { detail: { action: 'zoomIn' } }))}><ZoomIn size={16} /></button>
+          <button className="btn-ghost p-1.5 rounded-md" title="Zoom Out" onClick={() => window.dispatchEvent(new CustomEvent('graph-action', { detail: { action: 'zoomOut' } }))}><ZoomOut size={16} /></button>
+          <button className="btn-ghost p-1.5 rounded-md" title="Fit to Screen" onClick={() => window.dispatchEvent(new CustomEvent('graph-action', { detail: { action: 'fit' } }))}><Maximize2 size={16} /></button>
         </div>
 
         <div className="w-[1px] h-6 bg-white/10" />
         
-        <button className="btn-ghost p-1.5 rounded-md" title="Refresh">
+        <button className="btn-ghost p-1.5 rounded-md" title="Refresh" onClick={() => window.dispatchEvent(new CustomEvent('graph-action', { detail: { action: 'refresh' } }))}>
           <RefreshCw size={16} />
         </button>
       </div>
@@ -90,7 +90,7 @@ export default function GraphPage() {
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-xs font-medium text-zinc-400">Nodes</span>
-            <span className="badge-cyan">{stats.nodes}</span>
+            <span className="badge-emerald">{stats.nodes}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs font-medium text-zinc-400">Edges</span>
@@ -108,11 +108,11 @@ export default function GraphPage() {
         <h3 className="section-label text-white/70 mb-2.5">Legend</h3>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20, 184, 166,0.6)]"></div>
             <span className="text-xs text-zinc-300">Note Node</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16, 185, 129,0.6)]"></div>
             <span className="text-xs text-zinc-300">Tag Node</span>
           </div>
         </div>

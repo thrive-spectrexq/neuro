@@ -1,14 +1,20 @@
 import { useState } from 'react';
+import { apiClient } from '../../lib/api';
 
 export function useAI() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const askQuestion = async (question: string) => {
     setIsProcessing(true);
-    // Mock response
-    setTimeout(() => {
+    try {
+      const res = await apiClient.post('/ai/completion', { prompt: question });
+      return res.data;
+    } catch (e) {
+      console.error(e);
+      return null;
+    } finally {
       setIsProcessing(false);
-    }, 1000);
+    }
   };
 
   return { askQuestion, isProcessing };
