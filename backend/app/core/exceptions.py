@@ -8,6 +8,10 @@ from fastapi.responses import JSONResponse
 
 logger = logging.getLogger("neuro.exceptions")
 
+HTTP_422_UNPROCESSABLE = (
+    status.HTTP_422_UNPROCESSABLE_CONTENT if hasattr(status, "HTTP_422_UNPROCESSABLE_CONTENT") else 422
+)
+
 
 class NeuroException(Exception):
     """Base exception for all Neuro application-level domain errors."""
@@ -53,7 +57,7 @@ class ConflictException(NeuroException):
 
 class ValidationException(NeuroException):
     def __init__(self, detail: str = "Validation error", context: dict[str, Any] | None = None) -> None:
-        super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, context=context)
+        super().__init__(status_code=HTTP_422_UNPROCESSABLE, detail=detail, context=context)
 
 
 class PathTraversalError(ForbiddenException):
@@ -80,7 +84,7 @@ class GraphAnalysisException(NeuroException):
     def __init__(
         self, detail: str = "Knowledge graph extraction or analysis failed", context: dict[str, Any] | None = None
     ) -> None:
-        super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, context=context)
+        super().__init__(status_code=HTTP_422_UNPROCESSABLE, detail=detail, context=context)
 
 
 class RoadmapGenerationError(NeuroException):
@@ -94,7 +98,7 @@ class ObsidianLintError(NeuroException):
     """Raised when parsing or linting Obsidian vault content encounters syntax or structural violations."""
 
     def __init__(self, detail: str = "Obsidian vault lint error", context: dict[str, Any] | None = None) -> None:
-        super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail, context=context)
+        super().__init__(status_code=HTTP_422_UNPROCESSABLE, detail=detail, context=context)
 
 
 class DatabaseConnectionError(NeuroException):
