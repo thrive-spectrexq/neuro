@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-09-05
+
+### Fixed
+- **Testing & Tooling Stability**:
+  - Configured Vitest worker pool to `forks` in `@neuro/web` and `@neuro/desktop` to eliminate JSDOM worker RPC timeouts on Windows.
+  - Repaired corrupted literal backtick newline sequences in `apps/web/src/vite-env.d.ts`.
+  - Resolved Node `MODULE_TYPELESS_PACKAGE_JSON` warning by converting `apps/desktop/postcss.config.js` to CommonJS `module.exports`.
+  - Upgraded FastAPI exception status codes in `backend/app/core/exceptions.py` to `HTTP_422_UNPROCESSABLE_CONTENT`, eliminating Starlette deprecation warnings during test execution.
+  - Made root workspace scripts (`typecheck`, `test`) utilize portable `pnpm -r` execution, preventing Turborepo binary illegal-instruction crashes on Windows.
+
 ## [0.1.4] - 2026-09-04
 
 ### Added

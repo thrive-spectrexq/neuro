@@ -1,6 +1,6 @@
 [project]
 name = "neuro-backend"
-version = "0.1.4"
+version = "0.1.5"
 description = "Backend for Neuro project"
 requires-python = ">=3.12"
 dependencies = [

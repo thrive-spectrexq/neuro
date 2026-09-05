@@ -1,6 +1,6 @@
 {
   "name": "@neuro/clipper",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Neuro Web Clipper Extension",
   "private": true,
   "scripts": {
