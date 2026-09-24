@@ -7,7 +7,7 @@
 <p>Voice, Audio & Vision · Personal Agent Fabric · Model Registry · Governance Built-In · 100% Offline Capable</p>
 
 <p>
-  <img src="https://img.shields.io/badge/AI_Workspace-Active-00f5d4?style=for-the-badge&logo=probot&logoColor=black" />
+  <img src="https://img.shields.io/badge/Release-v0.2.0-00f5d4?style=for-the-badge&logo=github&logoColor=black" />
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-0.141+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
@@ -172,41 +172,6 @@ neuro graph wiki --out-dir ./wiki
 # Database Management
 neuro db init
 neuro db seed
-```
-
----
-
-## Architecture
-
-```
-neuro/
-├── apps/
-│   ├── desktop/          # Electron desktop app (TypeScript + React)
-│   ├── web/              # Browser app (TypeScript + React)
-│   └── clipper/          # Browser extension for web clipping
-├── backend/app/
-│   ├── api/              # FastAPI route handlers (v1 + v2)
-│   ├── core/             # Config, security, logging, governance middleware
-│   ├── models/           # SQLModel database models
-│   ├── schemas/          # Pydantic request/response schemas
-│   ├── services/
-│   │   ├── agent/        # Agent orchestrator, intent parser, tool registry
-│   │   ├── ai/           # AI provider adapters
-│   │   ├── governance/   # Policy engine, consent, audit
-│   │   ├── models/       # Model registry
-│   │   ├── vision/       # Vision engine, OCR
-│   │   ├── voice/        # Voice pipeline, local STT/TTS
-│   │   ├── search/       # Hybrid search engine
-│   │   ├── memory/       # Context & episodic memory
-│   │   └── ...           # Automation, ingestion, embeddings, vectorstore
-│   └── workers/          # Celery background tasks
-├── packages/
-│   ├── ui/               # Shared React component library
-│   ├── shared/           # Shared types and utilities
-│   └── sdk/              # Plugin SDK
-├── plugins/              # Plugin templates and examples
-├── docs/                 # Architecture, API reference, guides
-└── docker-compose.yml    # Redis, ChromaDB, Ollama (optional)
 ```
 
 ---
