@@ -19,7 +19,7 @@ dependencies = [
     "bcrypt==5.0.0",
     "python-multipart==0.0.32",
     "httpx==0.28.1",
-    "sentence-transformers==6.0.1",
+    "sentence-transformers==6.1.0",
     "pymupdf==1.28.2",
     "pyyaml==6.0.3",
     "typer==0.27.2",
