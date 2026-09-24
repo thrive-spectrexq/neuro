@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api';
+import { apiClient } from '../../lib/api';
 import { useNotes } from '../hooks/useNotes';
 import {
   Activity,
