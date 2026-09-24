@@ -30,7 +30,7 @@ async def list_policies(
     current_user: User = Depends(get_current_user),
 ) -> list[Policy]:
     """List all active governance policies."""
-    stmt = select(Policy).where(Policy.is_active == True)
+    stmt = select(Policy).where(Policy.is_active)
     result = await session.execute(stmt)
     return list(result.scalars().all())
 
@@ -121,16 +121,20 @@ async def update_consent(
         )
         return record
     else:
-        revoked = await governance_engine.revoke_consent(
+        await governance_engine.revoke_consent(
             session=session,
             user_id=current_user.id,
             consent_scope=payload.consent_scope,
         )
         # Return record or find it
-        stmt = select(ConsentRecord).where(
-            ConsentRecord.user_id == current_user.id,
-            ConsentRecord.consent_scope == payload.consent_scope,
-        ).order_by(ConsentRecord.granted_at.desc())
+        stmt = (
+            select(ConsentRecord)
+            .where(
+                ConsentRecord.user_id == current_user.id,
+                ConsentRecord.consent_scope == payload.consent_scope,
+            )
+            .order_by(ConsentRecord.granted_at.desc())
+        )
         result = await session.execute(stmt)
         record = result.scalars().first()
         if not record:

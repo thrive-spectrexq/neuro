@@ -21,6 +21,7 @@ class LocalTTSService:
             return
         try:
             import pyttsx3
+
             self._engine = pyttsx3.init()
             self._engine.setProperty("rate", self.rate)
             voices = self._engine.getProperty("voices")
@@ -31,10 +32,7 @@ class LocalTTSService:
                         break
             logger.info("Local TTS engine initialized")
         except ImportError:
-            logger.warning(
-                "pyttsx3 is not installed. Local TTS unavailable. "
-                "Install with: pip install pyttsx3"
-            )
+            logger.warning("pyttsx3 is not installed. Local TTS unavailable. Install with: pip install pyttsx3")
             raise RuntimeError("pyttsx3 is required for local TTS")
 
     async def synthesize(self, text: str, **kwargs: Any) -> bytes:
@@ -42,9 +40,8 @@ class LocalTTSService:
 
         Returns WAV audio data as bytes.
         """
-        import io
-        import tempfile
         import os
+        import tempfile
 
         self._ensure_engine()
 
@@ -72,17 +69,12 @@ class LocalTTSService:
 
     def is_available(self) -> bool:
         """Check if pyttsx3 is installed."""
-        try:
-            import pyttsx3
-            return True
-        except ImportError:
-            return False
+        import importlib.util
+
+        return importlib.util.find_spec("pyttsx3") is not None
 
     def list_voices(self) -> list[dict[str, str]]:
         """List available system voices."""
         self._ensure_engine()
         voices = self._engine.getProperty("voices")
-        return [
-            {"id": v.id, "name": v.name, "languages": str(v.languages)}
-            for v in (voices or [])
-        ]
+        return [{"id": v.id, "name": v.name, "languages": str(v.languages)} for v in (voices or [])]

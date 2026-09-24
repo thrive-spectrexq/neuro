@@ -16,6 +16,7 @@ class PolicyType(str, enum.Enum):
 
 class Policy(SQLModel, table=True):
     """Governance policy defining what actions/resources are permitted."""
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(index=True)
     policy_type: PolicyType = Field(sa_column=Column(SAEnum(PolicyType), nullable=False))

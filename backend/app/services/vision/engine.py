@@ -1,6 +1,5 @@
 import logging
 import uuid
-from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger("neuro.vision")
@@ -95,8 +94,7 @@ class VisionEngine:
             return buffer.read()
         except ImportError:
             raise RuntimeError(
-                "Pillow is required for screen capture. "
-                "Install with: pip install 'neuro-backend[vision]'"
+                "Pillow is required for screen capture. Install with: pip install 'neuro-backend[vision]'"
             )
         except Exception as e:
             logger.error(f"Screen capture failed: {e}")

@@ -58,11 +58,11 @@ async def get_agent(
     agent = await session.get(AgentDefinition, agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if agent.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
+
     return agent
 
 
@@ -76,7 +76,7 @@ async def update_agent(
     agent = await session.get(AgentDefinition, agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if agent.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized")
@@ -86,7 +86,7 @@ async def update_agent(
         for key, value in update_data.items():
             setattr(agent, key, value)
         agent.updated_at = datetime.now(UTC)
-        
+
     session.add(agent)
     await session.commit()
     await session.refresh(agent)
@@ -102,14 +102,14 @@ async def delete_agent(
     agent = await session.get(AgentDefinition, agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if agent.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
+
     # Clean up executions before deleting agent
     await session.execute(delete(AgentExecution).where(AgentExecution.agent_id == agent.id))
-    
+
     await session.delete(agent)
     await session.commit()
 
@@ -124,23 +124,19 @@ async def execute_agent(
     agent = await session.get(AgentDefinition, agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if agent.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
+
     if not agent.is_active:
         raise HTTPException(status_code=400, detail="Agent is not active")
 
     # Call orchestrator
     result = await agent_orchestrator.execute(
-        session=session,
-        user_id=user_uuid,
-        agent_id=agent.id,
-        command=request_in.command,
-        context=request_in.context
+        session=session, user_id=user_uuid, agent_id=agent.id, command=request_in.command, context=request_in.context
     )
-    
+
     return result
 
 
@@ -151,35 +147,33 @@ async def auto_route_execute(
     current_user: User = Depends(get_current_user),
 ):
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
-    
+
     # Try to find first active agent
-    stmt = select(AgentDefinition).where(
-        AgentDefinition.user_id == user_uuid, 
-        AgentDefinition.is_active == True
-    ).limit(1)
+    stmt = (
+        select(AgentDefinition)
+        .where(
+            AgentDefinition.user_id == user_uuid,
+            AgentDefinition.is_active,
+        )
+        .limit(1)
+    )
     result = await session.execute(stmt)
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         # Create a default agent
         agent = AgentDefinition(
-            name="Default Assistant",
-            description="Auto-created default assistant",
-            user_id=user_uuid
+            name="Default Assistant", description="Auto-created default assistant", user_id=user_uuid
         )
         session.add(agent)
         await session.commit()
         await session.refresh(agent)
-        
+
     # Call orchestrator
     result = await agent_orchestrator.execute(
-        session=session,
-        user_id=user_uuid,
-        agent_id=agent.id,
-        command=request_in.command,
-        context=request_in.context
+        session=session, user_id=user_uuid, agent_id=agent.id, command=request_in.command, context=request_in.context
     )
-    
+
     return result
 
 
@@ -193,15 +187,18 @@ async def agent_history(
     agent = await session.get(AgentDefinition, agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     if agent.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
-    stmt = select(AgentExecution).where(
-        AgentExecution.agent_id == agent.id
-    ).order_by(AgentExecution.created_at.desc()).limit(limit)
-    
+
+    stmt = (
+        select(AgentExecution)
+        .where(AgentExecution.agent_id == agent.id)
+        .order_by(AgentExecution.created_at.desc())
+        .limit(limit)
+    )
+
     result = await session.execute(stmt)
     history = result.scalars().all()
     return history

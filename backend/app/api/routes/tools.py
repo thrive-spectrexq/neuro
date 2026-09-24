@@ -1,5 +1,4 @@
 import uuid
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,22 +20,17 @@ async def list_tools(
     current_user: User = Depends(get_current_user),
 ):
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
-    
+
     # Allow fetching global tools (user_id is None) and user-specific tools
-    stmt = select(ToolDefinition).where(
-        or_(
-            ToolDefinition.user_id.is_(None),
-            ToolDefinition.user_id == user_uuid
-        )
-    )
-    
+    stmt = select(ToolDefinition).where(or_(ToolDefinition.user_id.is_(None), ToolDefinition.user_id == user_uuid))
+
     if category:
         try:
             tool_cat = ToolCategory(category)
             stmt = stmt.where(ToolDefinition.category == tool_cat)
         except ValueError:
             pass
-            
+
     result = await session.execute(stmt)
     tools = result.scalars().all()
     return tools
@@ -49,23 +43,23 @@ async def create_tool(
     current_user: User = Depends(get_current_user),
 ):
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
-    
+
     # Check if a tool with the same name already exists
     stmt = select(ToolDefinition).where(ToolDefinition.name == tool_in.name)
     result = await session.execute(stmt)
     existing_tool = result.scalar_one_or_none()
-    
+
     if existing_tool:
         raise HTTPException(status_code=400, detail="Tool with this name already exists")
-        
+
     try:
         category = ToolCategory(tool_in.category)
     except ValueError:
         category = ToolCategory.custom
-        
+
     tool_data = tool_in.model_dump(exclude={"category"})
     tool = ToolDefinition(**tool_data, category=category, user_id=user_uuid)
-    
+
     session.add(tool)
     await session.commit()
     await session.refresh(tool)
@@ -82,9 +76,9 @@ async def update_tool(
     tool = await session.get(ToolDefinition, tool_id)
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
-    
+
     # Cannot modify global tools or tools belonging to someone else
     if tool.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized to modify this tool")
@@ -93,7 +87,7 @@ async def update_tool(
     if update_data:
         for key, value in update_data.items():
             setattr(tool, key, value)
-            
+
     session.add(tool)
     await session.commit()
     await session.refresh(tool)
@@ -109,13 +103,13 @@ async def delete_tool(
     tool = await session.get(ToolDefinition, tool_id)
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
-        
+
     user_uuid = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
-    
+
     # Cannot delete global tools or tools belonging to someone else
     if tool.user_id != user_uuid:
         raise HTTPException(status_code=403, detail="Not authorized to delete this tool")
-        
+
     await session.delete(tool)
     await session.commit()
 

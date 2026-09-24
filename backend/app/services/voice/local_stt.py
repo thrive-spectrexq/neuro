@@ -18,6 +18,7 @@ class LocalSTTService:
             return
         try:
             from faster_whisper import WhisperModel
+
             self._model = WhisperModel(
                 self.model_size,
                 device=self.device,
@@ -25,10 +26,7 @@ class LocalSTTService:
             )
             logger.info(f"Loaded local STT model: {self.model_size} on {self.device}")
         except ImportError:
-            logger.error(
-                "faster-whisper is not installed. "
-                "Install with: pip install 'neuro-backend[voice]'"
-            )
+            logger.error("faster-whisper is not installed. Install with: pip install 'neuro-backend[voice]'")
             raise RuntimeError("faster-whisper is required for local STT")
 
     async def transcribe(
@@ -38,9 +36,8 @@ class LocalSTTService:
         **kwargs: Any,
     ) -> str:
         """Transcribe audio bytes to text using local Whisper model."""
-        import io
-        import tempfile
         import os
+        import tempfile
 
         self._load_model()
 
@@ -68,8 +65,6 @@ class LocalSTTService:
 
     def is_available(self) -> bool:
         """Check if faster-whisper is installed and a model can be loaded."""
-        try:
-            from faster_whisper import WhisperModel
-            return True
-        except ImportError:
-            return False
+        import importlib.util
+
+        return importlib.util.find_spec("faster_whisper") is not None

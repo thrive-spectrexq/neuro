@@ -25,8 +25,7 @@ class LocalOCRService:
             logger.info(f"EasyOCR reader initialized for languages: {lang_list}")
         except ImportError:
             logger.warning(
-                "easyocr is not installed. OCR will not be available. "
-                "Install with: pip install 'neuro-backend[vision]'"
+                "easyocr is not installed. OCR will not be available. Install with: pip install 'neuro-backend[vision]'"
             )
             raise RuntimeError("easyocr is required for OCR. Install with: pip install 'neuro-backend[vision]'")
 
@@ -48,8 +47,9 @@ class LocalOCRService:
         self._ensure_reader(lang)
 
         import io
-        from PIL import Image
+
         import numpy as np
+        from PIL import Image
 
         image = Image.open(io.BytesIO(image_data))
         image_np = np.array(image)
@@ -67,8 +67,6 @@ class LocalOCRService:
 
     def is_available(self) -> bool:
         """Check if easyocr is installed."""
-        try:
-            import easyocr
-            return True
-        except ImportError:
-            return False
+        import importlib.util
+
+        return importlib.util.find_spec("easyocr") is not None

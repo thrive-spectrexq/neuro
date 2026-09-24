@@ -30,7 +30,7 @@ class GovernanceEngine:
         resource_id: str | None = None,
     ) -> PolicyDecision:
         stmt = select(Policy).where(
-            Policy.is_active == True,
+            Policy.is_active,
             Policy.resource_type.in_([resource_type, "*"]),
         )
         result = await session.execute(stmt)
@@ -67,8 +67,8 @@ class GovernanceEngine:
         stmt = select(ConsentRecord).where(
             ConsentRecord.user_id == user_id,
             ConsentRecord.consent_scope == consent_scope,
-            ConsentRecord.consent_given == True,
-            ConsentRecord.revoked_at == None,
+            ConsentRecord.consent_given,
+            ConsentRecord.revoked_at.is_(None),
         )
         result = await session.execute(stmt)
         record = result.scalars().first()
@@ -103,8 +103,8 @@ class GovernanceEngine:
         stmt = select(ConsentRecord).where(
             ConsentRecord.user_id == user_id,
             ConsentRecord.consent_scope == consent_scope,
-            ConsentRecord.consent_given == True,
-            ConsentRecord.revoked_at == None,
+            ConsentRecord.consent_given,
+            ConsentRecord.revoked_at.is_(None),
         )
         result = await session.execute(stmt)
         record = result.scalars().first()
@@ -152,9 +152,7 @@ class GovernanceEngine:
         limit: int = 100,
         offset: int = 0,
     ) -> list[GovernanceAuditEntry]:
-        stmt = select(GovernanceAuditEntry).where(
-            GovernanceAuditEntry.user_id == user_id
-        )
+        stmt = select(GovernanceAuditEntry).where(GovernanceAuditEntry.user_id == user_id)
         if resource_type:
             stmt = stmt.where(GovernanceAuditEntry.resource_type == resource_type)
         if action:
@@ -206,8 +204,8 @@ class GovernanceEngine:
         stmt = select(ConsentRecord).where(
             ConsentRecord.user_id == user_id,
             ConsentRecord.policy_id == policy_id,
-            ConsentRecord.consent_given == True,
-            ConsentRecord.revoked_at == None,
+            ConsentRecord.consent_given,
+            ConsentRecord.revoked_at.is_(None),
         )
         result = await session.execute(stmt)
         return result.scalars().first() is not None

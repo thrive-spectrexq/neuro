@@ -1,9 +1,8 @@
-import enum
 import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import Column, JSON
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
 

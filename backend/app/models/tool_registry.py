@@ -3,7 +3,8 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import Column, Enum as SAEnum, JSON
+from sqlalchemy import JSON, Column
+from sqlalchemy import Enum as SAEnum
 from sqlmodel import Field, SQLModel
 
 

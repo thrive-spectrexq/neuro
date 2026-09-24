@@ -63,10 +63,7 @@ async def discover_models(
 ):
     user_id = uuid.UUID(current_user["id"]) if isinstance(current_user, dict) else current_user.id
     discovered = await model_registry.discover_local_models(session, user_id)
-    return ModelDiscoverResponse(
-        discovered=discovered,
-        provider="ollama"
-    )
+    return ModelDiscoverResponse(discovered=discovered, provider="ollama")
 
 
 @router.get("/{model_id}", response_model=ModelResponse)
@@ -124,14 +121,14 @@ async def invoke_model(
     model = await model_registry.get_model(session, model_id)
     if not model or model.user_id != user_id:
         raise HTTPException(status_code=404, detail="Model not found")
-    
+
     return ModelInvokeResponse(
         model_id=model.id,
         model_name=model.name,
         provider=model.provider.value,
         output={"message": "Invoke placeholder"},
         tokens_used=0,
-        latency_ms=0.0
+        latency_ms=0.0,
     )
 
 
@@ -145,11 +142,7 @@ async def get_usage_stats(
     model = await model_registry.get_model(session, model_id)
     if not model or model.user_id != user_id:
         raise HTTPException(status_code=404, detail="Model not found")
-    
+
     return ModelUsageStats(
-        model_id=model.id,
-        model_name=model.name,
-        total_invocations=0,
-        total_tokens=0,
-        avg_latency_ms=0.0
+        model_id=model.id, model_name=model.name, total_invocations=0, total_tokens=0, avg_latency_ms=0.0
     )

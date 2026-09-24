@@ -88,16 +88,20 @@ class ModelRegistry:
         stmt = select(RegisteredModel).where(
             RegisteredModel.user_id == user_id,
             RegisteredModel.model_type == model_type,
-            RegisteredModel.is_default == True,
+            RegisteredModel.is_default,
         )
         result = await session.execute(stmt)
         model = result.scalars().first()
         if not model:
             # Fall back to any model of this type
-            stmt = select(RegisteredModel).where(
-                RegisteredModel.user_id == user_id,
-                RegisteredModel.model_type == model_type,
-            ).limit(1)
+            stmt = (
+                select(RegisteredModel)
+                .where(
+                    RegisteredModel.user_id == user_id,
+                    RegisteredModel.model_type == model_type,
+                )
+                .limit(1)
+            )
             result = await session.execute(stmt)
             model = result.scalars().first()
         return model
@@ -145,7 +149,9 @@ class ModelRegistry:
         discovered = []
         try:
             import httpx
+
             from app.core.config import get_settings
+
             settings = get_settings()
             ollama_url = settings.OLLAMA_BASE_URL or "http://localhost:11434"
             async with httpx.AsyncClient(timeout=10.0) as client:
@@ -154,14 +160,16 @@ class ModelRegistry:
                     data = resp.json()
                     for model_info in data.get("models", []):
                         model_name = model_info.get("name", "")
-                        discovered.append({
-                            "name": model_name,
-                            "provider": "ollama",
-                            "model_type": "chat",
-                            "is_local": True,
-                            "size": model_info.get("size"),
-                            "modified_at": model_info.get("modified_at"),
-                        })
+                        discovered.append(
+                            {
+                                "name": model_name,
+                                "provider": "ollama",
+                                "model_type": "chat",
+                                "is_local": True,
+                                "size": model_info.get("size"),
+                                "modified_at": model_info.get("modified_at"),
+                            }
+                        )
         except Exception as e:
             logger.warning(f"Ollama discovery failed: {e}")
         return discovered
@@ -175,7 +183,7 @@ class ModelRegistry:
         stmt = select(RegisteredModel).where(
             RegisteredModel.user_id == user_id,
             RegisteredModel.model_type == model_type,
-            RegisteredModel.is_default == True,
+            RegisteredModel.is_default,
         )
         result = await session.execute(stmt)
         for model in result.scalars().all():
