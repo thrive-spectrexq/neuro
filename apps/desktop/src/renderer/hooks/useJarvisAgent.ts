@@ -412,7 +412,7 @@ export function useJarvisAgent() {
           ? `# ${noteTitle}\n\n${rawText}\n\n*Captured via Neuro Voice Agent*`
           : '# Quick Note\n\nCaptured thought...';
 
-        // Save note locally to backend or local mock
+        // Save note locally to backend API
         try {
           fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/notes`, {
             method: 'POST',

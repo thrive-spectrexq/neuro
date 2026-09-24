@@ -127,24 +127,6 @@ export function SpacedRepetitionStudio() {
       }
     });
 
-    // If no explicit syntax is present in notes yet, generate default study deck
-    if (extracted.length === 0) {
-      notes.slice(0, 5).forEach((n: NoteItem, i: number) => {
-        extracted.push({
-          id: `sample_${i}`,
-          noteId: n.id,
-          noteTitle: n.title,
-          front: `What are the core concepts covered in [[${n.title}]]?`,
-          back: n.content?.slice(0, 200) || 'Key takeaways from this note.',
-          cardType: 'qa',
-          easeFactor: 2.5,
-          repetitions: 1,
-          intervalDays: 1,
-          dueDate: now,
-        });
-      });
-    }
-
     setCards(extracted);
   }, [notes]);
 
@@ -595,19 +577,25 @@ export function SpacedRepetitionStudio() {
         ) : (
           <div className="p-8 text-center bg-[#0F1117] border border-[#1F2433] rounded-lg max-w-md w-full font-mono">
             <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-            <h3 className="text-xs font-bold text-white mb-1">Queue Completed</h3>
+            <h3 className="text-xs font-bold text-white mb-1">
+              {cards.length === 0 ? 'No Flashcards in Deck' : 'Queue Completed'}
+            </h3>
             <p className="text-[10px] text-[#64748B] mb-3">
-              All cards due for review in this deck are completed.
+              {cards.length === 0
+                ? 'Add "Question :: Answer" syntax or ==Cloze deletions== to your notes, or click "+ New Card".'
+                : 'All cards due for review in this deck are completed.'}
             </p>
-            <button
-              onClick={() => {
-                setFilterMode('all');
-                setCurrentCardIndex(0);
-              }}
-              className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors"
-            >
-              Review Full Deck
-            </button>
+            {cards.length > 0 && (
+              <button
+                onClick={() => {
+                  setFilterMode('all');
+                  setCurrentCardIndex(0);
+                }}
+                className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors"
+              >
+                Review Full Deck
+              </button>
+            )}
           </div>
         )}
       </div>

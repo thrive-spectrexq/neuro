@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -33,25 +33,7 @@ interface BM25Result {
 
 export function VaultLintStudio() {
   const token = useAuthStore((state) => state.token);
-  const [report, setReport] = useState<LintReport | null>({
-    vault_health_score: 94,
-    total_notes_scanned: 48,
-    broken_links: [
-      {
-        source_note: 'AI Agents Strategy.md',
-        target: 'Task Automations',
-        suggestion: 'Automation Pipelines.md',
-      },
-      {
-        source_note: 'Weekly Review 2026-W31.md',
-        target: 'Memory Graphs',
-        suggestion: 'Neuro AI Architecture.md',
-      },
-    ],
-    orphan_notes: ['Draft Scratchpad.md', 'Meeting 2026-08-01.md'],
-    empty_headings: [{ note: 'Research Notes.md', heading: '### Future Milestones' }],
-    metadata_gaps: [{ note: 'Local LLM Benchmark.md', missing: ['tags', 'updated_at'] }],
-  });
+  const [report, setReport] = useState<LintReport | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [bm25Query, setBm25Query] = useState('');
   const [bm25Results, setBm25Results] = useState<BM25Result[]>([]);
@@ -84,6 +66,10 @@ export function VaultLintStudio() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLintReport();
+  }, []);
 
   const handleRunBM25 = async () => {
     if (!bm25Query.trim()) return;
@@ -154,7 +140,7 @@ export function VaultLintStudio() {
     }
   };
 
-  const healthScore = report?.vault_health_score ?? 90;
+  const healthScore = report ? report.vault_health_score : 100;
   const scoreColor =
     healthScore >= 90 ? 'text-emerald-400' : healthScore >= 75 ? 'text-amber-400' : 'text-rose-400';
 
@@ -250,7 +236,7 @@ export function VaultLintStudio() {
                   </span>
                 </div>
                 <div className="w-10 h-10 rounded-md border border-[#242A3C] bg-[#141722] flex items-center justify-center font-bold text-xs text-white font-mono">
-                  {report?.total_notes_scanned ?? 48}
+                  {report?.total_notes_scanned ?? 0}
                 </div>
               </div>
 
@@ -312,27 +298,33 @@ export function VaultLintStudio() {
                 </div>
 
                 <div className="space-y-2">
-                  {report?.broken_links.map((link, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 bg-[#141722] border border-[#1F2433] rounded-md text-xs space-y-1"
-                    >
-                      <div className="flex items-center justify-between font-mono">
-                        <span className="text-[#CBD5E1] text-[11px]">{link.source_note}</span>
-                        <span className="text-rose-400 text-[11px] font-semibold">
-                          [[{link.target}]]
-                        </span>
-                      </div>
-                      {link.suggestion && (
-                        <div className="flex items-center gap-1 text-[#64748B]">
-                          <span className="font-mono text-[10px]">Suggestion:</span>
-                          <span className="px-1.5 py-0.2 bg-[#102319] text-emerald-300 border border-[#1B432C] rounded font-mono text-[10px]">
-                            {link.suggestion}
+                  {report?.broken_links && report.broken_links.length > 0 ? (
+                    report.broken_links.map((link, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 bg-[#141722] border border-[#1F2433] rounded-md text-xs space-y-1"
+                      >
+                        <div className="flex items-center justify-between font-mono">
+                          <span className="text-[#CBD5E1] text-[11px]">{link.source_note}</span>
+                          <span className="text-rose-400 text-[11px] font-semibold">
+                            [[{link.target}]]
                           </span>
                         </div>
-                      )}
+                        {link.suggestion && (
+                          <div className="flex items-center gap-1 text-[#64748B]">
+                            <span className="font-mono text-[10px]">Suggestion:</span>
+                            <span className="px-1.5 py-0.2 bg-[#102319] text-emerald-300 border border-[#1B432C] rounded font-mono text-[10px]">
+                              {link.suggestion}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-[11px] text-slate-500 font-mono">
+                      No broken [[wikilinks]] detected in vault.
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
@@ -349,20 +341,26 @@ export function VaultLintStudio() {
                 </div>
 
                 <div className="space-y-2">
-                  {report?.orphan_notes.map((note, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 bg-[#141722] border border-[#1F2433] rounded-md flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="font-mono text-[#CBD5E1] text-[11px]">{note}</span>
+                  {report?.orphan_notes && report.orphan_notes.length > 0 ? (
+                    report.orphan_notes.map((note, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 bg-[#141722] border border-[#1F2433] rounded-md flex items-center justify-between text-xs"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="font-mono text-[#CBD5E1] text-[11px]">{note}</span>
+                        </div>
+                        <button className="px-2 py-0.5 bg-[#1E2435] hover:bg-[#283046] border border-[#242A3C] rounded text-[#CBD5E1] text-[10px] font-mono transition-colors">
+                          Link Hub
+                        </button>
                       </div>
-                      <button className="px-2 py-0.5 bg-[#1E2435] hover:bg-[#283046] border border-[#242A3C] rounded text-[#CBD5E1] text-[10px] font-mono transition-colors">
-                        Link Hub
-                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-[11px] text-slate-500 font-mono">
+                      All vault notes are cross-linked. Zero orphans found.
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

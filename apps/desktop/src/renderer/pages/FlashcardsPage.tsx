@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Brain,
   Sparkles,
@@ -13,7 +13,6 @@ import {
   Plus,
   RefreshCw,
   BookOpen,
-  Volume2,
 } from 'lucide-react';
 import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -30,59 +29,26 @@ interface Flashcard {
 }
 
 export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'editor') => void }) {
-  const { data: notes } = useNotes();
+  const { data: notes = [] } = useNotes();
   const { setActiveNoteId } = useNoteStore();
 
-  const [cards, setCards] = useState<Flashcard[]>([
-    {
-      id: '1',
-      question: 'What is the primary role of ChromaDB in Neuro?',
-      answer:
-        'ChromaDB serves as the local-first vector store for semantic embeddings and similarity retrieval across notes.',
-      sourceNoteTitle: 'Welcome to Neuro',
-      sourceNoteId: '1',
-      intervalDays: 1,
-      reviewedCount: 0,
-    },
-    {
-      id: '2',
-      question: 'What global shortcut summons the tactical JARVIS HUD overlay?',
-      answer: 'Ctrl + Space or Alt + Space',
-      sourceNoteTitle: 'System Settings',
-      sourceNoteId: 'settings',
-      intervalDays: 3,
-      reviewedCount: 1,
-    },
-    {
-      id: '3',
-      question: 'How do you create bi-directional links between concepts in Neuro?',
-      answer:
-        'Use the double bracket syntax: [[Note Title]] to automatically generate backlinks in the knowledge graph.',
-      sourceNoteTitle: 'Bi-directional Linking',
-      sourceNoteId: '2',
-      intervalDays: 7,
-      reviewedCount: 2,
-    },
-  ]);
-
+  const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [streak, setStreak] = useState(3);
+  const [streak, setStreak] = useState(0);
   const [score, setScore] = useState({ correct: 0, total: 0 });
 
-  const currentCard = cards[currentIndex];
-
-  // Auto-generate flashcards from user notes
-  const handleGenerateCardsFromNotes = async () => {
+  // Dynamically extract real flashcards from user's actual notes
+  const handleGenerateCardsFromNotes = () => {
     if (!notes || notes.length === 0 || isGenerating) return;
     setIsGenerating(true);
     soundEngine.playClick();
 
     const newCards: Flashcard[] = [];
     notes.forEach((note) => {
-      const lines = note.content.split('\n').filter((l) => l.trim().length > 10);
+      const lines = note.content.split('\n').filter((l) => l.trim().length > 5);
       lines.forEach((line, i) => {
         if (line.includes('::')) {
           const [q, a] = line.split('::');
@@ -99,10 +65,10 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
           }
         } else if (line.startsWith('### ') || line.startsWith('## ')) {
           const nextLine = lines[i + 1];
-          if (nextLine && !nextLine.startsWith('#')) {
+          if (nextLine && !nextLine.startsWith('#') && nextLine.trim().length > 10) {
             newCards.push({
               id: `${note.id}-${i}`,
-              question: `What are the details of: "${line.replace(/^#+\s*/, '').trim()}"?`,
+              question: `What are the key points of: "${line.replace(/^#+\s*/, '').trim()}"?`,
               answer: nextLine.replace(/^[-*]+\s*/, '').trim(),
               sourceNoteTitle: note.title,
               sourceNoteId: note.id,
@@ -115,11 +81,20 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
     });
 
     if (newCards.length > 0) {
-      setCards((prev) => [...newCards, ...prev]);
+      setCards(newCards);
       soundEngine.playSuccessTone();
     }
     setIsGenerating(false);
   };
+
+  // Attempt to generate from notes on initial mount
+  useEffect(() => {
+    if (notes && notes.length > 0 && cards.length === 0) {
+      handleGenerateCardsFromNotes();
+    }
+  }, [notes]);
+
+  const currentCard = cards[currentIndex];
 
   const handleFlip = () => {
     soundEngine.playClick();
@@ -133,17 +108,22 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
       total: prev.total + 1,
     }));
 
+    if (rating !== 'again') {
+      setStreak((prev) => prev + 1);
+    } else {
+      setStreak(0);
+    }
+
+    setIsFlipped(false);
     if (currentIndex + 1 < cards.length) {
-      setIsFlipped(false);
-      setCurrentIndex((prev) => prev + 1);
+      setCurrentIndex(currentIndex + 1);
     } else {
       setSessionCompleted(true);
-      setStreak((prev) => prev + 1);
     }
   };
 
   const handleResetSession = () => {
-    soundEngine.playWakeChime();
+    soundEngine.playClick();
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionCompleted(false);
@@ -151,67 +131,113 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
   };
 
   const handleJumpToNote = (noteId: string) => {
+    soundEngine.playClick();
     setActiveNoteId(noteId);
     if (onNavigate) onNavigate('editor');
   };
 
+  // Keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        handleFlip();
+      } else if (isFlipped) {
+        if (e.key === '1') handleGrade('again');
+        if (e.key === '2') handleGrade('hard');
+        if (e.key === '3') handleGrade('good');
+        if (e.key === '4') handleGrade('easy');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFlipped, currentIndex, cards]);
+
   return (
-    <div className="p-8 max-w-4xl mx-auto h-full flex flex-col justify-between select-none font-sans overflow-y-auto">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-5 mb-6">
+    <div className="page-container flex flex-col justify-between h-full overflow-y-auto animate-in fade-in duration-200">
+      {/* Workspace Header */}
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
-              <Brain size={16} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-white font-sans">
-                Active Recall & Spaced Repetition (SRS)
-              </h1>
-              <p className="text-xs text-zinc-400 font-sans">
-                Review key concepts, formulas, and connections synthesized from your second brain.
-              </p>
+          <div className="flex items-center gap-3 mb-1.5">
+            <h1 className="page-title flex items-center gap-2">
+              <Brain className="w-6 h-6 text-[#0A84FF]" />
+              Study & Recall
+            </h1>
+            <div className="flex items-center gap-2">
+              <span className="badge-blue flex items-center gap-1">
+                <Layers size={11} />
+                {cards.length} cards
+              </span>
+              {streak > 0 && (
+                <span className="badge-gold flex items-center gap-1">
+                  <Flame size={11} className="text-[#FF9F0A]" />
+                  {streak} streak
+                </span>
+              )}
             </div>
           </div>
+          <p className="page-subtitle">
+            Spaced repetition memory review generated from your knowledge vault notes.
+          </p>
         </div>
 
-        {/* Streak & Generator Button */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs shadow-sm">
-            <Flame size={14} className="text-amber-400 animate-pulse" />
-            <span>{streak} Day Streak</span>
-          </div>
-
+        {/* Generate / Action Buttons */}
+        <div className="flex items-center gap-2.5">
           <button
             onClick={handleGenerateCardsFromNotes}
-            disabled={isGenerating}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-sans text-xs font-semibold shadow-[0_0_15px_rgba(20, 184, 166,0.3)] transition-all"
-            title="Generate flashcards from note definitions (::) and headers"
+            disabled={isGenerating || notes.length === 0}
+            className="btn-primary"
+            title="Scan your notes for 'Question :: Answer' or key concepts to build cards"
           >
-            <Sparkles size={13} className={isGenerating ? 'animate-spin' : ''} />
-            <span>Generate from Notes</span>
+            <Sparkles size={13} />
+            <span>{isGenerating ? 'Scanning Notes...' : 'Extract From Notes'}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Review Card Canvas */}
-      {!sessionCompleted && currentCard ? (
+      {/* Main Review Zone */}
+      {cards.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center card-surface my-6">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#86868B] mb-4">
+            <Brain size={26} />
+          </div>
+          <h2 className="text-base font-semibold text-[#F5F5F7] mb-1.5 tracking-tight">
+            No Study Cards in Deck
+          </h2>
+          <p className="text-xs text-[#86868B] max-w-md mb-6 leading-relaxed">
+            Add{' '}
+            <code className="text-[#0A84FF] font-mono bg-white/[0.06] px-1.5 py-0.5 rounded">
+              Question :: Answer
+            </code>{' '}
+            syntax or section headers in your notes to automatically generate flashcard decks.
+          </p>
+          <button
+            onClick={handleGenerateCardsFromNotes}
+            disabled={isGenerating || notes.length === 0}
+            className="btn-primary"
+          >
+            <Sparkles size={13} />
+            <span>Scan Notes for Flashcards</span>
+          </button>
+        </div>
+      ) : !sessionCompleted && currentCard ? (
         <div className="flex-1 flex flex-col items-center justify-center my-4">
           {/* Card Progress Indicator */}
-          <div className="w-full max-w-lg flex items-center justify-between text-xs text-zinc-500 font-mono mb-3">
+          <div className="w-full max-w-lg flex items-center justify-between text-xs text-[#86868B] font-mono mb-3">
             <span>
               Card {currentIndex + 1} of {cards.length}
             </span>
-            <span className="text-teal-400">SRS Interval: {currentCard.intervalDays}d</span>
+            <span className="text-[#0A84FF]">SRS Interval: {currentCard.intervalDays}d</span>
           </div>
 
           {/* 3D Flipping Card Container */}
           <div
             onClick={handleFlip}
-            className="w-full max-w-lg min-h-[300px] p-8 rounded-3xl bg-[#0d101d] hover:bg-[#111526] border border-white/[0.08] hover:border-teal-500/40 shadow-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between relative group"
+            className="w-full max-w-lg min-h-[280px] p-8 rounded-3xl bg-[#141418] hover:bg-[#1A1A20] border border-white/[0.08] hover:border-white/[0.16] shadow-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between relative group"
             style={{
               boxShadow: isFlipped
-                ? '0 16px 40px rgba(0,0,0,0.8), 0 0 24px rgba(20, 184, 166,0.2)'
+                ? '0 16px 40px rgba(0,0,0,0.8), 0 0 24px rgba(0, 113, 227, 0.2)'
                 : '0 12px 32px rgba(0,0,0,0.7)',
             }}
           >
@@ -220,33 +246,33 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
               <span
                 className={`px-2.5 py-0.5 rounded-full uppercase tracking-wider text-[10px] font-bold ${
                   isFlipped
-                    ? 'bg-teal-950/80 text-teal-300 border border-teal-500/40'
-                    : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                    ? 'bg-[#0071E3]/20 text-[#0A84FF] border border-[#0071E3]/40'
+                    : 'bg-white/[0.08] text-[#F5F5F7] border border-white/[0.1]'
                 }`}
               >
                 {isFlipped ? 'Answer' : 'Question / Prompt'}
               </span>
 
-              <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors text-[11px]">
+              <span className="text-[#86868B] group-hover:text-white transition-colors text-[11px]">
                 Click or Space to Flip ⟳
               </span>
             </div>
 
             {/* Card Content Body */}
             <div className="py-6 text-center">
-              <h2 className="text-lg md:text-xl font-bold text-white leading-relaxed font-sans">
+              <h2 className="text-lg md:text-xl font-bold text-[#F5F5F7] leading-relaxed font-sans tracking-tight">
                 {isFlipped ? currentCard.answer : currentCard.question}
               </h2>
             </div>
 
             {/* Bottom Card Meta & Source Link */}
-            <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+            <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-[#86868B] font-mono">
               <div
                 onClick={(e) => {
                   e.stopPropagation();
                   handleJumpToNote(currentCard.sourceNoteId);
                 }}
-                className="flex items-center gap-1 text-emerald-400 hover:text-emerald-200 cursor-pointer hover:underline"
+                className="flex items-center gap-1.5 text-[#0A84FF] hover:text-[#5E5CE6] cursor-pointer hover:underline"
               >
                 <BookOpen size={11} />
                 <span>Source: {currentCard.sourceNoteTitle}</span>
@@ -261,41 +287,41 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
             <div className="w-full max-w-lg grid grid-cols-4 gap-2.5 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-150">
               <button
                 onClick={() => handleGrade('again')}
-                className="py-2.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
+                className="py-2.5 rounded-2xl bg-[#FF453A]/15 hover:bg-[#FF453A]/25 border border-[#FF453A]/30 text-[#FF453A] text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
               >
                 <span>Again</span>
-                <span className="text-[9px] text-rose-400/80 font-normal mt-0.5">&lt; 1d</span>
+                <span className="text-[9px] text-[#FF453A]/80 font-normal mt-0.5">&lt; 1d</span>
               </button>
 
               <button
                 onClick={() => handleGrade('hard')}
-                className="py-2.5 rounded-xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
+                className="py-2.5 rounded-2xl bg-[#FF9F0A]/15 hover:bg-[#FF9F0A]/25 border border-[#FF9F0A]/30 text-[#FF9F0A] text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
               >
                 <span>Hard</span>
-                <span className="text-[9px] text-amber-400/80 font-normal mt-0.5">3d</span>
+                <span className="text-[9px] text-[#FF9F0A]/80 font-normal mt-0.5">3d</span>
               </button>
 
               <button
                 onClick={() => handleGrade('good')}
-                className="py-2.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
+                className="py-2.5 rounded-2xl bg-[#0071E3]/15 hover:bg-[#0071E3]/25 border border-[#0071E3]/30 text-[#0A84FF] text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
               >
                 <span>Good</span>
-                <span className="text-[9px] text-emerald-400/80 font-normal mt-0.5">7d</span>
+                <span className="text-[9px] text-[#0A84FF]/80 font-normal mt-0.5">7d</span>
               </button>
 
               <button
                 onClick={() => handleGrade('easy')}
-                className="py-2.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
+                className="py-2.5 rounded-2xl bg-[#30D158]/15 hover:bg-[#30D158]/25 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-bold transition-all shadow-sm flex flex-col items-center"
               >
                 <span>Easy</span>
-                <span className="text-[9px] text-emerald-400/80 font-normal mt-0.5">14d</span>
+                <span className="text-[9px] text-[#30D158]/80 font-normal mt-0.5">14d</span>
               </button>
             </div>
           ) : (
             <div className="mt-6">
               <button
                 onClick={handleFlip}
-                className="px-6 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 text-xs font-mono transition-all"
+                className="px-6 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-[#F5F5F7] text-xs font-mono transition-all"
               >
                 Show Answer (Spacebar)
               </button>
@@ -304,35 +330,31 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
         </div>
       ) : (
         /* Session Completed Screen */
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center my-8">
-          <div className="w-16 h-16 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 mb-4 shadow-[0_0_24px_rgba(20, 184, 166,0.3)]">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center my-6 card-surface">
+          <div className="w-16 h-16 rounded-2xl bg-[#30D158]/15 border border-[#30D158]/30 flex items-center justify-center text-[#30D158] mb-4 shadow-[0_0_24px_rgba(48,209,88,0.3)]">
             <Award size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-white font-sans mb-1">
-            Knowledge Session Complete!
+          <h2 className="text-xl font-bold text-[#F5F5F7] font-sans mb-1 tracking-tight">
+            Knowledge Review Complete!
           </h2>
-          <p className="text-xs text-zinc-400 max-w-md mb-6 font-sans">
-            You've reviewed all cards in this deck. Your spaced repetition intervals have been
-            recorded locally.
+          <p className="text-xs text-[#86868B] max-w-md mb-6 font-sans">
+            You've reviewed all cards in this active recall deck.
           </p>
 
           <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-6">
-            <div className="p-4 rounded-2xl bg-[#0c0f18] border border-white/[0.06] text-center">
-              <span className="text-[10px] font-mono text-zinc-500 uppercase">Cards Reviewed</span>
-              <p className="text-xl font-bold text-white font-mono mt-0.5">{score.total}</p>
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center">
+              <span className="text-[10px] font-mono text-[#86868B] uppercase">Cards Reviewed</span>
+              <p className="text-xl font-bold text-[#F5F5F7] font-mono mt-0.5">{score.total}</p>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0c0f18] border border-white/[0.06] text-center">
-              <span className="text-[10px] font-mono text-zinc-500 uppercase">Accuracy Rate</span>
-              <p className="text-xl font-bold text-emerald-400 font-mono mt-0.5">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-center">
+              <span className="text-[10px] font-mono text-[#86868B] uppercase">Accuracy Rate</span>
+              <p className="text-xl font-bold text-[#30D158] font-mono mt-0.5">
                 {score.total > 0 ? Math.round((score.correct / score.total) * 100) : 100}%
               </p>
             </div>
           </div>
 
-          <button
-            onClick={handleResetSession}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold font-sans shadow-[0_0_20px_rgba(20, 184, 166,0.3)] transition-all"
-          >
+          <button onClick={handleResetSession} className="btn-primary">
             <RefreshCw size={13} />
             <span>Review Deck Again</span>
           </button>
@@ -340,8 +362,8 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
       )}
 
       {/* Footer Navigation Bar */}
-      <div className="pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-zinc-500 font-mono">
-        <span>Active Deck: General Knowledge ({cards.length} cards)</span>
+      <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-[#86868B] font-mono">
+        <span>Active Deck: {cards.length} cards</span>
         <span>Keyboard: Space to flip, 1-4 to grade</span>
       </div>
     </div>

@@ -68,75 +68,8 @@ export function VaultCanvasStudio() {
     setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, text: newText } : n)));
   };
 
-  const [nodes, setNodes] = useState<CanvasNode[]>([
-    {
-      id: 'node-1',
-      type: 'note',
-      file: 'Index.md',
-      text: '# Second Brain Hub\nCentral knowledge entrypoint and core synthesis index.',
-      x: 80,
-      y: 80,
-      width: 280,
-      height: 140,
-      color: '#14B8A6',
-    },
-    {
-      id: 'node-2',
-      type: 'note',
-      file: 'Neuro AI Architecture.md',
-      text: '# Local RAG Engine\nDeterministic retrieval with Okapi BM25 and vector embeddings.',
-      x: 440,
-      y: 60,
-      width: 290,
-      height: 140,
-      color: '#10B981',
-    },
-    {
-      id: 'node-3',
-      type: 'text',
-      text: '⚡ Milestone: High-Speed Memory\nAchieved 12ms deterministic local query latencies across zero-knowledge encrypted notes.',
-      x: 440,
-      y: 260,
-      width: 290,
-      height: 130,
-      color: '#10b981',
-    },
-    {
-      id: 'node-4',
-      type: 'note',
-      file: 'PARA Methodology.md',
-      text: '# Projects & Areas\nActive actionable outcomes and standard operating areas.',
-      x: 80,
-      y: 280,
-      width: 280,
-      height: 130,
-      color: '#f59e0b',
-    },
-  ]);
-
-  const [edges, setEdges] = useState<CanvasEdge[]>([
-    {
-      id: 'edge-1-2',
-      fromNode: 'node-1',
-      toNode: 'node-2',
-      label: 'powers',
-      color: '#2DD4BF',
-    },
-    {
-      id: 'edge-2-3',
-      fromNode: 'node-2',
-      toNode: 'node-3',
-      label: 'yields',
-      color: '#34D399',
-    },
-    {
-      id: 'edge-1-4',
-      fromNode: 'node-1',
-      toNode: 'node-4',
-      label: 'structures',
-      color: '#fbbf24',
-    },
-  ]);
+  const [nodes, setNodes] = useState<CanvasNode[]>([]);
+  const [edges, setEdges] = useState<CanvasEdge[]>([]);
 
   // Load initial canvas state
   useEffect(() => {
@@ -527,6 +460,34 @@ export function VaultCanvasStudio() {
             );
           })}
         </svg>
+
+        {/* Empty Canvas Notice */}
+        {nodes.length === 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+            <div className="p-6 rounded-2xl bg-[#0F1117]/80 backdrop-blur-xl border border-[#242A3C] text-center max-w-sm pointer-events-auto">
+              <Network className="w-8 h-8 text-teal-400 mx-auto mb-3 opacity-60" />
+              <h3 className="text-xs font-semibold text-white mb-1">Canvas is Empty</h3>
+              <p className="text-[11px] text-[#94A3B8] leading-relaxed mb-4">
+                Add note cards, text nodes, or synthesize a topic roadmap to map out your second
+                brain visually.
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={handleAddNoteCard}
+                  className="px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-teal-300 border border-[#242A3C] rounded text-xs transition-colors"
+                >
+                  + Add Note Card
+                </button>
+                <button
+                  onClick={handleAddTextCard}
+                  className="px-2.5 py-1 bg-[#141722] hover:bg-[#1D2230] text-slate-300 border border-[#242A3C] rounded text-xs transition-colors"
+                >
+                  + Add Text Node
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Render Canvas Nodes */}
         <div
