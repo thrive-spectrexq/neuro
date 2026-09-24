@@ -1,10 +1,10 @@
-# JARVIS Agent Execution Engine Architecture
+# Agent Execution Engine Architecture
 
 ## Overview
 
-The **JARVIS Agent Execution Engine** transforms Neuro from a passive second brain into an active, proactive desktop operating partner. It allows users to invoke voice and text commands (e.g., *"Hey Neuro"*, *"Open Brave"*, *"Add this to note"*, *"Play Starboy on Spotify"*, *"Open VSCode"*, *"Set a reminder in 15 minutes"*, *"Search quantum physics on Google"*) with zero-latency execution.
+The **Agent Execution Engine** is the core runtime of the Neuro AI Workspace. It provides a multi-agent orchestration platform where users define personal agents with custom system prompts, assigned models from the model registry, and curated tool sets from the tool registry.
 
-Critically, **the JARVIS Agent functions natively without requiring any external LLM API key**.
+The engine preserves the zero-latency deterministic fast path for common OS commands while adding full LLM-powered reasoning with function calling for complex tasks. All agent actions are recorded in the governance audit trail.
 
 ```
                            ┌──────────────────────────────────────────────┐
@@ -15,9 +15,9 @@ Critically, **the JARVIS Agent functions natively without requiring any external
                                                   │
                                                   ▼
                                  ┌─────────────────────────────────┐
-                                 │       Renderer JarvisHUD        │
+                                 │        Agent HUD / Client       │
                                  │   • Web Speech API Recog/Synth  │
-                                 │   • Cyber Visualizer & Ticker   │
+                                 │   • Audio Visualizer & Ticker   │
                                  │   • Fast Command Chips          │
                                  └────────────────┬────────────────┘
                                                   │
@@ -27,54 +27,78 @@ Critically, **the JARVIS Agent functions natively without requiring any external
        ┌──────────────────────────────┐                       ┌──────────────────────────────┐
        │   Electron Main Process      │                       │      FastAPI Backend         │
        │   (Silent Background)        │                       │   (Background Supervisor)    │
-       │  • BackendProcessManager     │                       │  • IntentParser (Regex Zero-Key)│
-       │  • Native OS Shell & Spawner │                       │  • AgentToolsRegistry        │
-       │  • Desktop Notifications     │                       │  • AgentOrchestrator         │
-       │  • App Launch (Brave, VSCode)│                       │  • Note/Task/Reminder Store  │
-       └──────────────────────────────┘                       └──────────────────────────────┘
+       │  • BackendProcessManager     │                       │  • IntentParser (Fast Path)  │
+       │  • Native OS Shell & Spawner │                       │  • Agent Orchestrator        │
+       │  • Desktop Notifications     │                       │  • Tool Registry             │
+       │  • App Launch (Brave, VSCode)│                       │  • Model Registry            │
+       └──────────────────────────────┘                       │  • Governance Engine         │
+                                                              └──────────────────────────────┘
 ```
 
 ---
 
-## 1. Zero-Key Deterministic Intent Matching
+## 1. Agent Fabric
 
-To ensure instantaneous response times and full privacy offline, the engine uses a priority-ordered regex intent parser (`backend/app/services/agent/intent_parser.py`).
+Users can define multiple personal agents, each with:
 
-| Category | Trigger Patterns | Resolved Tool | Fallback / Behavior |
+- **Name & Description:** Identify the agent's purpose (e.g., "Research Agent", "Code Reviewer")
+- **System Prompt:** Custom personality and behavior instructions
+- **Model Assignment:** Preferred model from the model registry (chat, multimodal, etc.)
+- **Tool Set:** Curated list of tools the agent can invoke
+- **Permissions:** Fine-grained control over what the agent can access
+
+Agents are stored in the database (`AgentDefinition` model) and managed through `/api/v2/agents` endpoints.
+
+---
+
+## 2. Zero-Key Deterministic Intent Matching
+
+For common OS commands, the engine uses a priority-ordered regex intent parser (`backend/app/services/agent/intent_parser.py`) that executes with zero latency and zero API keys:
+
+| Category | Trigger Patterns | Resolved Tool | Behavior |
 |---|---|---|---|
 | **Wake & Status** | *"Hey Neuro"*, *"System status"* | `system_action` | Acknowledges wake state, reports time/uptime |
-| **App Launch** | *"Open [brave/vscode/terminal/notepad/calc]"* | `open_app` | Launches OS native binary or protocol handler |
-| **Media & Music** | *"Play [song/artist] on Spotify"* | `play_spotify` | Triggers `spotify:search:<query>` or desktop app |
-| **Productivity** | *"Add this to note: [...]"*, *"Take a note [...]"* | `create_quick_note` | Instantly writes markdown note to database |
-| **Reminders** | *"Set a reminder in [X] minutes to [...]"* | `set_reminder` | Creates timed task/alert in SQLite |
-| **Web Research** | *"Search [query] on google/youtube/github"* | `web_search` | Opens default browser with targeted search URL |
-| **Knowledge Base** | *"Search knowledge base for [...]"* | `search_knowledge_base` | Executes hybrid semantic/full-text query |
+| **App Launch** | *"Open [brave/vscode/terminal]"* | `open_app` | Launches OS native binary |
+| **Media** | *"Play [song/artist] on Spotify"* | `play_spotify` | Triggers Spotify playback |
+| **Notes** | *"Add this to note: [...]"* | `create_quick_note` | Writes note to database |
+| **Reminders** | *"Set a reminder in [X] minutes"* | `set_reminder` | Creates timed alert |
+| **Web Search** | *"Search [query] on google"* | `web_search` | Opens browser search |
+| **Knowledge** | *"Search knowledge base for [...]"* | `search_knowledge_base` | Hybrid semantic/FTS query |
 
 ---
 
-## 2. Desktop Process Lifecycle (Silent Background Supervisor)
+## 3. Execution Flow
 
-Users should never be forced to juggle multiple terminals or inspect raw backend logs during daily use.
+1. **Agent Resolution:** Route command to the appropriate agent (or use the default agent)
+2. **Governance Check:** Evaluate policies and consent for the requested action
+3. **Deterministic Fast Path:** Try regex intent matching for instant execution
+4. **LLM Reasoning:** If no deterministic match, invoke the agent's assigned model with function calling
+5. **Tool Execution:** Execute matched tools through the tool registry
+6. **Audit Trail:** Record execution details in the governance audit log
+
+---
+
+## 4. Desktop Process Lifecycle (Silent Background Supervisor)
 
 - **Silent Process Manager** (`apps/desktop/src/main/backend-process.ts`):
-  - Automatically identifies python environment (`backend/.venv` or system python).
-  - Spawns FastAPI `uvicorn` with `windowsHide: true` and redirects `stdout`/`stderr` to `.neuro/logs/backend.log`.
-  - Performs non-blocking health checks against `http://127.0.0.1:8000/health`.
-  - Gracefully terminates child backend processes on application exit via process tree signals.
+  - Spawns FastAPI `uvicorn` with `windowsHide: true`
+  - Redirects logs to `.neuro/logs/backend.log`
+  - Performs non-blocking health checks
+  - Gracefully terminates on application exit
 
 ---
 
-## 3. Global Hotkey & Voice HUD
+## 5. Global Hotkey & Agent HUD
 
-- **Global Hotkey:** `Ctrl + Space` or `Alt + Space` can be pressed from anywhere in the OS to summon the JARVIS Tactical HUD overlay.
-- **Audio Feedback:** Real-time Text-to-Speech synthesis responds dynamically to acknowledged commands.
-- **Microphone Listening:** Continuous Web Speech recognition detects spoken voice instructions and executes immediate actions.
+- **Global Hotkey:** `Ctrl + Space` or `Alt + Space` summons the Agent HUD overlay
+- **Audio Feedback:** Real-time TTS responds to commands
+- **Microphone Listening:** Continuous speech recognition for voice commands
+- **Desktop Orb:** Floating neon orb (`Alt + O`) for always-on voice interaction
 
 ---
 
-## 4. Single-Command Launch
+## 6. Single-Command Launch
 
-Launch Neuro with a single command:
 ```bash
 pnpm start
 # or

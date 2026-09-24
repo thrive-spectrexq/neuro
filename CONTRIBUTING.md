@@ -1,6 +1,6 @@
 # Contributing to Neuro
 
-Thank you for your interest in contributing. Neuro is a community-driven project and contributions of all kinds are welcome — bug reports, documentation, new features, plugin development, and code review.
+Thank you for your interest in contributing. Neuro is a community-driven, Apache 2.0 licensed project and contributions of all kinds are welcome — bug reports, documentation, new features, plugin development, and code review.
 
 Please read this guide before opening issues or pull requests. It exists to make the process smooth for everyone.
 

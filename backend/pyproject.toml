@@ -1,7 +1,8 @@
 [project]
 name = "neuro-backend"
-version = "0.1.5"
-description = "Backend for Neuro project"
+version = "0.2.0"
+description = "Neuro AI Workspace — backend platform services"
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.141.1",
@@ -32,6 +33,11 @@ neuro = "app.cli:app"
 [project.optional-dependencies]
 voice = [
     "pipecat-ai>=0.0.40",
+    "faster-whisper>=1.0.0",
+]
+vision = [
+    "easyocr>=1.7.0",
+    "Pillow>=10.0.0",
 ]
 dev = [
     "pytest>=8.1.1",

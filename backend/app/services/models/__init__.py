@@ -1,0 +1,1 @@
+"""Models registry package."""

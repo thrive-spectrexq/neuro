@@ -1,13 +1,13 @@
 {
   "name": "neuro",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "private": true,
-  "description": "An open-source, local-first AI second brain",
+  "description": "One AI workspace for your personal agents, models, tools, and knowledge",
   "repository": {
     "type": "git",
     "url": "https://github.com/thrive-spectrexq/neuro.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "packageManager": "pnpm@9.15.4",
   "engines": {
     "node": ">=20.0.0",

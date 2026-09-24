@@ -25,7 +25,7 @@ class AgentExecutionResult(BaseModel):
 
 class AgentOrchestrator:
     """
-    JARVIS Agent Orchestrator.
+    Neuro Agent Orchestrator.
     Manages dual-mode execution:
     1. Instant Zero-Key Deterministic OS Tool Calling (Fast Path)
     2. Hybrid LLM Reasoning & Function Calling (When LLM configured)
@@ -64,8 +64,8 @@ class AgentOrchestrator:
                     input_text=command_text,
                     tool_name="wake_word",
                     parameters={},
-                    voice_response="Yes sir, I am online and listening.",
-                    display_text="JARVIS is active and listening...",
+                    voice_response="Neuro is online and ready.",
+                    display_text="Agent is active and listening...",
                     is_offline_native=True,
                     confidence=1.0,
                 )

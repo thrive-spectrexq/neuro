@@ -40,7 +40,7 @@ function createWindow() {
     height: 850,
     minWidth: 900,
     minHeight: 600,
-    title: 'Neuro — AI Second Brain',
+    title: 'Neuro — AI Workspace',
     backgroundColor: '#060810',
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
@@ -245,7 +245,7 @@ app.whenReady().then(async () => {
   try {
     const icon = createTrayIcon();
     tray = new Tray(icon);
-    tray.setToolTip('Neuro — AI Second Brain & Voice Agent');
+    tray.setToolTip('Neuro — AI Workspace');
     
     const contextMenu = Menu.buildFromTemplate([
       {
@@ -267,7 +267,7 @@ app.whenReady().then(async () => {
         },
       },
       {
-        label: '🎙️ Summon JARVIS HUD (Ctrl+Space)',
+        label: '🎙️ Toggle Agent HUD (Ctrl+Space)',
         click: () => {
           if (mainWindow) {
             if (mainWindow.isMinimized()) mainWindow.restore();

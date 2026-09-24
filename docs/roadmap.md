@@ -1,6 +1,6 @@
 # Neuro Development Roadmap
 
-This document outlines the detailed development phases, feature milestones, architectural goals, and current progress for **Neuro**.
+This document outlines the development phases, feature milestones, and architectural goals for **Neuro — One AI workspace for your personal agents, models, tools, and knowledge**.
 
 ---
 
@@ -12,7 +12,8 @@ This document outlines the detailed development phases, feature milestones, arch
 | **Phase 2: Knowledge Graph & Ingestion** | Entity extraction, note graph, PDF/Vault importers, web clipper integration | ✅ Complete | Q2 |
 | **Phase 3: Workflows, Automations & API** | Project workspaces, task management, automation engine, tags, REST API v1 | ✅ Complete | Q3 |
 | **Phase 4: Multi-Provider AI & Voice** | Hybrid vector search (ChromaDB), OpenAI/Anthropic/Ollama AI stream, voice pipeline | ✅ Complete | Q4 |
-| **Phase 5: Enterprise Sync & Collaboration** | End-to-end encrypted sync, team workspaces, granular RBAC, audit logging | 🔄 In Progress | Q1 Next Year |
+| **Phase 5: AI Workspace Platform** | Agent Fabric, Model Registry, Vision Engine, Governance, API v2, Apache 2.0 | ✅ Complete | Q1 Next Year |
+| **Phase 6: Enterprise & Collaboration** | E2E encrypted sync, team workspaces, CRDT conflict resolution, enterprise packaging | 🔄 In Progress | Q2 Next Year |
 
 ---
 
@@ -47,9 +48,23 @@ This document outlines the detailed development phases, feature milestones, arch
 - [x] Text summarization and automatic tag extraction endpoints
 - [x] Real-time WebSocket audio streaming pipeline (`/api/v1/voice/stream`)
 
-### Phase 5 — Collaboration & E2E Encryption (Active)
+### Phase 5 — AI Workspace Platform (v0.2.0)
+- [x] **License migration** from MIT to Apache License 2.0
+- [x] **Agent Fabric** — Multi-agent orchestration with personal agent definitions
+- [x] **Tool Registry** — Composable, database-backed tool system for agents
+- [x] **Model Registry** — Unified model management across all providers (local + cloud)
+- [x] **Vision Engine** — Screen capture, document OCR, image analysis
+- [x] **Governance Engine** — Policy framework with consent management and audit trails
+- [x] **Voice Engine upgrades** — Local STT (faster-whisper) and local TTS for offline operation
+- [x] **API v2** — New REST endpoints for agents, tools, models, governance, vision
+- [x] **Shared types** — TypeScript type definitions for all workspace platform concepts
+- [x] **Identity rebrand** — "AI Second Brain" → "AI Workspace" across all touchpoints
+
+### Phase 6 — Enterprise & Collaboration (Active)
 - [x] Client-side blob storage for encrypted synchronization (`SyncBlob`)
-- [x] End-to-end zero-knowledge key exchange (`DeviceKey`, SHA-256 fingerprinting, Web Crypto API)
-- [x] Workspace access audit trails & compliance exports (`/api/v1/analytics/audit/export`)
+- [x] End-to-end zero-knowledge key exchange (`DeviceKey`, SHA-256 fingerprinting)
+- [x] Workspace access audit trails & compliance exports
 - [ ] Multi-device CRDT-based offline conflict resolution
 - [ ] Self-hosted enterprise team server packaging
+- [ ] Team agent sharing and collaborative tool registries
+- [ ] SSO / SAML integration for enterprise identity providers

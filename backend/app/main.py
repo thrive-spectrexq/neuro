@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import text
 
 from app.api.v1.router import api_router
+from app.api.v2.router import api_v2_router
 from app.core.config import get_settings
 from app.core.database import create_db_and_tables, engine
 from app.core.deps import get_current_active_user
@@ -41,8 +42,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Neuro API",
-    version="0.1.5",
+    title="Neuro AI Workspace API",
+    description="One AI workspace for your personal agents, models, tools, and knowledge",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -72,6 +74,7 @@ app.add_middleware(RequestIDMiddleware)
 app.add_exception_handler(NeuroException, neuro_exception_handler)
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_v2_router, prefix="/api/v2")
 
 
 @app.get("/api/v1/me", response_model=User)
