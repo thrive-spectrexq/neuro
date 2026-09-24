@@ -35,7 +35,7 @@ export class ZeroKnowledgeSyncService {
     envelope: EncryptedEnvelope | { encrypted_data: string; iv?: string; salt?: string } | string,
     passphrase: string,
     ivBase64?: string,
-    saltBase64?: string
+    saltBase64?: string,
   ): Promise<any> {
     return sharedDecryptPayload(envelope, passphrase, ivBase64, saltBase64);
   }
@@ -43,7 +43,10 @@ export class ZeroKnowledgeSyncService {
   /**
    * Register Web Crypto RSA-OAEP public key with server.
    */
-  async registerDevice(deviceName: string, token: string): Promise<{ id: string; public_key: string; key_fingerprint: string }> {
+  async registerDevice(
+    deviceName: string,
+    token: string,
+  ): Promise<{ id: string; public_key: string; key_fingerprint: string }> {
     const keyPair = await generateDeviceKeyPair();
     const publicKeyBase64 = await exportPublicKeySpki(keyPair.publicKey);
 
@@ -69,17 +72,22 @@ export class ZeroKnowledgeSyncService {
   /**
    * Wrap/exchange master passphrase for another device's RSA public key.
    */
-  async wrapPassphraseForDevice(passphrase: string, targetPublicKeySpkiBase64: string): Promise<string> {
+  async wrapPassphraseForDevice(
+    passphrase: string,
+    targetPublicKeySpkiBase64: string,
+  ): Promise<string> {
     return wrapPassphraseForDevice(passphrase, targetPublicKeySpkiBase64);
   }
 
   /**
    * Unwrap/receive master passphrase using this device's RSA private key.
    */
-  async unwrapPassphraseFromDevice(wrappedPassphraseBase64: string, privateKey: CryptoKey): Promise<string> {
+  async unwrapPassphraseFromDevice(
+    wrappedPassphraseBase64: string,
+    privateKey: CryptoKey,
+  ): Promise<string> {
     return unwrapPassphraseFromDevice(wrappedPassphraseBase64, privateKey);
   }
 }
 
 export const syncService = new ZeroKnowledgeSyncService();
-

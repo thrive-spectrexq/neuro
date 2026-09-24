@@ -13,7 +13,7 @@ export class AudioStreamingService {
 
   public async start() {
     this.onStateChange('listening');
-    
+
     // Connect WebSocket
     const wsUrl = `ws://localhost:8000/api/v1/voice/stream`;
     this.ws = new WebSocket(wsUrl);
@@ -42,7 +42,7 @@ export class AudioStreamingService {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.audioContext = new AudioContext({ sampleRate: 16000 });
-      
+
       this.microphone = this.audioContext.createMediaStreamSource(this.stream);
       // ScriptProcessor is deprecated but widely used for raw PCM extraction in browsers easily
       this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
@@ -57,7 +57,6 @@ export class AudioStreamingService {
 
       this.microphone.connect(this.processor);
       this.processor.connect(this.audioContext.destination);
-
     } catch (err) {
       console.error('Error accessing microphone:', err);
       this.stop();
@@ -70,14 +69,14 @@ export class AudioStreamingService {
     for (let i = 0, offset = 0; i < float32Array.length; i++, offset += 2) {
       const val = float32Array[i] ?? 0;
       const s = Math.max(-1, Math.min(1, val));
-      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
     }
     return buffer;
   }
 
   private playAudio(arrayBuffer: ArrayBuffer) {
     if (!this.audioContext) return;
-    
+
     // Pipecat sends raw 24kHz PCM 16-bit audio. We need to decode or play it.
     // For a real implementation, we might send WAV headers or use an AudioWorklet.
     // Assuming simple conversion for MVP here.
@@ -86,15 +85,15 @@ export class AudioStreamingService {
     for (let i = 0; i < view.length; i++) {
       floatArray[i] = (view[i] ?? 0) / 32768.0;
     }
-    
+
     const audioBuffer = this.audioContext.createBuffer(1, floatArray.length, 24000);
     audioBuffer.getChannelData(0).set(floatArray);
-    
+
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(this.audioContext.destination);
     source.start();
-    
+
     source.onended = () => {
       this.onStateChange('listening');
     };
@@ -115,7 +114,7 @@ export class AudioStreamingService {
       this.audioContext = null;
     }
     if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
+      this.stream.getTracks().forEach((track) => track.stop());
       this.stream = null;
     }
     if (this.ws) {

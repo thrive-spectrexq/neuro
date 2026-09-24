@@ -42,7 +42,10 @@ function tryDirectLaunch(candidatePaths: string[], args: string[] = []): boolean
   return false;
 }
 
-export async function launchNativeApp(appName: string, args?: string): Promise<{ success: boolean; message: string }> {
+export async function launchNativeApp(
+  appName: string,
+  args?: string,
+): Promise<{ success: boolean; message: string }> {
   const platform = os.platform();
   const normalized = appName.toLowerCase().trim();
 
@@ -87,7 +90,11 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         if (tryDirectLaunch(edgePaths, args ? [args] : [])) {
           return { success: true, message: 'Launched Microsoft Edge' };
         }
-      } else if (normalized === 'vscode' || normalized === 'code' || normalized.includes('vs code')) {
+      } else if (
+        normalized === 'vscode' ||
+        normalized === 'code' ||
+        normalized.includes('vs code')
+      ) {
         const codePaths = [
           path.join(localApp, 'Programs/Microsoft VS Code/Code.exe'),
           path.join(progFiles, 'Microsoft VS Code/Code.exe'),
@@ -112,9 +119,7 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
           return { success: true, message: 'Launched Obsidian Vault' };
         }
       } else if (normalized === 'notion') {
-        const notionPaths = [
-          path.join(localApp, 'Programs/Notion/Notion.exe'),
-        ];
+        const notionPaths = [path.join(localApp, 'Programs/Notion/Notion.exe')];
         if (tryDirectLaunch(notionPaths)) {
           return { success: true, message: 'Launched Notion' };
         }
@@ -140,7 +145,11 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command codex -ErrorAction SilentlyContinue) { codex } else { Write-Host '⚡ Launching Codex CLI in ${projectDir}...' -ForegroundColor Green; code . }"`;
       } else if (normalized.includes('aider')) {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; if (Get-Command aider -ErrorAction SilentlyContinue) { aider } else { Write-Host '⚡ Launching Aider AI in ${projectDir}...' -ForegroundColor Yellow; code . }"`;
-      } else if (normalized.includes('coding') || normalized.includes('code_session') || normalized.includes('resume coding')) {
+      } else if (
+        normalized.includes('coding') ||
+        normalized.includes('code_session') ||
+        normalized.includes('resume coding')
+      ) {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; Write-Host '🚀 Resuming AI Coding Session in ${projectDir}...' -ForegroundColor emerald; if (Get-Command antigravity -ErrorAction SilentlyContinue) { antigravity } else { code . }"`;
       } else if (normalized === 'cursor' || normalized.includes('cursor')) {
         command = `start cursor "${projectDir}" || cursor .`;
@@ -150,15 +159,24 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = `start zed "${projectDir}" || zed .`;
       } else if (normalized === 'nvim' || normalized === 'neovim') {
         command = `start powershell -NoExit -Command "cd '${projectDir}'; nvim"`;
-      } else if (normalized === 'vscode' || normalized === 'code' || normalized.includes('vs code')) {
+      } else if (
+        normalized === 'vscode' ||
+        normalized === 'code' ||
+        normalized.includes('vs code')
+      ) {
         command = `start code "${projectDir}" || code .`;
       } else if (normalized === 'github' || normalized.includes('github desktop')) {
         command = 'start github-desktop || start https://github.com';
       } else if (normalized === 'docker' || normalized.includes('docker desktop')) {
-        command = 'start "" "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" || start docker';
+        command =
+          'start "" "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" || start docker';
       } else if (normalized === 'postman') {
         command = 'start postman || start https://web.postman.co';
-      } else if (normalized.includes('browser') || normalized === 'web' || normalized === 'internet') {
+      } else if (
+        normalized.includes('browser') ||
+        normalized === 'web' ||
+        normalized === 'internet'
+      ) {
         command = 'start https://www.google.com';
       } else if (normalized.includes('edge') || normalized.includes('msedge')) {
         command = 'start msedge || start microsoft-edge:';
@@ -170,7 +188,12 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = 'start firefox || start https://google.com';
       } else if (normalized === 'spotify') {
         command = 'start spotify: || start spotify';
-      } else if (normalized === 'terminal' || normalized === 'powershell' || normalized === 'wt' || normalized === 'cmd') {
+      } else if (
+        normalized === 'terminal' ||
+        normalized === 'powershell' ||
+        normalized === 'wt' ||
+        normalized === 'cmd'
+      ) {
         command = `start wt -d "${projectDir}" || start powershell -NoExit -Command "cd '${projectDir}'"`;
       } else if (normalized === 'notion') {
         command = 'start notion || start https://notion.so';
@@ -180,13 +203,22 @@ export async function launchNativeApp(appName: string, args?: string): Promise<{
         command = 'start figma || start https://figma.com';
       } else if (normalized === 'notepad') {
         command = 'start notepad';
-      } else if (normalized === 'explorer' || normalized === 'files' || normalized === 'folder' || normalized.includes('open folder')) {
+      } else if (
+        normalized === 'explorer' ||
+        normalized === 'files' ||
+        normalized === 'folder' ||
+        normalized.includes('open folder')
+      ) {
         command = `start explorer "${projectDir}"`;
       } else if (normalized === 'calculator' || normalized === 'calc') {
         command = 'start calc';
       } else if (normalized === 'taskmgr' || normalized.includes('task manager')) {
         command = 'start taskmgr';
-      } else if (normalized === 'snipping' || normalized.includes('screenshot') || normalized.includes('snip')) {
+      } else if (
+        normalized === 'snipping' ||
+        normalized.includes('screenshot') ||
+        normalized.includes('snip')
+      ) {
         command = 'start snippingtool';
       } else if (normalized === 'discord') {
         command = 'start discord';
@@ -255,7 +287,9 @@ export function getSystemTelemetry(): SystemTelemetry {
   };
 }
 
-export async function controlMedia(action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute'): Promise<boolean> {
+export async function controlMedia(
+  action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute',
+): Promise<boolean> {
   const isWindows = process.platform === 'win32';
   if (!isWindows) return false;
 

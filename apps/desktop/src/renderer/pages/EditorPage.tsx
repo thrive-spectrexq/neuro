@@ -8,7 +8,6 @@ export default function EditorPage() {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-background relative">
-      
       {/* Primary Markdown Editor Canvas */}
       <div className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
         <NoteEditor />

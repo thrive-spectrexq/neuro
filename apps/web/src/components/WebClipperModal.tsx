@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Globe, Link2, CheckCircle2, AlertCircle, X, Sparkles, FileText, Bookmark } from 'lucide-react';
+import {
+  Globe,
+  Link2,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  Sparkles,
+  FileText,
+  Bookmark,
+} from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 interface WebClipperModalProps {
@@ -69,7 +78,9 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
             </div>
             <div>
               <h3 className="text-xs font-bold text-white font-mono">Web Research Clipper</h3>
-              <p className="text-[10px] text-[#64748B]">Synthesize external articles directly into your vault</p>
+              <p className="text-[10px] text-[#64748B]">
+                Synthesize external articles directly into your vault
+              </p>
             </div>
           </div>
           <button
@@ -83,7 +94,9 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
         <form onSubmit={handleClip} className="space-y-3">
           {/* URL Input */}
           <div>
-            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Target Page URL</label>
+            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+              Target Page URL
+            </label>
             <div className="flex items-center gap-2 px-2.5 py-1.5 bg-[#090A0F] border border-[#242A3C] rounded-md text-xs text-white">
               <Link2 className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
               <input
@@ -99,7 +112,9 @@ export function WebClipperModal({ onClose, onSuccess }: WebClipperModalProps) {
 
           {/* Clip Mode selector */}
           <div>
-            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Extraction Strategy</label>
+            <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+              Extraction Strategy
+            </label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { id: 'summary', label: 'AI Summary', icon: Sparkles },

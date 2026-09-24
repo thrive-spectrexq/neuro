@@ -25,7 +25,7 @@ const fetchGraphData = async (): Promise<GraphData> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/graph`, {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
@@ -131,4 +131,3 @@ export function useGraph() {
     staleTime: 5000,
   });
 }
-

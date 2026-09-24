@@ -1,6 +1,6 @@
 [project]
 name = "neuro-backend"
-version = "0.2.0"
+version = "0.2.1"
 description = "Neuro AI Workspace — backend platform services"
 license = "Apache-2.0"
 requires-python = ">=3.12"

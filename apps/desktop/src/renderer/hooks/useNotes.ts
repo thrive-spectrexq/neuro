@@ -19,7 +19,7 @@ const initialFallbackNotes: Note[] = [
     tags: ['ideas'],
     createdAt: Date.now(),
     updatedAt: Date.now(),
-  }
+  },
 ];
 
 const fetchNotes = async (): Promise<Note[]> => {
@@ -103,7 +103,7 @@ export function useCreateNote() {
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-    }
+    },
   });
 }
 
@@ -113,7 +113,7 @@ export function useUpdateNote() {
     mutationFn: updateNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-    }
+    },
   });
 }
 
@@ -123,7 +123,6 @@ export function useDeleteNote() {
     mutationFn: deleteNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-    }
+    },
   });
 }
-

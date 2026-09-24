@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { 
-  ShieldCheck, 
-  AlertTriangle, 
-  Link2Off, 
-  FileQuestion, 
-  RefreshCw, 
-  Wrench, 
-  Search, 
-  FolderTree, 
-  Sparkles, 
-  CheckCircle2, 
-  FileText
+import {
+  ShieldCheck,
+  AlertTriangle,
+  Link2Off,
+  FileQuestion,
+  RefreshCw,
+  Wrench,
+  Search,
+  FolderTree,
+  Sparkles,
+  CheckCircle2,
+  FileText,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
@@ -37,8 +37,16 @@ export function VaultLintStudio() {
     vault_health_score: 94,
     total_notes_scanned: 48,
     broken_links: [
-      { source_note: 'AI Agents Strategy.md', target: 'Task Automations', suggestion: 'Automation Pipelines.md' },
-      { source_note: 'Weekly Review 2026-W31.md', target: 'Memory Graphs', suggestion: 'Neuro AI Architecture.md' },
+      {
+        source_note: 'AI Agents Strategy.md',
+        target: 'Task Automations',
+        suggestion: 'Automation Pipelines.md',
+      },
+      {
+        source_note: 'Weekly Review 2026-W31.md',
+        target: 'Memory Graphs',
+        suggestion: 'Neuro AI Architecture.md',
+      },
     ],
     orphan_notes: ['Draft Scratchpad.md', 'Meeting 2026-08-01.md'],
     empty_headings: [{ note: 'Research Notes.md', heading: '### Future Milestones' }],
@@ -121,7 +129,8 @@ export function VaultLintStudio() {
             suggested_folder: '1_Projects/Neuro Core',
             filename: `${routeTitle.toLowerCase().replace(/\s+/g, '_')}.md`,
             recommended_moc: '[[Projects MOC]]',
-            rationale: 'Classified as active project outcome with immediate milestone deliverables.',
+            rationale:
+              'Classified as active project outcome with immediate milestone deliverables.',
           });
         } else if (routeMode === 'zettelkasten') {
           const uid = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
@@ -159,12 +168,16 @@ export function VaultLintStudio() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold text-white tracking-wide font-mono">Vault Health & Linter</h2>
+              <h2 className="text-xs font-bold text-white tracking-wide font-mono">
+                Vault Health & Linter
+              </h2>
               <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#102319] text-emerald-300 border border-[#1B432C] rounded">
                 Strict Diagnostics
               </span>
             </div>
-            <p className="text-[10px] text-[#64748B]">Deterministic link validation, orphan detection, BM25 indexing, and note routing</p>
+            <p className="text-[10px] text-[#64748B]">
+              Deterministic link validation, orphan detection, BM25 indexing, and note routing
+            </p>
           </div>
         </div>
 
@@ -223,8 +236,12 @@ export function VaultLintStudio() {
               {/* Health Score Gauge */}
               <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433] flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono text-[#64748B] uppercase tracking-wider">Health Index</span>
-                  <div className={`text-2xl font-bold ${scoreColor} mt-0.5 font-mono flex items-baseline gap-1`}>
+                  <span className="text-[10px] font-mono text-[#64748B] uppercase tracking-wider">
+                    Health Index
+                  </span>
+                  <div
+                    className={`text-2xl font-bold ${scoreColor} mt-0.5 font-mono flex items-baseline gap-1`}
+                  >
                     {healthScore}%
                     <span className="text-[10px] text-[#475569] font-sans font-normal">/ 100%</span>
                   </div>
@@ -240,7 +257,9 @@ export function VaultLintStudio() {
               {/* Broken Links Counter */}
               <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433]">
                 <div className="flex items-center justify-between text-[#64748B]">
-                  <span className="text-[10px] font-mono uppercase tracking-wider">Broken Links</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider">
+                    Broken Links
+                  </span>
                   <Link2Off className="w-3.5 h-3.5 text-rose-400" />
                 </div>
                 <div className="text-xl font-bold text-white mt-1 font-mono">
@@ -252,7 +271,9 @@ export function VaultLintStudio() {
               {/* Orphan Notes Counter */}
               <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433]">
                 <div className="flex items-center justify-between text-[#64748B]">
-                  <span className="text-[10px] font-mono uppercase tracking-wider">Orphan Notes</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider">
+                    Orphan Notes
+                  </span>
                   <FileQuestion className="w-3.5 h-3.5 text-amber-400" />
                 </div>
                 <div className="text-xl font-bold text-white mt-1 font-mono">
@@ -264,7 +285,9 @@ export function VaultLintStudio() {
               {/* Structure Quality */}
               <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433]">
                 <div className="flex items-center justify-between text-[#64748B]">
-                  <span className="text-[10px] font-mono uppercase tracking-wider">Empty Headings</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider">
+                    Empty Headings
+                  </span>
                   <AlertTriangle className="w-3.5 h-3.5 text-sky-400" />
                 </div>
                 <div className="text-xl font-bold text-white mt-1 font-mono">
@@ -296,7 +319,9 @@ export function VaultLintStudio() {
                     >
                       <div className="flex items-center justify-between font-mono">
                         <span className="text-[#CBD5E1] text-[11px]">{link.source_note}</span>
-                        <span className="text-rose-400 text-[11px] font-semibold">[[{link.target}]]</span>
+                        <span className="text-rose-400 text-[11px] font-semibold">
+                          [[{link.target}]]
+                        </span>
                       </div>
                       {link.suggestion && (
                         <div className="flex items-center gap-1 text-[#64748B]">
@@ -318,7 +343,9 @@ export function VaultLintStudio() {
                     <FileQuestion className="w-3.5 h-3.5 text-amber-400" />
                     Orphan Notes (Disconnected)
                   </h3>
-                  <span className="text-[10px] text-[#64748B] font-mono">No Inbound / Outbound</span>
+                  <span className="text-[10px] text-[#64748B] font-mono">
+                    No Inbound / Outbound
+                  </span>
                 </div>
 
                 <div className="space-y-2">
@@ -347,8 +374,12 @@ export function VaultLintStudio() {
           <div className="space-y-3 max-w-2xl mx-auto">
             <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433] space-y-3">
               <div>
-                <h3 className="text-xs font-bold text-white font-mono">Deterministic Okapi BM25 Ranking</h3>
-                <p className="text-[10px] text-[#64748B]">Term-frequency inverse document frequency indexing (k1=1.5, b=0.75)</p>
+                <h3 className="text-xs font-bold text-white font-mono">
+                  Deterministic Okapi BM25 Ranking
+                </h3>
+                <p className="text-[10px] text-[#64748B]">
+                  Term-frequency inverse document frequency indexing (k1=1.5, b=0.75)
+                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -415,13 +446,19 @@ export function VaultLintStudio() {
           <div className="space-y-3 max-w-2xl mx-auto">
             <div className="bg-[#0F1117] p-4 rounded-lg border border-[#1F2433] space-y-3">
               <div>
-                <h3 className="text-xs font-bold text-white font-mono">Organizational Methodology Router</h3>
-                <p className="text-[10px] text-[#64748B]">Destination folder placement, standardized naming, and MOC linking</p>
+                <h3 className="text-xs font-bold text-white font-mono">
+                  Organizational Methodology Router
+                </h3>
+                <p className="text-[10px] text-[#64748B]">
+                  Destination folder placement, standardized naming, and MOC linking
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Note Title or Topic</label>
+                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                    Note Title or Topic
+                  </label>
                   <input
                     type="text"
                     value={routeTitle}
@@ -432,7 +469,9 @@ export function VaultLintStudio() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Target Methodology</label>
+                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                    Target Methodology
+                  </label>
                   <select
                     value={routeMode}
                     onChange={(e) => setRouteMode(e.target.value as any)}
@@ -463,18 +502,30 @@ export function VaultLintStudio() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                   <div className="p-2.5 bg-[#090A0F] rounded-md border border-[#1F2433]">
-                    <span className="text-[#64748B] font-mono text-[9px] uppercase">Destination Folder</span>
-                    <p className="font-mono text-emerald-400 font-bold mt-0.5 text-[11px]">{routeSuggestion.suggested_folder}</p>
+                    <span className="text-[#64748B] font-mono text-[9px] uppercase">
+                      Destination Folder
+                    </span>
+                    <p className="font-mono text-emerald-400 font-bold mt-0.5 text-[11px]">
+                      {routeSuggestion.suggested_folder}
+                    </p>
                   </div>
                   <div className="p-2.5 bg-[#090A0F] rounded-md border border-[#1F2433]">
-                    <span className="text-[#64748B] font-mono text-[9px] uppercase">Standardized Filename</span>
-                    <p className="font-mono text-sky-400 font-bold mt-0.5 text-[11px]">{routeSuggestion.filename}</p>
+                    <span className="text-[#64748B] font-mono text-[9px] uppercase">
+                      Standardized Filename
+                    </span>
+                    <p className="font-mono text-sky-400 font-bold mt-0.5 text-[11px]">
+                      {routeSuggestion.filename}
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-2.5 bg-[#090A0F] rounded-md border border-[#1F2433] text-xs">
-                  <span className="text-[#64748B] font-mono text-[9px] uppercase">Recommended Parent MOC Link</span>
-                  <p className="font-mono text-teal-300 font-bold mt-0.5 text-[11px]">{routeSuggestion.recommended_moc}</p>
+                  <span className="text-[#64748B] font-mono text-[9px] uppercase">
+                    Recommended Parent MOC Link
+                  </span>
+                  <p className="font-mono text-teal-300 font-bold mt-0.5 text-[11px]">
+                    {routeSuggestion.recommended_moc}
+                  </p>
                 </div>
 
                 <p className="text-[11px] text-[#94A3B8] font-mono">

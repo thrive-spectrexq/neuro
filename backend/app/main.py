@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Neuro AI Workspace API",
     description="One AI workspace for your personal agents, models, tools, and knowledge",
-    version="0.2.0",
+    version="0.2.1",
     lifespan=lifespan,
 )
 

@@ -1,5 +1,14 @@
 import { useMemo } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+  DroppableProvided,
+  DroppableStateSnapshot,
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from '@hello-pangea/dnd';
 import { useTasks } from '@/hooks/useTasks';
 import { Task } from '@neuro/shared/types';
 import { Plus, GripVertical } from 'lucide-react';
@@ -20,7 +29,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
       in_progress: [],
       done: [],
     };
-    
+
     tasks.forEach((task: Task) => {
       if (cols[task.status]) {
         cols[task.status]!.push(task);
@@ -28,7 +37,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
         cols.todo.push(task);
       }
     });
-    
+
     return cols;
   }, [tasks]);
 
@@ -39,18 +48,15 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
       return;
     }
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
 
     const newStatus = destination.droppableId as Task['status'];
-    
+
     updateTaskStatus({
       id: draggableId,
-      data: { status: newStatus }
+      data: { status: newStatus },
     });
   };
 
@@ -60,7 +66,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
       createTask({
         title,
         status,
-        project_id: projectId
+        project_id: projectId,
       });
     }
   };
@@ -72,25 +78,31 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
   return (
     <div className="flex h-full w-full gap-6 p-6 overflow-x-auto bg-black text-white">
       <DragDropContext onDragEnd={onDragEnd}>
-        {COLUMNS.map(column => {
+        {COLUMNS.map((column) => {
           const colTasks = columns[column.id] || [];
           return (
             <div key={column.id} className="flex flex-col w-80 shrink-0">
               <div className="flex items-center justify-between mb-4 px-2">
-                <h2 className={`text-lg font-semibold ${
-                  column.id === 'todo' ? 'text-emerald-400' :
-                  column.id === 'in_progress' ? 'text-teal-400' :
-                  column.id === 'review' ? 'text-amber-400' :
-                  column.id === 'done' ? 'text-emerald-500' :
-                  'text-white/90'
-                }`}>
+                <h2
+                  className={`text-lg font-semibold ${
+                    column.id === 'todo'
+                      ? 'text-emerald-400'
+                      : column.id === 'in_progress'
+                        ? 'text-teal-400'
+                        : column.id === 'review'
+                          ? 'text-amber-400'
+                          : column.id === 'done'
+                            ? 'text-emerald-500'
+                            : 'text-white/90'
+                  }`}
+                >
                   {column.title}
                 </h2>
                 <span className="bg-emerald-900/50 text-emerald-200 text-xs py-1 px-2 rounded-full">
                   {colTasks.length}
                 </span>
               </div>
-              
+
               <Droppable droppableId={column.id}>
                 {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
                   <div
@@ -108,10 +120,12 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               className={`group relative rounded-lg p-4 bg-black/60 border border-white/10 shadow-lg backdrop-blur-sm transition-all ${
-                                snapshot.isDragging ? 'shadow-teal-500/20 border-teal-500/50 rotate-2' : 'hover:border-white/20'
+                                snapshot.isDragging
+                                  ? 'shadow-teal-500/20 border-teal-500/50 rotate-2'
+                                  : 'hover:border-white/20'
                               }`}
                             >
-                              <div 
+                              <div
                                 {...provided.dragHandleProps}
                                 className="absolute top-4 right-2 text-white/20 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
                               >
@@ -124,11 +138,15 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                                 </p>
                               )}
                               <div className="mt-4 flex items-center justify-between text-xs text-white/40">
-                                <span className={`px-2 py-0.5 rounded capitalize ${
-                                  task.priority === 'high' ? 'bg-red-500/20 text-red-300' : 
-                                  task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                                  'bg-blue-500/20 text-blue-300'
-                                }`}>
+                                <span
+                                  className={`px-2 py-0.5 rounded capitalize ${
+                                    task.priority === 'high'
+                                      ? 'bg-red-500/20 text-red-300'
+                                      : task.priority === 'medium'
+                                        ? 'bg-yellow-500/20 text-yellow-300'
+                                        : 'bg-blue-500/20 text-blue-300'
+                                  }`}
+                                >
                                   {task.priority || 'medium'}
                                 </span>
                                 <span>{new Date(task.created_at).toLocaleDateString()}</span>
@@ -139,7 +157,7 @@ export function KanbanBoard({ projectId }: { projectId?: string }) {
                       ))}
                       {provided.placeholder}
                     </div>
-                    
+
                     <button
                       onClick={() => handleCreateTask(column.id as Task['status'])}
                       className="mt-4 flex items-center gap-2 text-white/40 hover:text-teal-400 transition-colors text-sm px-2 py-2 w-full rounded hover:bg-white/5"

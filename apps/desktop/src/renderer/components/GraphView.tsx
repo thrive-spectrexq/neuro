@@ -1,7 +1,16 @@
 import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useGraph } from '../hooks/useGraph';
-import { ZoomIn, ZoomOut, Maximize2, Network, Search, Filter, Sparkles, Layers } from 'lucide-react';
+import {
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Network,
+  Search,
+  Filter,
+  Sparkles,
+  Layers,
+} from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 import { useNoteStore } from '../store/noteStore';
 
@@ -23,19 +32,25 @@ export default function GraphView() {
         });
       }
     };
-    
+
     window.addEventListener('resize', updateDimensions);
     setTimeout(updateDimensions, 100);
-    
+
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   useEffect(() => {
     const handler = (e: any) => {
       switch (e.detail?.action) {
-        case 'zoomIn': handleZoomIn(); break;
-        case 'zoomOut': handleZoomOut(); break;
-        case 'fit': handleResetZoom(); break;
+        case 'zoomIn':
+          handleZoomIn();
+          break;
+        case 'zoomOut':
+          handleZoomOut();
+          break;
+        case 'fit':
+          handleResetZoom();
+          break;
         // Optional: refresh data could be added if refetch was available
       }
     };
@@ -69,16 +84,19 @@ export default function GraphView() {
     return { nodes, links };
   }, [data, searchQuery, filterType]);
 
-  const handleNodeClick = useCallback((node: any) => {
-    soundEngine.playClick();
-    if (node.type === 'note' && !node.id.startsWith('tag-')) {
-      setActiveNoteId(node.id);
-    }
-    if (fgRef.current) {
-      fgRef.current.centerAt(node.x, node.y, 800);
-      fgRef.current.zoom(3.5, 1200);
-    }
-  }, [setActiveNoteId]);
+  const handleNodeClick = useCallback(
+    (node: any) => {
+      soundEngine.playClick();
+      if (node.type === 'note' && !node.id.startsWith('tag-')) {
+        setActiveNoteId(node.id);
+      }
+      if (fgRef.current) {
+        fgRef.current.centerAt(node.x, node.y, 800);
+        fgRef.current.zoom(3.5, 1200);
+      }
+    },
+    [setActiveNoteId],
+  );
 
   const handleZoomIn = () => {
     if (fgRef.current) {
@@ -115,7 +133,10 @@ export default function GraphView() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full bg-[#07080c] overflow-hidden flex-grow relative select-none">
+    <div
+      ref={containerRef}
+      className="w-full h-full bg-[#07080c] overflow-hidden flex-grow relative select-none"
+    >
       {/* Floating Graph Header & Search Filter */}
       <div className="absolute top-6 left-6 z-10 flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
@@ -209,7 +230,7 @@ export default function GraphView() {
           const label = node.name || 'Untitled';
           const fontSize = Math.max(10, 13 / globalScale);
           ctx.font = `${fontSize}px "Plus Jakarta Sans", sans-serif`;
-          
+
           const isNote = node.type === 'note';
           const nodeColor = isNote ? '#14B8A6' : '#10B981';
           const nodeRadius = isNote ? 5.5 : 4;

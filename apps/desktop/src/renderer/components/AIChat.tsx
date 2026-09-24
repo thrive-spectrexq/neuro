@@ -11,7 +11,7 @@ import {
   PlusCircle,
   Search,
   Zap,
-  Tag
+  Tag,
 } from 'lucide-react';
 import { useNoteStore } from '../store/noteStore';
 import { useNotes, useUpdateNote } from '../hooks/useNotes';
@@ -33,10 +33,19 @@ interface Message {
 }
 
 const QUICK_PROMPTS = [
-  { label: 'Summarize Note', prompt: 'Please summarize the key takeaways of this note into bullet points.' },
-  { label: 'Extract Tasks', prompt: 'Extract any actionable tasks, to-dos, or next steps from this note.' },
+  {
+    label: 'Summarize Note',
+    prompt: 'Please summarize the key takeaways of this note into bullet points.',
+  },
+  {
+    label: 'Extract Tasks',
+    prompt: 'Extract any actionable tasks, to-dos, or next steps from this note.',
+  },
   { label: 'Search Brain', prompt: 'Search all my notes for concepts related to this topic.' },
-  { label: 'Brainstorm Ideas', prompt: 'Generate 3 creative ideas or expansions related to this content.' },
+  {
+    label: 'Brainstorm Ideas',
+    prompt: 'Generate 3 creative ideas or expansions related to this content.',
+  },
 ];
 
 export default function AIChat() {
@@ -44,7 +53,8 @@ export default function AIChat() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hello! I'm your Neuro AI Second Brain. Ask questions about your active note or query your entire knowledge vault with full RAG citations.",
+      content:
+        "Hello! I'm your Neuro AI Second Brain. Ask questions about your active note or query your entire knowledge vault with full RAG citations.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -85,37 +95,51 @@ export default function AIChat() {
       // 1. Semantic RAG Search across vault if in Search Vault mode or asking cross-note questions
       let foundCitations: Citation[] = [];
       if (notes && notes.length > 0) {
-        const queryTerms = textToSend.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+        const queryTerms = textToSend
+          .toLowerCase()
+          .split(/\s+/)
+          .filter((w) => w.length > 2);
         const matches = notes
-          .map(note => {
-            const titleMatch = queryTerms.some(t => note.title.toLowerCase().includes(t));
-            const contentMatch = queryTerms.some(t => note.content.toLowerCase().includes(t));
+          .map((note) => {
+            const titleMatch = queryTerms.some((t) => note.title.toLowerCase().includes(t));
+            const contentMatch = queryTerms.some((t) => note.content.toLowerCase().includes(t));
             const score = (titleMatch ? 2 : 0) + (contentMatch ? 1 : 0);
             return { note, score };
           })
-          .filter(m => m.score > 0)
+          .filter((m) => m.score > 0)
           .sort((a, b) => b.score - a.score)
           .slice(0, 3);
 
-        foundCitations = matches.map(m => ({
+        foundCitations = matches.map((m) => ({
           id: m.note.id,
           title: m.note.title || 'Untitled Note',
-          snippet: m.note.content.slice(0, 140).replace(/[\n#*`]/g, ' ').trim() + '...',
+          snippet:
+            m.note.content
+              .slice(0, 140)
+              .replace(/[\n#*`]/g, ' ')
+              .trim() + '...',
           score: m.score,
         }));
       }
 
       // 2. Query Agent / AI Backend
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input_text: textToSend,
-          context_note: activeNote
-            ? { id: activeNote.id, title: activeNote.title, content: activeNote.content.slice(0, 1200) }
-            : null,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input_text: textToSend,
+            context_note: activeNote
+              ? {
+                  id: activeNote.id,
+                  title: activeNote.title,
+                  content: activeNote.content.slice(0, 1200),
+                }
+              : null,
+          }),
+        },
+      );
 
       if (res.ok) {
         const data = await res.json();
@@ -229,14 +253,15 @@ export default function AIChat() {
                         onClick={() => setActiveNoteId(cite.id)}
                         className="p-1.5 rounded-lg bg-black/40 hover:bg-emerald-950/40 border border-white/[0.06] hover:border-emerald-500/30 cursor-pointer transition-all flex items-start gap-1.5 group"
                       >
-                        <ArrowRight size={10} className="text-emerald-400 mt-0.5 group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight
+                          size={10}
+                          className="text-emerald-400 mt-0.5 group-hover:translate-x-0.5 transition-transform"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] font-bold text-zinc-200 group-hover:text-emerald-300 truncate">
                             {cite.title}
                           </p>
-                          <p className="text-[9px] text-zinc-400 line-clamp-1">
-                            {cite.snippet}
-                          </p>
+                          <p className="text-[9px] text-zinc-400 line-clamp-1">{cite.snippet}</p>
                         </div>
                       </div>
                     ))}
@@ -252,7 +277,11 @@ export default function AIChat() {
                   onClick={() => handleCopy(msg.id, msg.content)}
                   className="hover:text-zinc-300 transition-colors flex items-center gap-1"
                 >
-                  {copiedId === msg.id ? <Check size={10} className="text-emerald-400" /> : <Copy size={10} />}
+                  {copiedId === msg.id ? (
+                    <Check size={10} className="text-emerald-400" />
+                  ) : (
+                    <Copy size={10} />
+                  )}
                   <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
                 </button>
 
@@ -261,7 +290,11 @@ export default function AIChat() {
                     onClick={() => handleInsertIntoNote(msg.id, msg.content)}
                     className="hover:text-emerald-300 transition-colors flex items-center gap-1 text-zinc-400"
                   >
-                    {insertedId === msg.id ? <Check size={10} className="text-emerald-400" /> : <PlusCircle size={10} />}
+                    {insertedId === msg.id ? (
+                      <Check size={10} className="text-emerald-400" />
+                    ) : (
+                      <PlusCircle size={10} />
+                    )}
                     <span>{insertedId === msg.id ? 'Inserted' : 'Insert to Note'}</span>
                   </button>
                 )}
@@ -304,7 +337,11 @@ export default function AIChat() {
         >
           <input
             type="text"
-            placeholder={searchVaultMode ? "Ask across entire Second Brain..." : "Ask Copilot about this note..."}
+            placeholder={
+              searchVaultMode
+                ? 'Ask across entire Second Brain...'
+                : 'Ask Copilot about this note...'
+            }
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 bg-transparent text-xs text-white placeholder-zinc-500 outline-none font-sans"

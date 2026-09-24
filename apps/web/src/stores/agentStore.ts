@@ -26,8 +26,7 @@ export const useAgentStore = create<AgentState>((set) => ({
   setIsStreaming: (isStreaming) => set({ isStreaming }),
   streamingText: '',
   setStreamingText: (streamingText) => set({ streamingText }),
-  appendStreamingText: (delta) =>
-    set((state) => ({ streamingText: state.streamingText + delta })),
+  appendStreamingText: (delta) => set((state) => ({ streamingText: state.streamingText + delta })),
   suggestions: [],
   addSuggestion: (suggestion) =>
     set((state) => ({ suggestions: [suggestion, ...state.suggestions] })),

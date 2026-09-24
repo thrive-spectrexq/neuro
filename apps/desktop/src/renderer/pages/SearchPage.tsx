@@ -11,7 +11,7 @@ import {
   CornerDownLeft,
   ListTodo,
   CheckCircle2,
-  BookOpen
+  BookOpen,
 } from 'lucide-react';
 import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -41,44 +41,45 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
     const timeout = setTimeout(async () => {
       // Local hybrid semantic & text search
       const q = query.toLowerCase().trim();
-      const terms = q.split(/\s+/).filter(t => t.length > 0);
+      const terms = q.split(/\s+/).filter((t) => t.length > 0);
 
-      const matched = (notes || []).map((note) => {
-        let titleScore = 0;
-        let contentScore = 0;
-        let tagScore = 0;
-        let taskScore = 0;
+      const matched = (notes || [])
+        .map((note) => {
+          let titleScore = 0;
+          let contentScore = 0;
+          let tagScore = 0;
+          let taskScore = 0;
 
-        const titleLower = note.title.toLowerCase();
-        const contentLower = note.content.toLowerCase();
+          const titleLower = note.title.toLowerCase();
+          const contentLower = note.content.toLowerCase();
 
-        terms.forEach((t) => {
-          if (titleLower.includes(t)) titleScore += 30;
-          if (contentLower.includes(t)) contentScore += 15;
-          if (note.tags?.some((tag) => tag.toLowerCase().includes(t))) tagScore += 25;
-          if (note.content.includes('- [ ]') && contentLower.includes(t)) taskScore += 20;
-        });
+          terms.forEach((t) => {
+            if (titleLower.includes(t)) titleScore += 30;
+            if (contentLower.includes(t)) contentScore += 15;
+            if (note.tags?.some((tag) => tag.toLowerCase().includes(t))) tagScore += 25;
+            if (note.content.includes('- [ ]') && contentLower.includes(t)) taskScore += 20;
+          });
 
-        const totalScore = Math.min(99, titleScore + contentScore + tagScore + taskScore);
-        const hasTasks = note.content.includes('- [ ]') || note.content.includes('- [x]');
+          const totalScore = Math.min(99, titleScore + contentScore + tagScore + taskScore);
+          const hasTasks = note.content.includes('- [ ]') || note.content.includes('- [x]');
 
-        return {
-          id: note.id,
-          title: note.title,
-          content: note.content,
-          tags: note.tags || [],
-          score: totalScore > 0 ? totalScore : 0,
-          hasTasks,
-          updatedAt: note.updatedAt || note.createdAt,
-        };
-      })
-      .filter((n) => n.score > 0)
-      .filter((n) => {
-        if (filterType === 'tags') return n.tags.length > 0;
-        if (filterType === 'tasks') return n.hasTasks;
-        return true;
-      })
-      .sort((a, b) => b.score - a.score);
+          return {
+            id: note.id,
+            title: note.title,
+            content: note.content,
+            tags: note.tags || [],
+            score: totalScore > 0 ? totalScore : 0,
+            hasTasks,
+            updatedAt: note.updatedAt || note.createdAt,
+          };
+        })
+        .filter((n) => n.score > 0)
+        .filter((n) => {
+          if (filterType === 'tags') return n.tags.length > 0;
+          if (filterType === 'tasks') return n.hasTasks;
+          return true;
+        })
+        .sort((a, b) => b.score - a.score);
 
       setResults(matched);
       setIsSearching(false);
@@ -102,12 +103,15 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
       <>
         {parts.map((part, i) =>
           part.toLowerCase() === q.toLowerCase() ? (
-            <mark key={i} className="bg-emerald-500/30 text-emerald-200 px-0.5 rounded font-semibold">
+            <mark
+              key={i}
+              className="bg-emerald-500/30 text-emerald-200 px-0.5 rounded font-semibold"
+            >
               {part}
             </mark>
           ) : (
             part
-          )
+          ),
         )}
       </>
     );
@@ -122,9 +126,7 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
             <Search className="text-brand-emerald" size={20} />
             Knowledge Vault Search
           </h1>
-          <span className="badge-emerald">
-            Hybrid Semantic & BM25
-          </span>
+          <span className="badge-emerald">Hybrid Semantic & BM25</span>
         </div>
         <p className="page-subtitle">
           Query your second brain across all notes, tags, checklists, and semantic embeddings.
@@ -189,7 +191,9 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
 
         {!isSearching && query && results.length === 0 && (
           <div className="p-8 rounded-card border border-white/[0.06] bg-panel text-center text-text-secondary animate-fade-in">
-            <p className="text-sm font-medium text-text-primary mb-1">No matches found for "{query}"</p>
+            <p className="text-sm font-medium text-text-primary mb-1">
+              No matches found for "{query}"
+            </p>
             <p className="text-xs text-text-muted">
               Try broader keywords, searching for tags, or asking the voice agent directly.
             </p>
@@ -261,7 +265,8 @@ export default function SearchPage({ onNavigate }: SearchPageProps) {
               Type any concept, question, or note keyword
             </p>
             <p className="text-[11px] text-text-muted mt-1 max-w-sm">
-              Instant hybrid vector & BM25 retrieval across all notes, tags, checklists, and links in your vault.
+              Instant hybrid vector & BM25 retrieval across all notes, tags, checklists, and links
+              in your vault.
             </p>
           </div>
         )}

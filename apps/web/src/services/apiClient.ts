@@ -22,8 +22,14 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
-    const url = new URL(`${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`, window.location.origin);
+  private buildUrl(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | undefined>,
+  ): string {
+    const url = new URL(
+      `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`,
+      window.location.origin,
+    );
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
         if (val !== undefined && val !== null) {
@@ -61,7 +67,8 @@ class ApiClient {
       } catch {
         // Response wasn't JSON
       }
-      const message = errBody?.detail || errBody?.message || `Request failed with status ${response.status}`;
+      const message =
+        errBody?.detail || errBody?.message || `Request failed with status ${response.status}`;
       throw new ApiError(message, response.status, errBody);
     }
 

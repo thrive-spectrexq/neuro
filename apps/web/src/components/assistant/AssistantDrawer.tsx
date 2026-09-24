@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Sparkles, 
-  X, 
-  Send, 
-  Square, 
-  Database, 
-  Layers, 
-  Info
-} from 'lucide-react';
+import { Sparkles, X, Send, Square, Database, Layers, Info } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { agentClient } from '../../services/agentClient';
@@ -72,7 +64,7 @@ export const AssistantDrawer: React.FC = () => {
         onDone: () => {
           setIsStreaming(false);
         },
-      }
+      },
     );
   };
 
@@ -146,24 +138,29 @@ export const AssistantDrawer: React.FC = () => {
       {/* Suggestion Feed & Streaming Area */}
       <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
         {/* Voice control integration */}
-        <VoiceControl onAudioReady={async (blob: Blob) => {
-          try {
-            const fd = new FormData();
-            fd.append('file', blob, 'speech.webm');
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/voice/transcribe`, {
-              method: 'POST',
-              body: fd,
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.text) {
-                setPrompt(data.text);
+        <VoiceControl
+          onAudioReady={async (blob: Blob) => {
+            try {
+              const fd = new FormData();
+              fd.append('file', blob, 'speech.webm');
+              const res = await fetch(
+                `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/voice/transcribe`,
+                {
+                  method: 'POST',
+                  body: fd,
+                },
+              );
+              if (res.ok) {
+                const data = await res.json();
+                if (data.text) {
+                  setPrompt(data.text);
+                }
               }
+            } catch (err) {
+              console.error('Voice transcribe error:', err);
             }
-          } catch (err) {
-            console.error('Voice transcribe error:', err);
-          }
-        }} />
+          }}
+        />
 
         {/* Live Streaming State */}
         {isStreaming && (

@@ -3,19 +3,23 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
   ping: () => ipcRenderer.invoke('ping'),
   openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
-  launchApp: (appName: string, args?: string) => ipcRenderer.invoke('shell:launchApp', { appName, args }),
-  showNotification: (title: string, body: string) => ipcRenderer.invoke('notification:show', { title, body }),
+  launchApp: (appName: string, args?: string) =>
+    ipcRenderer.invoke('shell:launchApp', { appName, args }),
+  showNotification: (title: string, body: string) =>
+    ipcRenderer.invoke('notification:show', { title, body }),
   writeClipboard: (text: string) => ipcRenderer.invoke('clipboard:write', text),
   readClipboard: () => ipcRenderer.invoke('clipboard:read'),
   getBackendStatus: () => ipcRenderer.invoke('backend:status'),
   createOrbWindow: () => ipcRenderer.invoke('orb:create'),
   closeOrbWindow: () => ipcRenderer.invoke('orb:close'),
   toggleOrbWindow: () => ipcRenderer.invoke('orb:toggle'),
-  resizeOrbWindow: (width: number, height: number) => ipcRenderer.invoke('orb:resize', { width, height }),
+  resizeOrbWindow: (width: number, height: number) =>
+    ipcRenderer.invoke('orb:resize', { width, height }),
   focusMainWindow: () => ipcRenderer.invoke('window:focus-main'),
   toggleMainWindow: () => ipcRenderer.invoke('window:toggle-main'),
   getSystemTelemetry: () => ipcRenderer.invoke('system:telemetry'),
-  controlMedia: (action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => ipcRenderer.invoke('media:control', action),
+  controlMedia: (action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') =>
+    ipcRenderer.invoke('media:control', action),
   onToggleJarvisHUD: (callback: () => void) => {
     const handler = () => callback();
     ipcRenderer.on('jarvis:toggle-hud', handler);

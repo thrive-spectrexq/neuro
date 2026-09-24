@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  Sparkles, 
-  X, 
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  Sparkles,
+  X,
   Minus,
-  Maximize2, 
-  Zap, 
+  Maximize2,
+  Zap,
   Radio,
   Terminal,
   ExternalLink,
   Play,
   FileText,
-  Search
+  Search,
 } from 'lucide-react';
 import { useJarvisAgent } from '../hooks/useJarvisAgent';
 import { soundEngine } from '../utils/soundEngine';
@@ -140,10 +140,10 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
   const orbState = isProcessing
     ? 'processing'
     : isListening
-    ? 'listening'
-    : lastResult && !isMuted
-    ? 'speaking'
-    : 'idle';
+      ? 'listening'
+      : lastResult && !isMuted
+        ? 'speaking'
+        : 'idle';
 
   // Setup Real-Time Web Audio Analyzer with exponential smoothing
   const startAudioAnalyzer = async () => {
@@ -221,7 +221,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   // In-browser dragging event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('.no-drag')) return;
+    if (
+      (e.target as HTMLElement).closest('button') ||
+      (e.target as HTMLElement).closest('.no-drag')
+    )
+      return;
     isDraggingRef.current = true;
     dragOffsetRef.current = {
       x: e.clientX - position.x,
@@ -231,8 +235,14 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current) return;
-    const newX = Math.max(10, Math.min(window.innerWidth - 260, e.clientX - dragOffsetRef.current.x));
-    const newY = Math.max(10, Math.min(window.innerHeight - 260, e.clientY - dragOffsetRef.current.y));
+    const newX = Math.max(
+      10,
+      Math.min(window.innerWidth - 260, e.clientX - dragOffsetRef.current.x),
+    );
+    const newY = Math.max(
+      10,
+      Math.min(window.innerHeight - 260, e.clientY - dragOffsetRef.current.y),
+    );
     setPosition({ x: newX, y: newY });
   }, []);
 
@@ -442,7 +452,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                   }`}
                   title={isListening ? 'Microphone Active (Click to Pause)' : 'Open Microphone'}
                 >
-                  {isListening ? <Mic className="w-3.5 h-3.5 text-emerald-400" /> : <MicOff className="w-3.5 h-3.5" />}
+                  {isListening ? (
+                    <Mic className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : (
+                    <MicOff className="w-3.5 h-3.5" />
+                  )}
                 </button>
 
                 {/* Minimize to Mini-Orb */}
@@ -479,19 +493,35 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               <div className="bg-black/50 border border-white/[0.08] rounded-xl p-2 mb-2 font-mono">
                 <div className="flex items-center justify-between text-[10px] mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${
-                      voiceLevel === 'optimal' ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]' :
-                      voiceLevel === 'quiet' ? 'bg-amber-400 animate-pulse' :
-                      voiceLevel === 'loud' ? 'bg-rose-400 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'bg-zinc-600'
-                    }`} />
-                    <span className={`font-semibold ${
-                      voiceLevel === 'optimal' ? 'text-emerald-300' :
-                      voiceLevel === 'quiet' ? 'text-amber-300' :
-                      voiceLevel === 'loud' ? 'text-rose-300' : 'text-zinc-400'
-                    }`}>
-                      {voiceLevel === 'optimal' ? 'Hearing Clearly (Optimal)' :
-                       voiceLevel === 'quiet' ? 'Speak Slightly Louder ⏶' :
-                       voiceLevel === 'loud' ? 'Loud Audio ⏷' : 'Listening for Voice...'}
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        voiceLevel === 'optimal'
+                          ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]'
+                          : voiceLevel === 'quiet'
+                            ? 'bg-amber-400 animate-pulse'
+                            : voiceLevel === 'loud'
+                              ? 'bg-rose-400 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.8)]'
+                              : 'bg-zinc-600'
+                      }`}
+                    />
+                    <span
+                      className={`font-semibold ${
+                        voiceLevel === 'optimal'
+                          ? 'text-emerald-300'
+                          : voiceLevel === 'quiet'
+                            ? 'text-amber-300'
+                            : voiceLevel === 'loud'
+                              ? 'text-rose-300'
+                              : 'text-zinc-400'
+                      }`}
+                    >
+                      {voiceLevel === 'optimal'
+                        ? 'Hearing Clearly (Optimal)'
+                        : voiceLevel === 'quiet'
+                          ? 'Speak Slightly Louder ⏶'
+                          : voiceLevel === 'loud'
+                            ? 'Loud Audio ⏷'
+                            : 'Listening for Voice...'}
                     </span>
                   </div>
                   <span className="text-emerald-400 font-bold">{audioVolume}%</span>
@@ -508,9 +538,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
                   {/* Real-time Voice Volume Fill */}
                   <div
                     className={`h-full transition-all duration-75 rounded-full ${
-                      audioVolume >= 75 ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-rose-500' :
-                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-emerald-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
-                      'bg-amber-500/60'
+                      audioVolume >= 75
+                        ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-rose-500'
+                        : audioVolume >= activationThreshold
+                          ? 'bg-gradient-to-r from-emerald-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+                          : 'bg-amber-500/60'
                     }`}
                     style={{ width: `${Math.max(3, audioVolume)}%` }}
                   />
@@ -605,8 +637,8 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               orbState === 'processing'
                 ? 'animate-spin border-teal-400/80'
                 : orbState === 'listening'
-                ? 'animate-pulse border-emerald-400'
-                : 'border-teal-500/50'
+                  ? 'animate-pulse border-emerald-400'
+                  : 'border-teal-500/50'
             }`}
             style={{
               borderColor: colors.border,
@@ -615,7 +647,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           />
 
           {/* Satellite Orbit Nodes (4 Cardinal Points) */}
-          <div className={`absolute ${sizeCfg.outerRingClass} rounded-full pointer-events-none ${orbState === 'processing' ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_20s_linear_infinite]'}`}>
+          <div
+            className={`absolute ${sizeCfg.outerRingClass} rounded-full pointer-events-none ${orbState === 'processing' ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_20s_linear_infinite]'}`}
+          >
             <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_12px_#ffffff] border border-emerald-400" />
             <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#00f5ff]" />
             <span className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_10px_#2DD4BF]" />
@@ -628,8 +662,8 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               orbState === 'listening'
                 ? 'animate-[spin_4s_linear_infinite]'
                 : orbState === 'processing'
-                ? 'animate-[spin_2s_linear_infinite]'
-                : 'animate-[spin_14s_linear_infinite]'
+                  ? 'animate-[spin_2s_linear_infinite]'
+                  : 'animate-[spin_14s_linear_infinite]'
             }`}
             viewBox="0 0 200 200"
           >
@@ -669,7 +703,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
           {/* Counter-Rotating Inner Tachyon Ring */}
           <svg
             className={`absolute ${sizeCfg.middleRingClass} pointer-events-none opacity-60 ${
-              orbState === 'listening' ? 'animate-[spin_6s_linear_infinite_reverse]' : 'animate-[spin_24s_linear_infinite_reverse]'
+              orbState === 'listening'
+                ? 'animate-[spin_6s_linear_infinite_reverse]'
+                : 'animate-[spin_24s_linear_infinite_reverse]'
             }`}
             viewBox="0 0 200 200"
           >
@@ -756,7 +792,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               ) : isMuted ? (
                 <div className="flex flex-col items-center gap-1">
                   <MicOff className="w-8 h-8 text-rose-400 group-hover:text-rose-300 transition-colors" />
-                  <span className="text-[9px] font-mono font-bold text-rose-400 tracking-wider">MUTED</span>
+                  <span className="text-[9px] font-mono font-bold text-rose-400 tracking-wider">
+                    MUTED
+                  </span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-1">
@@ -918,8 +956,8 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
             orbState === 'processing'
               ? 'animate-spin border-teal-400'
               : orbState === 'listening'
-              ? 'animate-pulse border-emerald-400'
-              : 'border-teal-500/50'
+                ? 'animate-pulse border-emerald-400'
+                : 'border-teal-500/50'
           }`}
           style={{
             borderColor: colors.border,
@@ -929,7 +967,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
         <svg
           className={`absolute ${sizeCfg.middleRingClass} pointer-events-none ${
-            orbState === 'listening' ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_14s_linear_infinite]'
+            orbState === 'listening'
+              ? 'animate-[spin_4s_linear_infinite]'
+              : 'animate-[spin_14s_linear_infinite]'
           }`}
           viewBox="0 0 200 200"
         >
@@ -964,7 +1004,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
             borderColor: colors.primary,
             boxShadow: `0 0 32px ${colors.glow}, inset 0 0 20px ${colors.glowWide}`,
           }}
-          title={isListening ? 'Click to pause voice listening' : 'Click to activate voice listening'}
+          title={
+            isListening ? 'Click to pause voice listening' : 'Click to activate voice listening'
+          }
         >
           <div className="flex items-center gap-1">
             {orbState === 'listening' ? (

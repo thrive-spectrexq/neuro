@@ -89,7 +89,9 @@ export default function AuthForm() {
               {isLogin ? 'Neuro Workstation Authentication' : 'Create Vault Identity'}
             </h2>
             <p className="text-[10px] text-[#64748B] font-mono">
-              {isLogin ? 'Sign in to access your local neural vault' : 'Establish local encryption & identity'}
+              {isLogin
+                ? 'Sign in to access your local neural vault'
+                : 'Establish local encryption & identity'}
             </p>
           </div>
         </div>
@@ -103,7 +105,9 @@ export default function AuthForm() {
         <form className="space-y-3" onSubmit={handleSubmit}>
           {!isLogin && (
             <div>
-              <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Email</label>
+              <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">
+                Email
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                   <Mail className="h-3.5 w-3.5 text-[#64748B]" />
@@ -121,7 +125,9 @@ export default function AuthForm() {
           )}
 
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Username</label>
+            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">
+              Username
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                 <User className="h-3.5 w-3.5 text-[#64748B]" />
@@ -138,7 +144,9 @@ export default function AuthForm() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">Secret Key / Password</label>
+            <label className="block text-[10px] font-mono uppercase tracking-wider text-[#94A3B8] mb-1">
+              Secret Key / Password
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                 <Lock className="h-3.5 w-3.5 text-[#64748B]" />
@@ -160,7 +168,9 @@ export default function AuthForm() {
             className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-xs font-medium text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors shadow-sm disabled:opacity-50 mt-4"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{loading ? 'Authenticating...' : (isLogin ? 'Sign In to Vault' : 'Initialize Vault')}</span>
+            <span>
+              {loading ? 'Authenticating...' : isLogin ? 'Sign In to Vault' : 'Initialize Vault'}
+            </span>
           </button>
         </form>
 

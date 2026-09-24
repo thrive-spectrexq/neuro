@@ -21,7 +21,9 @@ export interface ElectronAPI {
     uptimeHours: number;
     cpus: number;
   }>;
-  controlMedia: (action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => Promise<boolean>;
+  controlMedia: (
+    action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute',
+  ) => Promise<boolean>;
   onToggleJarvisHUD: (callback: () => void) => () => void;
   onQuickNote: (callback: () => void) => () => void;
 }

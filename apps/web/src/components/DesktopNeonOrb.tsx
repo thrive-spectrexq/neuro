@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  Sparkles, 
-  X, 
-  Maximize2, 
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  Sparkles,
+  X,
+  Maximize2,
   Zap,
   Radio,
   Terminal,
   ExternalLink,
   Play,
   FileText,
-  Search
+  Search,
 } from 'lucide-react';
 
 export interface DesktopNeonOrbProps {
@@ -59,10 +59,7 @@ const QUICK_ACTIONS = [
   { label: 'AI Search', cmd: 'search latest quantum computing breakthrough', icon: Search },
 ];
 
-export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
-  onSummonHUD,
-  defaultPosition,
-}) => {
+export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({ onSummonHUD, defaultPosition }) => {
   const [orbState, setOrbState] = useState<OrbState>('idle');
   const [isActive, setIsActive] = useState<boolean>(true);
   const [transcript, setTranscript] = useState<string>('');
@@ -161,11 +158,14 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
     try {
       // Execute via Neuro OS FastAPI Backend
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input_text: rawText, include_voice: true }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/agent/execute`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input_text: rawText, include_voice: true }),
+        },
+      );
 
       if (res.ok) {
         const data = await res.json();
@@ -293,7 +293,11 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   // Dragging handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('.no-drag')) return;
+    if (
+      (e.target as HTMLElement).closest('button') ||
+      (e.target as HTMLElement).closest('.no-drag')
+    )
+      return;
     isDraggingRef.current = true;
     dragOffsetRef.current = {
       x: e.clientX - position.x,
@@ -303,8 +307,14 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current) return;
-    const newX = Math.max(10, Math.min(window.innerWidth - 260, e.clientX - dragOffsetRef.current.x));
-    const newY = Math.max(10, Math.min(window.innerHeight - 260, e.clientY - dragOffsetRef.current.y));
+    const newX = Math.max(
+      10,
+      Math.min(window.innerWidth - 260, e.clientX - dragOffsetRef.current.x),
+    );
+    const newY = Math.max(
+      10,
+      Math.min(window.innerHeight - 260, e.clientY - dragOffsetRef.current.y),
+    );
     setPosition({ x: newX, y: newY });
   }, []);
 
@@ -409,8 +419,8 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
             orbState === 'processing'
               ? 'animate-spin border-teal-400'
               : orbState === 'listening'
-              ? 'animate-pulse border-emerald-400'
-              : 'border-teal-500/50'
+                ? 'animate-pulse border-emerald-400'
+                : 'border-teal-500/50'
           }`}
           style={{
             borderColor: colors.border,
@@ -421,7 +431,9 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
         {/* Counter-rotating Inner Arc Ring */}
         <svg
           className={`absolute ${sizeCfg.middleRingClass} pointer-events-none ${
-            orbState === 'listening' ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_14s_linear_infinite]'
+            orbState === 'listening'
+              ? 'animate-[spin_4s_linear_infinite]'
+              : 'animate-[spin_14s_linear_infinite]'
           }`}
           viewBox="0 0 200 200"
         >
@@ -603,9 +615,7 @@ export const DesktopNeonOrb: React.FC<DesktopNeonOrbProps> = ({
               <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1.5 uppercase tracking-wider mb-0.5">
                 <Zap className="w-3 h-3" /> Result:
               </div>
-              <p className="text-xs text-zinc-100 font-sans leading-relaxed">
-                {lastAction}
-              </p>
+              <p className="text-xs text-zinc-100 font-sans leading-relaxed">{lastAction}</p>
             </div>
           ) : (
             <div className="space-y-1.5 mb-2">

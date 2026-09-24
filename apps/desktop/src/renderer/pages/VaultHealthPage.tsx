@@ -35,12 +35,8 @@ const MOCK_ISSUES = {
     { id: '4', file: 'Drafts/Untitled_2.md' },
     { id: '5', file: 'Archive/Old_Project.md' },
   ],
-  missingFrontmatter: [
-    { id: '6', file: 'Inbox/Quick_Thought.md' },
-  ],
-  emptySections: [
-    { id: '7', file: 'Projects/Neuro/Roadmap.md', header: 'Q4 Goals' },
-  ],
+  missingFrontmatter: [{ id: '6', file: 'Inbox/Quick_Thought.md' }],
+  emptySections: [{ id: '7', file: 'Projects/Neuro/Roadmap.md', header: 'Q4 Goals' }],
 };
 
 const MOCK_ACTIVITY = [
@@ -54,12 +50,16 @@ export default function VaultHealthPage() {
 
   const { data: stats = MOCK_STATS, refetch: refetchStats } = useQuery({
     queryKey: ['vault-health'],
-    queryFn: () => apiClient.get('/obsidian/health-summary').then(res => res.data)
+    queryFn: () => apiClient.get('/obsidian/health-summary').then((res) => res.data),
   });
 
-  const { data: issues = MOCK_ISSUES, refetch: refetchIssues, isFetching: isLinting } = useQuery({
+  const {
+    data: issues = MOCK_ISSUES,
+    refetch: refetchIssues,
+    isFetching: isLinting,
+  } = useQuery({
     queryKey: ['vault-lint'],
-    queryFn: () => apiClient.get('/obsidian/lint?path=.').then(res => res.data)
+    queryFn: () => apiClient.get('/obsidian/lint?path=.').then((res) => res.data),
   });
 
   const fixDeadLinksMutation = useMutation({
@@ -67,11 +67,11 @@ export default function VaultHealthPage() {
     onSuccess: () => {
       refetchStats();
       refetchIssues();
-    }
+    },
   });
 
   const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => ({
+    setExpandedCategories((prev) => ({
       ...prev,
       [category]: !prev[category],
     }));
@@ -101,7 +101,11 @@ export default function VaultHealthPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="btn-secondary flex items-center gap-2" onClick={() => refetchIssues()} disabled={isLinting}>
+          <button
+            className="btn-secondary flex items-center gap-2"
+            onClick={() => refetchIssues()}
+            disabled={isLinting}
+          >
             <RefreshCw className={`w-4 h-4 ${isLinting ? 'animate-spin' : ''}`} />
             {isLinting ? 'Linting...' : 'Run Full Lint'}
           </button>
@@ -189,7 +193,11 @@ export default function VaultHealthPage() {
         </div>
         <div className="flex gap-3">
           <button className="btn-secondary">Generate Frontmatter</button>
-          <button className="btn-primary" onClick={() => fixDeadLinksMutation.mutate()} disabled={fixDeadLinksMutation.isPending}>
+          <button
+            className="btn-primary"
+            onClick={() => fixDeadLinksMutation.mutate()}
+            disabled={fixDeadLinksMutation.isPending}
+          >
             {fixDeadLinksMutation.isPending ? 'Fixing...' : 'Fix Dead Links'}
           </button>
         </div>
@@ -202,7 +210,7 @@ export default function VaultHealthPage() {
 
           {/* Dead Links */}
           <div className="card-surface overflow-hidden">
-            <button 
+            <button
               className="w-full p-4 flex items-center justify-between hover:bg-surface-elevated transition-colors"
               onClick={() => toggleCategory('deadLinks')}
             >
@@ -217,17 +225,25 @@ export default function VaultHealthPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span className="badge-rose">{issues.deadLinks.length}</span>
-                {expandedCategories['deadLinks'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
+                {expandedCategories['deadLinks'] ? (
+                  <ChevronDown className="w-5 h-5 text-text-muted" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                )}
               </div>
             </button>
             {expandedCategories['deadLinks'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-3">
                   {issues.deadLinks.map((issue: any) => (
-                    <li key={issue.id} className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors">
+                    <li
+                      key={issue.id}
+                      className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors"
+                    >
                       <span className="text-text-primary font-medium">{issue.file}</span>
                       <span className="text-text-muted flex items-center gap-1">
-                        <Unlink className="w-3 h-3" /> Targets: <span className="text-rose-400">{issue.target}</span>
+                        <Unlink className="w-3 h-3" /> Targets:{' '}
+                        <span className="text-rose-400">{issue.target}</span>
                       </span>
                     </li>
                   ))}
@@ -238,7 +254,7 @@ export default function VaultHealthPage() {
 
           {/* Orphan Notes */}
           <div className="card-surface overflow-hidden">
-            <button 
+            <button
               className="w-full p-4 flex items-center justify-between hover:bg-surface-elevated transition-colors"
               onClick={() => toggleCategory('orphanNotes')}
             >
@@ -248,19 +264,28 @@ export default function VaultHealthPage() {
                 </div>
                 <div className="text-left">
                   <h4 className="font-medium text-text-primary">Orphan Notes</h4>
-                  <p className="text-sm text-text-muted">Notes with zero incoming or outgoing links</p>
+                  <p className="text-sm text-text-muted">
+                    Notes with zero incoming or outgoing links
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <span className="badge-amber">{issues.orphanNotes.length}</span>
-                {expandedCategories['orphanNotes'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
+                {expandedCategories['orphanNotes'] ? (
+                  <ChevronDown className="w-5 h-5 text-text-muted" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                )}
               </div>
             </button>
             {expandedCategories['orphanNotes'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
                   {issues.orphanNotes.map((issue: any) => (
-                    <li key={issue.id} className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors">
+                    <li
+                      key={issue.id}
+                      className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors"
+                    >
                       {issue.file}
                     </li>
                   ))}
@@ -271,7 +296,7 @@ export default function VaultHealthPage() {
 
           {/* Missing Frontmatter */}
           <div className="card-surface overflow-hidden">
-            <button 
+            <button
               className="w-full p-4 flex items-center justify-between hover:bg-surface-elevated transition-colors"
               onClick={() => toggleCategory('missingFrontmatter')}
             >
@@ -285,15 +310,24 @@ export default function VaultHealthPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-400 border border-teal-500/20">{issues.missingFrontmatter.length}</span>
-                {expandedCategories['missingFrontmatter'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                  {issues.missingFrontmatter.length}
+                </span>
+                {expandedCategories['missingFrontmatter'] ? (
+                  <ChevronDown className="w-5 h-5 text-text-muted" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                )}
               </div>
             </button>
             {expandedCategories['missingFrontmatter'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
                   {issues.missingFrontmatter.map((issue: any) => (
-                    <li key={issue.id} className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors">
+                    <li
+                      key={issue.id}
+                      className="text-sm text-text-secondary p-2 rounded hover:bg-surface transition-colors"
+                    >
                       {issue.file}
                     </li>
                   ))}
@@ -304,7 +338,7 @@ export default function VaultHealthPage() {
 
           {/* Empty Sections */}
           <div className="card-surface overflow-hidden">
-            <button 
+            <button
               className="w-full p-4 flex items-center justify-between hover:bg-surface-elevated transition-colors"
               onClick={() => toggleCategory('emptySections')}
             >
@@ -319,14 +353,21 @@ export default function VaultHealthPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span className="badge-neutral">{MOCK_ISSUES.emptySections.length}</span>
-                {expandedCategories['emptySections'] ? <ChevronDown className="w-5 h-5 text-text-muted" /> : <ChevronRight className="w-5 h-5 text-text-muted" />}
+                {expandedCategories['emptySections'] ? (
+                  <ChevronDown className="w-5 h-5 text-text-muted" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                )}
               </div>
             </button>
             {expandedCategories['emptySections'] && (
               <div className="p-4 border-t border-surface-elevated bg-surface/50">
                 <ul className="space-y-2">
                   {MOCK_ISSUES.emptySections.map((issue: any) => (
-                    <li key={issue.id} className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors">
+                    <li
+                      key={issue.id}
+                      className="text-sm flex flex-col gap-1 p-2 rounded hover:bg-surface transition-colors"
+                    >
                       <span className="text-text-primary">{issue.file}</span>
                       <span className="text-text-muted text-xs">Header: {issue.header}</span>
                     </li>
@@ -344,8 +385,14 @@ export default function VaultHealthPage() {
             <div className="relative pl-6 border-l-2 border-surface-elevated space-y-8">
               {MOCK_ACTIVITY.map((activity, idx) => (
                 <div key={activity.id} className="relative">
-                  <div className={`absolute -left-[35px] bg-panel p-1 rounded-full border-2 border-surface-elevated ${activity.type === 'fix' ? 'text-brand-emerald' : 'text-emerald-500'}`}>
-                    {activity.type === 'fix' ? <Wrench className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                  <div
+                    className={`absolute -left-[35px] bg-panel p-1 rounded-full border-2 border-surface-elevated ${activity.type === 'fix' ? 'text-brand-emerald' : 'text-emerald-500'}`}
+                  >
+                    {activity.type === 'fix' ? (
+                      <Wrench className="w-4 h-4" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4" />
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-text-primary">{activity.action}</p>

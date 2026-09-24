@@ -134,7 +134,9 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onClose();
             }}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
-              selectedIndex === 0 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
+              selectedIndex === 0
+                ? 'bg-[#18162B] text-white border border-[#302856]'
+                : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -150,7 +152,9 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onClose();
             }}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
-              selectedIndex === 1 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
+              selectedIndex === 1
+                ? 'bg-[#18162B] text-white border border-[#302856]'
+                : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -166,7 +170,9 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
               onClose();
             }}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
-              selectedIndex === 2 ? 'bg-[#18162B] text-white border border-[#302856]' : 'text-[#94A3B8] hover:bg-[#141722]'
+              selectedIndex === 2
+                ? 'bg-[#18162B] text-white border border-[#302856]'
+                : 'text-[#94A3B8] hover:bg-[#141722]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -201,7 +207,9 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
                     <span className="text-xs font-bold text-white font-mono">{item.title}</span>
                     <span className="text-[9px] text-[#64748B] font-mono">Note</span>
                   </div>
-                  <p className="text-[10px] text-[#94A3B8] line-clamp-1 font-mono">{item.content}</p>
+                  <p className="text-[10px] text-[#94A3B8] line-clamp-1 font-mono">
+                    {item.content}
+                  </p>
                 </div>
               ))}
             </div>
@@ -211,8 +219,21 @@ export function CommandPaletteModal({ isOpen, onClose, onSelectTab }: CommandPal
         {/* Footer */}
         <div className="px-3 py-1.5 border-t border-[#1F2433] bg-[#090A0F] text-[9px] font-mono text-[#64748B] flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span>Navigate: <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↑</kbd> <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↓</kbd></span>
-            <span>Select: <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">↵</kbd></span>
+            <span>
+              Navigate:{' '}
+              <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">
+                ↑
+              </kbd>{' '}
+              <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">
+                ↓
+              </kbd>
+            </span>
+            <span>
+              Select:{' '}
+              <kbd className="px-1 py-0.2 bg-[#141722] border border-[#242A3C] rounded text-[#94A3B8]">
+                ↵
+              </kbd>
+            </span>
           </div>
           <span>Neuro Command Palette</span>
         </div>

@@ -11,28 +11,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium mb-1">
+          <label className="block text-xs font-medium text-[#A1A1A6] mb-1.5 tracking-tight">
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#86868B] pointer-events-none">
               {icon}
             </div>
           )}
           <input
             ref={ref}
-            className={`flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 ${icon ? 'pl-10' : ''} ${className}`}
+            className={`flex h-9 w-full rounded-xl border border-white/[0.09] bg-white/[0.05] px-3.5 py-1.5 text-xs text-[#F5F5F7] placeholder:text-[#86868B] transition-all duration-150 focus:outline-none focus:border-[#0071E3] focus:bg-white/[0.08] focus:ring-2 focus:ring-[#0071E3]/30 disabled:cursor-not-allowed disabled:opacity-40 ${icon ? 'pl-9' : ''} ${className}`}
             {...props}
           />
         </div>
-        {error && (
-          <p className="mt-1 text-sm text-red-500">{error}</p>
-        )}
+        {error && <p className="mt-1 text-xs text-[#FF453A] font-medium tracking-tight">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

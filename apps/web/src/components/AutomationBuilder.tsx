@@ -31,17 +31,21 @@ export function AutomationBuilder() {
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (Array.isArray(data)) setRules(data);
       })
       .catch(console.error);
   }, []);
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
-  const [triggerType, setTriggerType] = useState<'on_note_create' | 'on_tag_add' | 'on_task_done'>('on_note_create');
+  const [triggerType, setTriggerType] = useState<'on_note_create' | 'on_tag_add' | 'on_task_done'>(
+    'on_note_create',
+  );
   const [triggerValue, setTriggerValue] = useState('');
-  const [actionType, setActionType] = useState<'auto_summarize' | 'extract_tasks' | 'notify'>('auto_summarize');
+  const [actionType, setActionType] = useState<'auto_summarize' | 'extract_tasks' | 'notify'>(
+    'auto_summarize',
+  );
 
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,11 +60,14 @@ export function AutomationBuilder() {
     };
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRule),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRule),
+        },
+      );
       if (res.ok) {
         const created = await res.json();
         setRules((prev) => [...prev, created]);
@@ -75,9 +82,12 @@ export function AutomationBuilder() {
 
   const toggleRule = async (id: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}/toggle`, {
-        method: 'PATCH',
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}/toggle`,
+        {
+          method: 'PATCH',
+        },
+      );
       if (res.ok) {
         setRules((prev) => prev.map((r) => (r.id === id ? { ...r, is_active: !r.is_active } : r)));
       }
@@ -88,9 +98,12 @@ export function AutomationBuilder() {
 
   const deleteRule = async (id: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/automations/${id}`,
+        {
+          method: 'DELETE',
+        },
+      );
       if (res.ok) {
         setRules((prev) => prev.filter((r) => r.id !== id));
       }
@@ -108,8 +121,12 @@ export function AutomationBuilder() {
             <Zap className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-white tracking-wide font-mono">Event Automations</h2>
-            <p className="text-[10px] text-[#64748B]">Trigger-action pipelines for autonomous vault enrichment</p>
+            <h2 className="text-xs font-bold text-white tracking-wide font-mono">
+              Event Automations
+            </h2>
+            <p className="text-[10px] text-[#64748B]">
+              Trigger-action pipelines for autonomous vault enrichment
+            </p>
           </div>
         </div>
 
@@ -130,7 +147,9 @@ export function AutomationBuilder() {
             className="p-3.5 rounded-lg border border-[#1F2433] bg-[#0F1117] hover:border-[#2E364B] transition-colors flex items-center justify-between gap-3"
           >
             <div className="flex items-start gap-3">
-              <div className={`p-1.5 rounded-md border mt-0.5 ${rule.is_active ? 'bg-[#2B1B10] border-[#4D2E14] text-amber-400' : 'bg-[#141722] border-[#242A3C] text-[#64748B]'}`}>
+              <div
+                className={`p-1.5 rounded-md border mt-0.5 ${rule.is_active ? 'bg-[#2B1B10] border-[#4D2E14] text-amber-400' : 'bg-[#141722] border-[#242A3C] text-[#64748B]'}`}
+              >
                 <Zap className="w-3.5 h-3.5" />
               </div>
               <div className="space-y-1">
@@ -147,12 +166,18 @@ export function AutomationBuilder() {
                   )}
                 </h3>
                 <div className="flex items-center gap-2 text-[10px] font-mono text-[#94A3B8]">
-                  <span>Trigger: <strong className="text-sky-300">{rule.trigger_type}</strong></span>
+                  <span>
+                    Trigger: <strong className="text-sky-300">{rule.trigger_type}</strong>
+                  </span>
                   {rule.trigger_value && (
-                    <span className="bg-[#141722] px-1 py-0.2 rounded text-slate-300 border border-[#242A3C]">#{rule.trigger_value}</span>
+                    <span className="bg-[#141722] px-1 py-0.2 rounded text-slate-300 border border-[#242A3C]">
+                      #{rule.trigger_value}
+                    </span>
                   )}
                   <span>&bull;</span>
-                  <span>Action: <strong className="text-teal-300">{rule.action_type}</strong></span>
+                  <span>
+                    Action: <strong className="text-teal-300">{rule.action_type}</strong>
+                  </span>
                 </div>
               </div>
             </div>
@@ -187,7 +212,9 @@ export function AutomationBuilder() {
             <h3 className="text-xs font-bold text-white font-mono">Create Automation Pipeline</h3>
             <form onSubmit={handleCreateRule} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Pipeline Name</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                  Pipeline Name
+                </label>
                 <input
                   type="text"
                   required
@@ -199,7 +226,9 @@ export function AutomationBuilder() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Event Trigger</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                  Event Trigger
+                </label>
                 <select
                   value={triggerType}
                   onChange={(e) => setTriggerType(e.target.value as any)}
@@ -213,7 +242,9 @@ export function AutomationBuilder() {
 
               {triggerType === 'on_tag_add' && (
                 <div>
-                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Target Tag</label>
+                  <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                    Target Tag
+                  </label>
                   <input
                     type="text"
                     value={triggerValue}
@@ -225,7 +256,9 @@ export function AutomationBuilder() {
               )}
 
               <div>
-                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">Autonomous Action</label>
+                <label className="block text-[10px] font-mono text-[#94A3B8] mb-1">
+                  Autonomous Action
+                </label>
                 <select
                   value={actionType}
                   onChange={(e) => setActionType(e.target.value as any)}

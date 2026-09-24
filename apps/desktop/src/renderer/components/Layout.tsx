@@ -5,13 +5,12 @@ import {
   Network,
   Search,
   Settings,
-  Zap,
+  Sparkles,
   ChevronRight,
   Radio,
   Brain,
-  Shield,
-  Upload,
   Activity,
+  Upload,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -37,7 +36,7 @@ function NavButton({
   isActive,
   onClick,
 }: {
-  item: typeof navItems[number];
+  item: (typeof navItems)[number];
   isActive: boolean;
   onClick: () => void;
 }) {
@@ -49,34 +48,34 @@ function NavButton({
       onClick={onClick}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
-      className={`relative w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-200 ease-out group ${
+      className={`relative w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 ease-out group ${
         isActive
-          ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.08]'
-          : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] border border-transparent'
+          ? 'bg-white/[0.12] text-white shadow-sm border border-white/[0.1]'
+          : 'text-[#86868B] hover:text-[#F5F5F7] hover:bg-white/[0.06] border border-transparent'
       }`}
       title={`${item.label} (Alt+${item.shortcut})`}
     >
-      {/* Active indicator bar — slides in */}
+      {/* Apple Blue active indicator bar */}
       <span
-        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-brand-emerald shadow-glow-emerald transition-all duration-200 ease-out-expo ${
+        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-[#0071E3] shadow-[0_0_8px_rgba(0,113,227,0.6)] transition-all duration-200 ease-out ${
           isActive ? 'h-4 opacity-100' : 'h-0 opacity-0'
         }`}
       />
       <Icon
         size={18}
         className={`transition-all duration-200 ${
-          isActive
-            ? 'text-brand-emerald-light scale-105'
-            : 'group-hover:scale-105 group-hover:text-zinc-200'
+          isActive ? 'text-white scale-105' : 'group-hover:scale-105 group-hover:text-[#F5F5F7]'
         }`}
       />
 
-      {/* Floating tooltip */}
+      {/* Apple Frosted Tooltip */}
       {showTooltip && (
-        <div className="absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 z-50 pointer-events-none animate-fade-in">
-          <div className="px-2.5 py-1.5 rounded-lg bg-surface-elevated border border-white/[0.1] shadow-elevated whitespace-nowrap flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-zinc-200">{item.label}</span>
-            <kbd className="text-[9px] px-1 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-zinc-500 font-mono">
+        <div className="absolute left-[calc(100%+10px)] top-1/2 -translate-y-1/2 z-50 pointer-events-none animate-in fade-in duration-150">
+          <div className="px-2.5 py-1.5 rounded-xl bg-[#1C1C22]/95 backdrop-blur-xl border border-white/[0.12] shadow-xl whitespace-nowrap flex items-center gap-2">
+            <span className="text-[11px] font-medium tracking-tight text-[#F5F5F7]">
+              {item.label}
+            </span>
+            <kbd className="text-[9px] px-1 py-0.5 rounded bg-white/[0.08] border border-white/[0.08] text-[#86868B] font-mono">
               Alt+{item.shortcut}
             </kbd>
           </div>
@@ -90,14 +89,14 @@ function BrandMark({ onClick }: { onClick: () => void }) {
   return (
     <div
       onClick={onClick}
-      className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-emerald/20 via-brand-primary/15 to-brand-emerald/5 border border-brand-emerald/25 flex items-center justify-center cursor-pointer hover:border-brand-emerald/50 transition-all duration-200 group relative no-drag"
-      title="Neuro — AI Second Brain"
+      className="w-10 h-10 rounded-2xl bg-gradient-to-br from-white/[0.1] to-white/[0.02] border border-white/[0.12] flex items-center justify-center cursor-pointer hover:border-[#0071E3]/60 hover:shadow-[0_0_20px_rgba(0,113,227,0.25)] transition-all duration-200 group relative no-drag"
+      title="Neuro — AI Workspace"
     >
-      {/* Outer pulse ring */}
-      <div className="absolute inset-0 rounded-xl bg-brand-emerald/10 animate-pulse-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
-      {/* Inner core */}
-      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-brand-emerald to-brand-primary flex items-center justify-center shadow-glow-emerald group-hover:scale-110 transition-transform duration-200">
-        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+      {/* Iridescent Apple Intelligence Core */}
+      <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0071E3] via-[#5E5CE6] to-[#BF5AF2] p-[1.5px] shadow-sm group-hover:scale-105 transition-transform duration-200">
+        <div className="w-full h-full rounded-full bg-[#000000] flex items-center justify-center">
+          <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+        </div>
       </div>
     </div>
   );
@@ -107,11 +106,14 @@ function AgentSummonButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full aspect-square rounded-xl bg-gradient-to-b from-brand-emerald/15 to-brand-primary/8 border border-brand-emerald/25 text-brand-emerald hover:border-brand-emerald/50 hover:shadow-glow-emerald transition-all duration-200 flex items-center justify-center group relative"
-      title="Summon Neuro Agent (Ctrl+Space / 'Hey Neuro')"
+      className="w-full aspect-square rounded-2xl bg-gradient-to-b from-[#0071E3]/20 via-[#5E5CE6]/15 to-transparent border border-[#0071E3]/30 hover:border-[#0071E3]/60 hover:shadow-[0_0_20px_rgba(0,113,227,0.3)] text-[#0A84FF] hover:text-white transition-all duration-200 flex items-center justify-center group relative"
+      title="Neuro Intelligence (Ctrl+Space / 'Hey Neuro')"
     >
-      <Zap size={17} className="group-hover:scale-110 transition-transform text-brand-emerald" />
-      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-brand-emerald animate-pulse shadow-glow-emerald" />
+      <Sparkles
+        size={16}
+        className="group-hover:scale-110 transition-transform text-[#0A84FF] group-hover:text-white"
+      />
+      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#0071E3] animate-pulse shadow-[0_0_8px_#0071E3]" />
     </button>
   );
 }
@@ -128,7 +130,7 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
         }
       }
     },
-    [onNavigate]
+    [onNavigate],
   );
 
   useEffect(() => {
@@ -141,16 +143,16 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
   const settingsItem = navItems.find((i) => i.id === 'settings')!;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background text-zinc-100 font-sans">
-      {/* ═══ Sidebar Navigation ═══ */}
-      <aside className="w-sidebar flex flex-col items-center bg-background-secondary border-r border-white/[0.06] z-30 flex-shrink-0 select-none titlebar-drag">
+    <div className="flex h-screen w-full overflow-hidden bg-[#000000] text-[#F5F5F7] font-sans">
+      {/* ═══ Apple macOS Translucent Sidebar ═══ */}
+      <aside className="w-sidebar flex flex-col items-center bg-[#0B0B0E]/85 backdrop-blur-2xl border-r border-white/[0.08] z-30 flex-shrink-0 select-none titlebar-drag">
         {/* Brand Mark */}
-        <div className="h-header flex items-center justify-center flex-shrink-0 border-b border-white/[0.04]">
+        <div className="h-header flex items-center justify-center flex-shrink-0 border-b border-white/[0.06]">
           <BrandMark onClick={() => onNavigate('notes')} />
         </div>
 
         {/* Primary Navigation */}
-        <nav className="flex flex-col gap-1 flex-1 w-full px-2.5 pt-3 no-drag overflow-y-auto">
+        <nav className="flex flex-col gap-1.5 flex-1 w-full px-2.5 pt-3 no-drag overflow-y-auto">
           {mainNavItems.map((item) => (
             <NavButton
               key={item.id}
@@ -162,11 +164,11 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
         </nav>
 
         {/* Bottom Section: Divider + Agent + Settings + Version */}
-        <div className="w-full px-2.5 pb-3 no-drag flex flex-col items-center gap-1.5">
+        <div className="w-full px-2.5 pb-3 no-drag flex flex-col items-center gap-2">
           {/* Subtle divider */}
-          <div className="w-8 h-px bg-white/[0.06] mb-1" />
+          <div className="w-8 h-px bg-white/[0.08] mb-0.5" />
 
-          {/* Agent summon */}
+          {/* Neuro Intelligence Summon */}
           <AgentSummonButton onClick={onOpenJarvis} />
 
           {/* Settings */}
@@ -177,28 +179,28 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
           />
 
           {/* Version pill */}
-          <div className="mt-1 px-2 py-0.5 rounded-pill text-[9px] font-mono text-zinc-600 select-none">
-            v0.1.1
+          <div className="mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono text-[#86868B] bg-white/[0.04] border border-white/[0.06] select-none">
+            v0.2.1
           </div>
         </div>
       </aside>
 
       {/* ═══ Main Content Area ═══ */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-background">
-        {/* Header Bar */}
-        <header className="h-header w-full titlebar-drag flex items-center justify-between px-4 border-b border-white/[0.05] bg-background-secondary/80 backdrop-blur-md select-none z-20 flex-shrink-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-[#000000]">
+        {/* Apple macOS Unified Header Bar */}
+        <header className="h-header w-full titlebar-drag flex items-center justify-between px-5 border-b border-white/[0.08] bg-[#0A0A0D]/75 backdrop-blur-2xl select-none z-20 flex-shrink-0">
           {/* Breadcrumb */}
-          <div className="no-drag flex items-center gap-2 text-[11px]">
-            <span className="text-zinc-300 font-semibold tracking-tight">Neuro</span>
-            <ChevronRight size={11} className="text-zinc-600" />
+          <div className="no-drag flex items-center gap-2 text-xs">
+            <span className="text-[#F5F5F7] font-semibold tracking-tight">Neuro</span>
+            <ChevronRight size={12} className="text-[#86868B]" />
             <div className="flex items-center gap-1.5">
               {(() => {
                 const activeItem = navItems.find((n) => n.id === currentPage);
                 const ActiveIcon = activeItem?.icon || FileText;
                 return (
                   <>
-                    <ActiveIcon size={12} className="text-zinc-500" />
-                    <span className="capitalize text-zinc-400 font-medium">
+                    <ActiveIcon size={13} className="text-[#0A84FF]" />
+                    <span className="capitalize text-[#A1A1A6] font-medium tracking-tight">
                       {activeItem?.label || currentPage}
                     </span>
                   </>
@@ -207,44 +209,47 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
             </div>
           </div>
 
-          {/* Center Command Pill */}
+          {/* Center Spotlight Command Pill */}
           <div className="no-drag">
             <button
               onClick={onOpenJarvis}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-button bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.1] text-zinc-400 hover:text-zinc-200 text-xs transition-all duration-150 group"
+              className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.09] hover:border-white/[0.16] text-[#A1A1A6] hover:text-[#F5F5F7] text-xs transition-all duration-150 group shadow-sm"
             >
-              <Search size={12} className="text-zinc-500 group-hover:text-brand-emerald transition-colors" />
-              <span className="text-[11px] font-sans">Command & Voice Agent...</span>
-              <kbd className="text-[9px] px-1.5 py-0.5 bg-black/30 rounded border border-white/[0.06] text-zinc-500 font-mono">
+              <Search
+                size={13}
+                className="text-[#86868B] group-hover:text-[#0A84FF] transition-colors"
+              />
+              <span className="text-xs font-normal tracking-tight">
+                Spotlight & Intelligence...
+              </span>
+              <kbd className="text-[10px] px-1.5 py-0.5 bg-black/40 rounded-md border border-white/[0.08] text-[#86868B] font-mono">
                 Ctrl+Space
               </kbd>
             </button>
           </div>
 
           {/* Right Status Cluster */}
-          <div className="no-drag flex items-center gap-2 text-[11px]">
+          <div className="no-drag flex items-center gap-2 text-xs">
             {/* Desktop Orb Button */}
             <button
               onClick={() => (window as any).electronAPI?.createOrbWindow()}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono hover:bg-emerald-900/30 hover:border-emerald-500/35 transition-all duration-150"
-              title="Spawn Floating Neon Desktop Orb"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-[#A1A1A6] hover:text-[#F5F5F7] text-[11px] font-medium transition-all"
+              title="Spawn Floating Desktop Orb"
             >
-              <Radio size={9} className="text-emerald-400 animate-pulse" />
+              <Radio size={10} className="text-[#30D158]" />
               <span>Orb</span>
             </button>
 
             {/* Engine Status */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-emerald-950/30 border border-emerald-500/15 text-emerald-400 text-[10px] font-mono">
-              <span className="status-dot-online" />
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#30D158]/10 border border-[#30D158]/20 text-[#30D158] text-[11px] font-medium tracking-tight">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#30D158] shadow-[0_0_6px_#30D158]" />
               <span>Ready</span>
             </div>
           </div>
         </header>
 
         {/* Page Content Viewport */}
-        <main className="flex-1 overflow-auto animate-fade-in">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto animate-fade-in bg-[#000000]">{children}</main>
       </div>
     </div>
   );

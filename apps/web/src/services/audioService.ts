@@ -99,7 +99,7 @@ class AudioService {
         cb({
           volume: normalized,
           isSpeaking: normalized > 0.15,
-        })
+        }),
       );
 
       this.animationFrameId = requestAnimationFrame(checkLevel);

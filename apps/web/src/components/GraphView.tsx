@@ -1,7 +1,18 @@
 import { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useGraph } from '../hooks/useGraph';
-import { Network, ZoomIn, ZoomOut, RefreshCw, Download, Search, Map, FileCode, Sparkles, X } from 'lucide-react';
+import {
+  Network,
+  ZoomIn,
+  ZoomOut,
+  RefreshCw,
+  Download,
+  Search,
+  Map,
+  FileCode,
+  Sparkles,
+  X,
+} from 'lucide-react';
 
 export default function GraphView() {
   const { data, isPending, error } = useGraph();
@@ -26,7 +37,7 @@ export default function GraphView() {
         });
       }
     };
-    
+
     window.addEventListener('resize', updateDimensions);
     setTimeout(updateDimensions, 100);
     return () => window.removeEventListener('resize', updateDimensions);
@@ -101,7 +112,9 @@ export default function GraphView() {
       nodes = nodes.filter((n: any) => n.name.toLowerCase().includes(q));
     }
     const nodeIds = new Set(nodes.map((n: any) => n.id));
-    const links = rawLinks.filter((l: any) => nodeIds.has(l.source.id || l.source) && nodeIds.has(l.target.id || l.target));
+    const links = rawLinks.filter(
+      (l: any) => nodeIds.has(l.source.id || l.source) && nodeIds.has(l.target.id || l.target),
+    );
 
     return { nodes, links };
   }, [rawNodes, rawLinks, typeFilter, searchQuery]);
@@ -138,7 +151,10 @@ export default function GraphView() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full bg-[#090A0F] overflow-hidden flex-grow relative">
+    <div
+      ref={containerRef}
+      className="w-full h-full bg-[#090A0F] overflow-hidden flex-grow relative"
+    >
       {/* Header & Filter Controls Overlay */}
       <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2 bg-[#0F1117] px-3 py-1.5 rounded-lg border border-[#1F2433] shadow-md">
         <div className="flex items-center gap-2">
@@ -240,11 +256,22 @@ export default function GraphView() {
       {selectedNode && (
         <div className="absolute bottom-3 left-3 z-10 bg-[#0F1117] p-3 rounded-lg border border-teal-500/40 max-w-xs text-xs space-y-1 shadow-xl">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-bold text-white text-xs truncate font-mono">{selectedNode.name}</span>
-            <button onClick={() => setSelectedNode(null)} className="text-[#64748B] hover:text-white font-bold">&times;</button>
+            <span className="font-bold text-white text-xs truncate font-mono">
+              {selectedNode.name}
+            </span>
+            <button
+              onClick={() => setSelectedNode(null)}
+              className="text-[#64748B] hover:text-white font-bold"
+            >
+              &times;
+            </button>
           </div>
-          <p className="text-[10px] text-teal-300 font-mono uppercase tracking-wider">{selectedNode.type || 'Note'}</p>
-          <p className="text-[10px] text-[#64748B]">Isolated subgraph ({activeNeighbors.size} connections)</p>
+          <p className="text-[10px] text-teal-300 font-mono uppercase tracking-wider">
+            {selectedNode.type || 'Note'}
+          </p>
+          <p className="text-[10px] text-[#64748B]">
+            Isolated subgraph ({activeNeighbors.size} connections)
+          </p>
         </div>
       )}
 
@@ -257,9 +284,14 @@ export default function GraphView() {
                 <div className="p-1 bg-[#18162B] border border-[#302856] rounded text-teal-400">
                   <Sparkles className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="font-bold text-white text-xs font-mono">Learning Path & Prerequisite DAG Generator</h3>
+                <h3 className="font-bold text-white text-xs font-mono">
+                  Learning Path & Prerequisite DAG Generator
+                </h3>
               </div>
-              <button onClick={() => setShowRoadmapModal(false)} className="text-[#64748B] hover:text-white font-mono text-xs">
+              <button
+                onClick={() => setShowRoadmapModal(false)}
+                className="text-[#64748B] hover:text-white font-mono text-xs"
+              >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -279,7 +311,11 @@ export default function GraphView() {
                   disabled={isGeneratingRoadmap || !roadmapGoal.trim()}
                   className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-50 text-white rounded-md text-xs font-mono font-medium flex items-center gap-1.5 transition-colors shadow-sm"
                 >
-                  {isGeneratingRoadmap ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                  {isGeneratingRoadmap ? (
+                    <RefreshCw className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3 h-3" />
+                  )}
                   Generate DAG
                 </button>
               </div>
@@ -288,8 +324,12 @@ export default function GraphView() {
                 <div className="space-y-3 pt-1">
                   <div className="flex items-center justify-between bg-[#090A0F] border border-[#1F2433] p-3 rounded-md">
                     <div>
-                      <h4 className="text-xs font-bold text-white font-mono">{roadmapData.subject}</h4>
-                      <p className="text-[10px] text-[#64748B] font-mono">Total estimated duration: ~{roadmapData.total_estimated_hours} hours</p>
+                      <h4 className="text-xs font-bold text-white font-mono">
+                        {roadmapData.subject}
+                      </h4>
+                      <p className="text-[10px] text-[#64748B] font-mono">
+                        Total estimated duration: ~{roadmapData.total_estimated_hours} hours
+                      </p>
                     </div>
                     <span className="text-[9px] font-mono px-1.5 py-0.5 bg-[#18162B] text-teal-300 rounded border border-[#302856]">
                       {roadmapData.nodes.length} Stages · {roadmapData.edges.length} Dependencies
@@ -297,25 +337,37 @@ export default function GraphView() {
                   </div>
 
                   <div className="space-y-2">
-                    <h5 className="text-[10px] font-mono uppercase tracking-wider text-[#64748B]">Sequential Learning Sequence</h5>
+                    <h5 className="text-[10px] font-mono uppercase tracking-wider text-[#64748B]">
+                      Sequential Learning Sequence
+                    </h5>
                     <div className="space-y-2">
                       {roadmapData.nodes.map((node: any, idx: number) => (
-                        <div key={node.id} className="p-3 bg-[#090A0F] border border-[#1F2433] rounded-md space-y-1 hover:border-[#2E364B] transition-colors">
+                        <div
+                          key={node.id}
+                          className="p-3 bg-[#090A0F] border border-[#1F2433] rounded-md space-y-1 hover:border-[#2E364B] transition-colors"
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="w-4 h-4 rounded bg-[#18162B] border border-[#302856] text-teal-300 text-[9px] font-bold flex items-center justify-center font-mono">
                                 {idx + 1}
                               </span>
-                              <span className="text-xs font-bold text-white font-mono">{node.title}</span>
+                              <span className="text-xs font-bold text-white font-mono">
+                                {node.title}
+                              </span>
                             </div>
-                            <span className="text-[10px] text-[#64748B] font-mono">~{node.estimated_hours}h</span>
+                            <span className="text-[10px] text-[#64748B] font-mono">
+                              ~{node.estimated_hours}h
+                            </span>
                           </div>
                           <p className="text-[11px] text-[#CBD5E1] pl-6">{node.summary}</p>
                           {node.prerequisites && node.prerequisites.length > 0 && (
                             <div className="flex items-center gap-1 pl-6 pt-1">
                               <span className="text-[9px] text-[#64748B] font-mono">Requires:</span>
                               {node.prerequisites.map((pId: string) => (
-                                <span key={pId} className="text-[9px] px-1.5 py-0.2 bg-[#141722] text-[#94A3B8] border border-[#1F2433] rounded font-mono">
+                                <span
+                                  key={pId}
+                                  className="text-[9px] px-1.5 py-0.2 bg-[#141722] text-[#94A3B8] border border-[#1F2433] rounded font-mono"
+                                >
                                   {pId}
                                 </span>
                               ))}
@@ -344,7 +396,7 @@ export default function GraphView() {
           if (!active) return 'rgba(20, 184, 166, 0.15)';
           const sId = link.source.id || link.source;
           const tId = link.target.id || link.target;
-          return (sId === active.id || tId === active.id)
+          return sId === active.id || tId === active.id
             ? 'rgba(20, 184, 166, 0.85)'
             : 'rgba(20, 184, 166, 0.03)';
         }}
@@ -353,7 +405,7 @@ export default function GraphView() {
           if (!active) return 1.2;
           const sId = link.source.id || link.source;
           const tId = link.target.id || link.target;
-          return (sId === active.id || tId === active.id) ? 2.5 : 0.5;
+          return sId === active.id || tId === active.id ? 2.5 : 0.5;
         }}
         backgroundColor="#090A0F"
         onNodeHover={setHoverNode}
@@ -362,12 +414,14 @@ export default function GraphView() {
           const label = node.name;
           const fontSize = 12 / globalScale;
           ctx.font = `${fontSize}px "Plus Jakarta Sans", sans-serif`;
-          
+
           const isNote = node.type === 'note';
           const nodeColor = isNote ? '#2DD4BF' : '#38BDF8';
           const nodeRadius = isNote ? 5.5 : 3.8;
-          
-          const isTargetActive = (selectedNode && selectedNode.id === node.id) || (hoverNode && hoverNode.id === node.id);
+
+          const isTargetActive =
+            (selectedNode && selectedNode.id === node.id) ||
+            (hoverNode && hoverNode.id === node.id);
           const isNeighbor = activeNeighbors.has(node.id);
           const isDimmed = activeNeighbors.size > 0 && !isNeighbor;
 
@@ -381,10 +435,17 @@ export default function GraphView() {
 
           // Draw node circle
           ctx.beginPath();
-          ctx.arc(node.x, node.y, isTargetActive ? nodeRadius * 1.5 : nodeRadius, 0, 2 * Math.PI, false);
+          ctx.arc(
+            node.x,
+            node.y,
+            isTargetActive ? nodeRadius * 1.5 : nodeRadius,
+            0,
+            2 * Math.PI,
+            false,
+          );
           ctx.fillStyle = isDimmed ? 'rgba(148, 163, 184, 0.15)' : nodeColor;
           ctx.fill();
-          
+
           if (isTargetActive) {
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1.4 / globalScale;
@@ -396,8 +457,14 @@ export default function GraphView() {
           ctx.textBaseline = 'top';
           ctx.fillStyle = isDimmed
             ? 'rgba(148, 163, 184, 0.2)'
-            : (isTargetActive ? 'rgba(255, 255, 255, 1)' : 'rgba(226, 232, 240, 0.75)');
-          ctx.fillText(label, node.x, node.y + (isTargetActive ? nodeRadius * 1.5 : nodeRadius) + 2);
+            : isTargetActive
+              ? 'rgba(255, 255, 255, 1)'
+              : 'rgba(226, 232, 240, 0.75)';
+          ctx.fillText(
+            label,
+            node.x,
+            node.y + (isTargetActive ? nodeRadius * 1.5 : nodeRadius) + 2,
+          );
         }}
       />
     </div>

@@ -142,7 +142,9 @@ export class BackendProcessManager {
       }
       await new Promise((r) => setTimeout(r, 400));
     }
-    console.warn('[Neuro] Backend did not respond within timeout, continuing with offline UI fallback.');
+    console.warn(
+      '[Neuro] Backend did not respond within timeout, continuing with offline UI fallback.',
+    );
     return false;
   }
 

@@ -8,97 +8,118 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Neural depth layers (organic gradient from deepest to lightest)
-        background: '#060810',
-        'background-secondary': '#0A0E16',
-        canvas: '#0C1018',
-        panel: '#101520',
-        'panel-hover': '#141A28',
-        surface: '#182030',
-        'surface-elevated': '#1E2838',
-        'surface-highlight': '#243040',
-        'surface-active': '#1A2E38',
+        // Apple Space Black & Midnight Depth Hierarchy
+        background: '#000000',
+        'background-secondary': '#0A0A0D',
+        canvas: '#101014',
+        panel: '#16161B',
+        'panel-hover': '#1F1F26',
+        surface: '#1C1C20',
+        'surface-elevated': '#28282F',
+        'surface-highlight': '#34343D',
+        'surface-active': '#22222A',
         
-        // Border system
+        // Apple Hairline Border System
         border: {
-          subtle: 'rgba(255, 255, 255, 0.04)',
+          subtle: 'rgba(255, 255, 255, 0.05)',
           DEFAULT: 'rgba(255, 255, 255, 0.08)',
-          strong: 'rgba(255, 255, 255, 0.14)',
-          focus: 'rgba(16, 185, 129, 0.5)',
+          strong: 'rgba(255, 255, 255, 0.16)',
+          focus: '#0071E3',
         },
         
-        // Text hierarchy
+        // Apple Human Interface Text Hierarchy
         text: {
-          primary: '#E8ECF0',
-          secondary: '#94A3B8',
-          tertiary: '#64748B',
-          muted: '#475569',
+          primary: '#F5F5F7',
+          secondary: '#A1A1A6',
+          tertiary: '#86868B',
+          muted: '#6E6E73',
         },
         
-        // Brand colors — Emerald + Gold neural identity
+        // Apple Brand Identity — Cupertino Blue & Siri / Apple Intelligence
         brand: {
-          primary: '#10B981',
-          'primary-light': '#34D399',
-          'primary-dark': '#059669',
-          secondary: '#FBBF24',
-          'secondary-light': '#FCD34D',
-          'secondary-dark': '#D97706',
-          glow: '#10B981',
+          primary: '#0071E3',
+          'primary-light': '#0A84FF',
+          'primary-dark': '#0058B6',
+          secondary: '#5E5CE6',
+          'secondary-light': '#7D7AFF',
+          'secondary-dark': '#4845B2',
+          glow: '#0071E3',
+          emerald: '#30D158',
+          'emerald-light': '#34C759',
         },
         
         accent: {
-          emerald: '#10B981',
-          teal: '#14B8A6',
-          gold: '#FBBF24',
-          amber: '#F59E0B',
+          blue: '#0071E3',
+          indigo: '#5E5CE6',
+          purple: '#BF5AF2',
+          mint: '#30D158',
+          teal: '#40C8E0',
+          amber: '#FF9F0A',
+          coral: '#FF453A',
         },
         
         status: {
-          success: '#10B981',
-          warning: '#FBBF24',
-          error: '#EF4444',
-          info: '#38BDF8',
+          success: '#30D158',
+          warning: '#FF9F0A',
+          error: '#FF453A',
+          info: '#0A84FF',
         },
         
-        // Neural-specific
-        neural: {
-          glow: 'rgba(16, 185, 129, 0.15)',
-          'glow-strong': 'rgba(16, 185, 129, 0.25)',
-          'glow-gold': 'rgba(251, 191, 36, 0.15)',
-          synapse: 'rgba(16, 185, 129, 0.4)',
-          dendrite: 'rgba(20, 184, 166, 0.3)',
+        // Apple Intelligence Iridescent Tokens
+        intelligence: {
+          glow: 'rgba(0, 113, 227, 0.15)',
+          'glow-strong': 'rgba(10, 132, 255, 0.3)',
+          violet: 'rgba(191, 90, 242, 0.2)',
+          siri: 'rgba(94, 92, 230, 0.35)',
         },
       },
       spacing: {
-        'sidebar': '72px',
-        'header': '44px',
+        'sidebar': '74px',
+        'header': '48px',
         'page-x': '2rem',
         'page-y': '1.5rem',
       },
       borderRadius: {
-        'card': '16px',
-        'button': '10px',
-        'input': '10px',
+        'card': '18px',
+        'card-lg': '24px',
+        'button': '9999px',
+        'input': '12px',
         'pill': '9999px',
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'Fira Code', 'monospace'],
+        sans: [
+          '"SF Pro Display"',
+          '"SF Pro Text"',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Inter',
+          '"Plus Jakarta Sans"',
+          'system-ui',
+          'sans-serif',
+        ],
+        mono: [
+          '"SF Mono"',
+          '"JetBrains Mono"',
+          'ui-monospace',
+          'Menlo',
+          'Monaco',
+          'Consolas',
+          'monospace',
+        ],
       },
       fontSize: {
         'xxs': ['0.625rem', { lineHeight: '0.875rem' }],
       },
       boxShadow: {
-        'glow-emerald': '0 0 24px -4px rgba(16, 185, 129, 0.3)',
-        'glow-emerald-lg': '0 0 40px -8px rgba(16, 185, 129, 0.25)',
-        'glow-gold': '0 0 24px -4px rgba(251, 191, 36, 0.2)',
-        'glow-teal': '0 0 20px -4px rgba(20, 184, 166, 0.2)',
-        'neural-pulse': '0 0 30px -5px rgba(16, 185, 129, 0.2), 0 0 60px -10px rgba(16, 185, 129, 0.1)',
-        'elevated': '0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(16, 185, 129, 0.06)',
-        'card': '0 4px 16px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04)',
-        'card-hover': '0 8px 28px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(16, 185, 129, 0.12)',
-        'inner-glow': 'inset 0 1px 0 0 rgba(16, 185, 129, 0.06)',
-        'neural-border': '0 0 0 1px rgba(16, 185, 129, 0.08)',
+        'glow-apple': '0 0 24px -4px rgba(0, 113, 227, 0.35)',
+        'glow-apple-lg': '0 0 44px -8px rgba(0, 113, 227, 0.3)',
+        'glow-emerald': '0 0 24px -4px rgba(48, 209, 88, 0.3)',
+        'glow-intelligence': '0 0 35px -5px rgba(94, 92, 230, 0.3), 0 0 70px -10px rgba(0, 113, 227, 0.2)',
+        'elevated': '0 16px 36px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+        'card': '0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+        'card-hover': '0 8px 30px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.14)',
+        'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
+        'apple-float': '0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12)',
       },
       animation: {
         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -107,13 +128,11 @@ export default {
         'slide-in-left': 'slideInLeft 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         'slide-up': 'slideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
         'slide-down': 'slideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-        'shimmer': 'shimmer 2s infinite linear',
-        'spin-slow': 'spin 3s linear infinite',
+        'shimmer': 'shimmer 2.5s infinite linear',
+        'spin-slow': 'spin 4s linear infinite',
         'bounce-subtle': 'bounceSoft 1s ease-in-out infinite',
-        'neural-pulse': 'neuralPulse 4s ease-in-out infinite',
+        'intelligence-pulse': 'intelligencePulse 3s ease-in-out infinite',
         'glow-breathe': 'glowBreathe 3s ease-in-out infinite',
-        'synapse-fire': 'synapseFire 0.6s ease-out',
-        'dendrite-grow': 'dendriteGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -121,7 +140,7 @@ export default {
           '100%': { opacity: '1' },
         },
         scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.96) translateY(4px)' },
+          '0%': { opacity: '0', transform: 'scale(0.97) translateY(4px)' },
           '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
         },
         slideInLeft: {
@@ -144,29 +163,23 @@ export default {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-2px)' },
         },
-        neuralPulse: {
-          '0%, 100%': { boxShadow: '0 0 20px -5px rgba(16, 185, 129, 0.15)' },
-          '50%': { boxShadow: '0 0 35px -5px rgba(16, 185, 129, 0.3)' },
+        intelligencePulse: {
+          '0%, 100%': { boxShadow: '0 0 25px -4px rgba(0, 113, 227, 0.25)' },
+          '50%': { boxShadow: '0 0 45px -4px rgba(94, 92, 230, 0.45)' },
         },
         glowBreathe: {
           '0%, 100%': { opacity: '0.6' },
           '50%': { opacity: '1' },
         },
-        synapseFire: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '50%': { transform: 'scale(1.02)' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        dendriteGrow: {
-          '0%': { transform: 'scaleX(0)', transformOrigin: 'left' },
-          '100%': { transform: 'scaleX(1)', transformOrigin: 'left' },
-        },
       },
       backdropBlur: {
         xs: '2px',
+        '2xl': '24px',
+        '3xl': '36px',
       },
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'apple-spring': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
       },
     },
   },

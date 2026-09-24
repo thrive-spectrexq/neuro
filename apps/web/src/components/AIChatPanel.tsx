@@ -1,5 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, FileText, RefreshCw, X, Terminal, Database, ChevronDown } from 'lucide-react';
+import {
+  Send,
+  Bot,
+  User,
+  Sparkles,
+  FileText,
+  RefreshCw,
+  X,
+  Terminal,
+  Database,
+  ChevronDown,
+} from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 interface Message {
@@ -73,7 +84,10 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: data.response || data.text || 'Analyzed your knowledge base. Here are the relevant findings.',
+        text:
+          data.response ||
+          data.text ||
+          'Analyzed your knowledge base. Here are the relevant findings.',
         sources: data.sources || [],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         modelUsed: selectedModel,
@@ -168,7 +182,9 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
                 <Bot className="w-3 h-3" />
               </div>
             )}
-            <div className={`max-w-[85%] flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+            <div
+              className={`max-w-[85%] flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+            >
               <div
                 className={`p-2.5 rounded-lg text-xs leading-relaxed ${
                   msg.sender === 'user'
@@ -190,7 +206,11 @@ export function AIChatPanel({ onClose }: { onClose?: () => void }) {
                           className="px-1.5 py-0.2 text-[9px] font-mono bg-[#141722] text-teal-300 rounded border border-[#242A3C] flex items-center gap-1"
                         >
                           {src.title}
-                          {src.score && <span className="text-[8px] text-[#64748B]">({Math.round(src.score * 100)}%)</span>}
+                          {src.score && (
+                            <span className="text-[8px] text-[#64748B]">
+                              ({Math.round(src.score * 100)}%)
+                            </span>
+                          )}
                         </span>
                       ))}
                     </div>

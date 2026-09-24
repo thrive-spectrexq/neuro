@@ -1,19 +1,19 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Sparkles, 
-  RotateCw, 
-  CheckCircle2, 
-  Layers, 
-  Trophy, 
-  BrainCircuit, 
-  Search, 
-  Plus, 
-  BookOpen, 
-  HelpCircle, 
-  Check, 
+import {
+  Sparkles,
+  RotateCw,
+  CheckCircle2,
+  Layers,
+  Trophy,
+  BrainCircuit,
+  Search,
+  Plus,
+  BookOpen,
+  HelpCircle,
+  Check,
   Flame,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
@@ -155,7 +155,7 @@ export function SpacedRepetitionStudio() {
   // Filtered Cards Deck
   const activeDeck = useMemo(() => {
     return cards.filter((card) => {
-      const matchesSearch = 
+      const matchesSearch =
         card.front.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.back.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.noteTitle.toLowerCase().includes(searchQuery.toLowerCase());
@@ -192,7 +192,10 @@ export function SpacedRepetitionStudio() {
       newReps = 0;
     }
 
-    newEase = Math.max(1.3, Number((newEase + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))).toFixed(2)));
+    newEase = Math.max(
+      1.3,
+      Number((newEase + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))).toFixed(2)),
+    );
     const nextDue = new Date();
     nextDue.setDate(nextDue.getDate() + newInterval);
 
@@ -208,8 +211,8 @@ export function SpacedRepetitionStudio() {
               dueDate: nextDue.toISOString(),
               lastReviewedAt: new Date().toISOString(),
             }
-          : c
-      )
+          : c,
+      ),
     );
 
     setIsFlipped(false);
@@ -268,7 +271,9 @@ export function SpacedRepetitionStudio() {
 
   const masteredCount = cards.filter((c) => c.repetitions >= 4).length;
   const learningCount = cards.filter((c) => c.repetitions < 4).length;
-  const dueCount = cards.filter((c) => new Date(c.dueDate) <= new Date() || c.repetitions === 0).length;
+  const dueCount = cards.filter(
+    (c) => new Date(c.dueDate) <= new Date() || c.repetitions === 0,
+  ).length;
   const retentionPct = cards.length > 0 ? Math.round((masteredCount / cards.length) * 100) : 100;
 
   return (
@@ -289,7 +294,9 @@ export function SpacedRepetitionStudio() {
                   </span>
                 </h2>
                 <p className="text-[10px] text-[#64748B] font-mono">
-                  Active recall deck parsed from <code className="text-teal-300 bg-[#141722] px-1 rounded">Question::Answer</code> and <code className="text-teal-300 bg-[#141722] px-1 rounded">==cloze==</code>
+                  Active recall deck parsed from{' '}
+                  <code className="text-teal-300 bg-[#141722] px-1 rounded">Question::Answer</code>{' '}
+                  and <code className="text-teal-300 bg-[#141722] px-1 rounded">==cloze==</code>
                 </p>
               </div>
             </div>
@@ -373,7 +380,11 @@ export function SpacedRepetitionStudio() {
         <div className="w-full flex flex-col md:flex-row items-center justify-between gap-2.5 mb-4">
           <div className="flex items-center gap-1 p-0.5 bg-[#090A0F] border border-[#1F2433] rounded-md">
             <button
-              onClick={() => { setFilterMode('due'); setCurrentCardIndex(0); setIsFlipped(false); }}
+              onClick={() => {
+                setFilterMode('due');
+                setCurrentCardIndex(0);
+                setIsFlipped(false);
+              }}
               className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'due'
                   ? 'bg-[#4F46E5] text-white shadow-sm'
@@ -383,7 +394,11 @@ export function SpacedRepetitionStudio() {
               Due ({dueCount})
             </button>
             <button
-              onClick={() => { setFilterMode('all'); setCurrentCardIndex(0); setIsFlipped(false); }}
+              onClick={() => {
+                setFilterMode('all');
+                setCurrentCardIndex(0);
+                setIsFlipped(false);
+              }}
               className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'all'
                   ? 'bg-[#4F46E5] text-white shadow-sm'
@@ -393,7 +408,11 @@ export function SpacedRepetitionStudio() {
               All ({cards.length})
             </button>
             <button
-              onClick={() => { setFilterMode('mastered'); setCurrentCardIndex(0); setIsFlipped(false); }}
+              onClick={() => {
+                setFilterMode('mastered');
+                setCurrentCardIndex(0);
+                setIsFlipped(false);
+              }}
               className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterMode === 'mastered'
                   ? 'bg-[#4F46E5] text-white shadow-sm'
@@ -421,7 +440,9 @@ export function SpacedRepetitionStudio() {
           <div className="w-full flex flex-col items-center gap-4">
             {/* Card Progress Indicator */}
             <div className="w-full flex items-center justify-between text-[11px] font-mono text-[#64748B]">
-              <span>Card {currentCardIndex + 1} of {activeDeck.length}</span>
+              <span>
+                Card {currentCardIndex + 1} of {activeDeck.length}
+              </span>
               <div className="flex items-center gap-1.5">
                 <span className="px-1.5 py-0.2 text-[9px] font-mono bg-[#090A0F] border border-[#1F2433] rounded text-slate-400">
                   Ease: {currentCard.easeFactor}x
@@ -501,7 +522,9 @@ export function SpacedRepetitionStudio() {
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-xs font-bold text-rose-400 font-mono">1. Again</span>
-                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1215] text-rose-300 rounded font-mono">1</kbd>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1215] text-rose-300 rounded font-mono">
+                        1
+                      </kbd>
                     </div>
                     <span className="text-[9px] text-[#64748B] font-mono">Reset (1d)</span>
                   </button>
@@ -512,9 +535,13 @@ export function SpacedRepetitionStudio() {
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-xs font-bold text-amber-400 font-mono">2. Hard</span>
-                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1B10] text-amber-300 rounded font-mono">2</kbd>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#2B1B10] text-amber-300 rounded font-mono">
+                        2
+                      </kbd>
                     </div>
-                    <span className="text-[9px] text-[#64748B] font-mono">Effort required (1d)</span>
+                    <span className="text-[9px] text-[#64748B] font-mono">
+                      Effort required (1d)
+                    </span>
                   </button>
 
                   <button
@@ -523,7 +550,9 @@ export function SpacedRepetitionStudio() {
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-xs font-bold text-sky-400 font-mono">3. Good</span>
-                      <kbd className="px-1 py-0.2 text-[9px] bg-[#121E2E] text-sky-300 rounded font-mono">3</kbd>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#121E2E] text-sky-300 rounded font-mono">
+                        3
+                      </kbd>
                     </div>
                     <span className="text-[9px] text-[#64748B] font-mono">Correct interval</span>
                   </button>
@@ -534,7 +563,9 @@ export function SpacedRepetitionStudio() {
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-xs font-bold text-emerald-400 font-mono">4. Easy</span>
-                      <kbd className="px-1 py-0.2 text-[9px] bg-[#102319] text-emerald-300 rounded font-mono">4</kbd>
+                      <kbd className="px-1 py-0.2 text-[9px] bg-[#102319] text-emerald-300 rounded font-mono">
+                        4
+                      </kbd>
                     </div>
                     <span className="text-[9px] text-[#64748B] font-mono">Instant mastery</span>
                   </button>
@@ -569,7 +600,10 @@ export function SpacedRepetitionStudio() {
               All cards due for review in this deck are completed.
             </p>
             <button
-              onClick={() => { setFilterMode('all'); setCurrentCardIndex(0); }}
+              onClick={() => {
+                setFilterMode('all');
+                setCurrentCardIndex(0);
+              }}
               className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-md text-xs font-mono font-medium transition-colors"
             >
               Review Full Deck
@@ -611,7 +645,9 @@ export function SpacedRepetitionStudio() {
             </div>
 
             <div>
-              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">Question / Prompt (Front)</label>
+              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">
+                Question / Prompt (Front)
+              </label>
               <textarea
                 value={newFront}
                 onChange={(e) => setNewFront(e.target.value)}
@@ -622,7 +658,9 @@ export function SpacedRepetitionStudio() {
             </div>
 
             <div>
-              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">Answer / Explanation (Back)</label>
+              <label className="text-[10px] font-mono text-[#94A3B8] block mb-1">
+                Answer / Explanation (Back)
+              </label>
               <textarea
                 value={newBack}
                 onChange={(e) => setNewBack(e.target.value)}

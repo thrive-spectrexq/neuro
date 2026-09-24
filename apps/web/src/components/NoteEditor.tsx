@@ -3,24 +3,24 @@ import CodeMirror from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { 
-  FileText, 
-  Save, 
-  Tag, 
-  Eye, 
-  Edit3, 
-  Columns, 
-  Check, 
-  List, 
-  Link2, 
-  Bold, 
-  Italic, 
-  Heading2, 
-  CheckSquare, 
-  Code, 
+import {
+  FileText,
+  Save,
+  Tag,
+  Eye,
+  Edit3,
+  Columns,
+  Check,
+  List,
+  Link2,
+  Bold,
+  Italic,
+  Heading2,
+  CheckSquare,
+  Code,
   Clock,
   Sparkles,
-  X
+  X,
 } from 'lucide-react';
 
 interface NoteEditorProps {
@@ -135,33 +135,77 @@ export function NoteEditor({
     return (
       <div className="p-4 space-y-2 text-[#CBD5E1] text-xs font-sans leading-relaxed">
         {lines.map((line, i) => {
-          if (line.startsWith('# ')) return <h1 key={i} className="text-base font-bold text-white border-b border-[#242A3C] pb-1 my-2 font-mono">{line.slice(2)}</h1>;
-          if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-semibold text-teal-300 border-b border-[#1E2333] pb-0.5 my-1.5 font-mono">{line.slice(3)}</h2>;
-          if (line.startsWith('### ')) return <h3 key={i} className="text-xs font-semibold text-sky-300 my-1 font-mono">{line.slice(4)}</h3>;
-          if (line.startsWith('- [ ] ')) return (
-            <div key={i} className="flex items-center gap-2 text-[#CBD5E1]">
-              <input type="checkbox" disabled className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500" />
-              <span>{line.slice(6)}</span>
-            </div>
-          );
-          if (line.startsWith('- [x] ')) return (
-            <div key={i} className="flex items-center gap-2 text-[#64748B] line-through">
-              <input type="checkbox" checked disabled className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500" />
-              <span>{line.slice(6)}</span>
-            </div>
-          );
-          if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 list-disc text-[#CBD5E1]">{line.slice(2)}</li>;
-          if (line.startsWith('> ')) return (
-            <blockquote key={i} className="border-l-2 border-teal-500 pl-2.5 py-0.5 text-[#94A3B8] italic bg-[#131622] rounded-r">
-              {line.slice(2)}
-            </blockquote>
-          );
+          if (line.startsWith('# '))
+            return (
+              <h1
+                key={i}
+                className="text-base font-bold text-white border-b border-[#242A3C] pb-1 my-2 font-mono"
+              >
+                {line.slice(2)}
+              </h1>
+            );
+          if (line.startsWith('## '))
+            return (
+              <h2
+                key={i}
+                className="text-sm font-semibold text-teal-300 border-b border-[#1E2333] pb-0.5 my-1.5 font-mono"
+              >
+                {line.slice(3)}
+              </h2>
+            );
+          if (line.startsWith('### '))
+            return (
+              <h3 key={i} className="text-xs font-semibold text-sky-300 my-1 font-mono">
+                {line.slice(4)}
+              </h3>
+            );
+          if (line.startsWith('- [ ] '))
+            return (
+              <div key={i} className="flex items-center gap-2 text-[#CBD5E1]">
+                <input
+                  type="checkbox"
+                  disabled
+                  className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500"
+                />
+                <span>{line.slice(6)}</span>
+              </div>
+            );
+          if (line.startsWith('- [x] '))
+            return (
+              <div key={i} className="flex items-center gap-2 text-[#64748B] line-through">
+                <input
+                  type="checkbox"
+                  checked
+                  disabled
+                  className="rounded border-[#2E354A] bg-[#090A0F] text-teal-500"
+                />
+                <span>{line.slice(6)}</span>
+              </div>
+            );
+          if (line.startsWith('- ') || line.startsWith('* '))
+            return (
+              <li key={i} className="ml-4 list-disc text-[#CBD5E1]">
+                {line.slice(2)}
+              </li>
+            );
+          if (line.startsWith('> '))
+            return (
+              <blockquote
+                key={i}
+                className="border-l-2 border-teal-500 pl-2.5 py-0.5 text-[#94A3B8] italic bg-[#131622] rounded-r"
+              >
+                {line.slice(2)}
+              </blockquote>
+            );
 
           // Inline Q::A highlight
           if (line.includes('::')) {
             const parts = line.split('::');
             return (
-              <div key={i} className="p-2 my-1 bg-[#161A28] border border-teal-500/30 rounded text-xs">
+              <div
+                key={i}
+                className="p-2 my-1 bg-[#161A28] border border-teal-500/30 rounded text-xs"
+              >
                 <span className="text-teal-300 font-semibold font-mono">Q: {parts[0]}</span>
                 <div className="text-slate-300 mt-0.5">A: {parts.slice(1).join('::')}</div>
               </div>
@@ -215,7 +259,9 @@ export function NoteEditor({
           <button
             onClick={() => setViewMode('edit')}
             className={`p-1 rounded text-xs transition-colors ${
-              viewMode === 'edit' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
+              viewMode === 'edit'
+                ? 'bg-[#242A3C] text-white'
+                : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
             title="Editor Only"
           >
@@ -224,7 +270,9 @@ export function NoteEditor({
           <button
             onClick={() => setViewMode('split')}
             className={`p-1 rounded text-xs transition-colors ${
-              viewMode === 'split' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
+              viewMode === 'split'
+                ? 'bg-[#242A3C] text-white'
+                : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
             title="Split Editor & Preview"
           >
@@ -233,7 +281,9 @@ export function NoteEditor({
           <button
             onClick={() => setViewMode('preview')}
             className={`p-1 rounded text-xs transition-colors ${
-              viewMode === 'preview' ? 'bg-[#242A3C] text-white' : 'text-[#64748B] hover:text-[#CBD5E1]'
+              viewMode === 'preview'
+                ? 'bg-[#242A3C] text-white'
+                : 'text-[#64748B] hover:text-[#CBD5E1]'
             }`}
             title="Rendered Preview"
           >
@@ -245,7 +295,9 @@ export function NoteEditor({
         <button
           onClick={() => setShowOutline(!showOutline)}
           className={`p-1.5 rounded-md border text-xs transition-colors ${
-            showOutline ? 'bg-[#1D2230] text-teal-300 border-teal-500/40' : 'border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#181C26]'
+            showOutline
+              ? 'bg-[#1D2230] text-teal-300 border-teal-500/40'
+              : 'border-[#242A3C] text-[#64748B] hover:text-white hover:bg-[#181C26]'
           }`}
           title="Document Outline"
         >
@@ -428,7 +480,10 @@ export function NoteEditor({
                 </h4>
                 <div className="space-y-1">
                   {wikiLinks.map((link) => (
-                    <div key={link} className="flex items-center gap-1 text-[11px] font-mono text-teal-300 truncate">
+                    <div
+                      key={link}
+                      className="flex items-center gap-1 text-[11px] font-mono text-teal-300 truncate"
+                    >
                       <Link2 className="w-2.5 h-2.5 text-teal-400" />
                       <span>{link}</span>
                     </div>

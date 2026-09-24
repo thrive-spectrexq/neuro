@@ -25,10 +25,7 @@ class AgentClient {
     }
   }
 
-  async streamSuggestion(
-    options: StreamQueryOptions,
-    callbacks: StreamCallbacks
-  ): Promise<void> {
+  async streamSuggestion(options: StreamQueryOptions, callbacks: StreamCallbacks): Promise<void> {
     this.cancelCurrentStream();
 
     this.activeAbortController = new AbortController();
@@ -96,8 +93,12 @@ class AgentClient {
         callbacks.onDone?.();
       } else {
         const data = await response.json();
-        const fullText = data.response || data.text || data.reply || (typeof data === 'string' ? data : JSON.stringify(data));
-        
+        const fullText =
+          data.response ||
+          data.text ||
+          data.reply ||
+          (typeof data === 'string' ? data : JSON.stringify(data));
+
         const suggestion: AgentSuggestion = {
           id: `sug_${Date.now()}`,
           type: 'completion',

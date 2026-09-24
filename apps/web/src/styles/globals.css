@@ -2,209 +2,262 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   NEURO WEB DESIGN SYSTEM — Apple Human Interface (v0.2.1)
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
-    --bg-root: #060810;
-    --bg-surface-1: #0C1018;
-    --bg-surface-2: #101520;
-    --bg-surface-3: #182030;
-    --bg-surface-hover: #141A28;
-    --bg-surface-active: #1A2E38;
-    
-    --border-subtle: rgba(255, 255, 255, 0.04);
-    --border-default: rgba(255, 255, 255, 0.08);
-    --border-focus: rgba(16, 185, 129, 0.5);
-    --border-accent: #10B981;
+    --bg-root: #000000;
+    --bg-surface-1: #0f0f12;
+    --bg-surface-2: #16161b;
+    --bg-surface-3: #1e1e24;
+    --bg-surface-hover: #26262f;
+    --bg-surface-active: #2c2c38;
 
-    --text-primary: #E8ECF0;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --text-dim: #475569;
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-focus: #0071e3;
+    --border-accent: #0a84ff;
+
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-muted: #86868b;
+    --text-dim: #6e6e73;
   }
 
   body {
     background-color: var(--bg-root);
     color: var(--text-primary);
-    font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    letter-spacing: -0.01em;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui,
+      sans-serif;
+    letter-spacing: -0.012em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
   }
 
-  code, kbd, pre, samp {
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+  }
+
+  /* Focus ring */
+  *:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px rgba(0, 113, 227, 0.6),
+      0 0 0 4px rgba(0, 113, 227, 0.15);
   }
 }
 
-/* Professional Solid Surfaces */
+/* ─── Apple Surfaces & Cards ─── */
 .pro-surface-1 {
-  background-color: #0C1018;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background-color: rgba(22, 22, 26, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .pro-surface-2 {
-  background-color: #101520;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background-color: rgba(26, 26, 32, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .pro-surface-3 {
-  background-color: #182030;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(32, 32, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .pro-card {
-  background-color: #101520;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  background-color: rgba(22, 22, 26, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.5);
 }
 
 .pro-card:hover {
-  background-color: #141A28;
-  border-color: rgba(16, 185, 129, 0.2);
+  background-color: rgba(28, 28, 34, 0.9);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.65);
+  transform: translateY(-1px);
 }
 
 .pro-card-active {
-  background-color: #1A2E38;
-  border-color: #10B981;
+  background-color: rgba(30, 30, 38, 0.95);
+  border-color: #0071e3;
 }
 
-/* Crisp Button Hierarchy */
+/* ─── Apple Button Hierarchy ─── */
 .pro-button-primary {
-  background-color: #10B981;
-  color: #FFFFFF;
-  border: 1px solid #10B981;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: #0071e3;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   font-weight: 500;
-  border-radius: 8px;
-  padding: 6px 14px;
-  transition: all 0.12s ease;
-  box-shadow: 0 0 24px -4px rgba(16, 185, 129, 0.3);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .pro-button-primary:hover {
-  background-color: #34D399;
-  border-color: #34D399;
-  color: #FEF3C7; /* Amber 100 */
+  background-color: #0077ed;
+  box-shadow:
+    0 0 20px -2px rgba(0, 113, 227, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .pro-button-primary:active {
-  background-color: #059669;
-  transform: translateY(0.5px);
+  background-color: #0058b6;
+  transform: scale(0.98);
 }
 
 .pro-button-secondary {
-  background-color: rgba(255, 255, 255, 0.04);
-  color: #CBD5E1;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #f5f5f7;
+  border: 1px solid rgba(255, 255, 255, 0.09);
   font-weight: 500;
-  border-radius: 8px;
-  padding: 6px 12px;
-  transition: all 0.12s ease;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pro-button-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .pro-button-secondary:active {
-  background-color: rgba(16, 185, 129, 0.1);
+  transform: scale(0.98);
 }
 
 .pro-button-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: transparent;
-  color: #94A3B8;
+  color: #a1a1a6;
   border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 5px 10px;
-  transition: all 0.12s ease;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease;
 }
 
 .pro-button-ghost:hover {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #10B981;
-  border-color: transparent;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #f5f5f7;
 }
 
 .pro-button-danger {
-  background-color: rgba(244, 63, 94, 0.1);
-  border: 1px solid rgba(244, 63, 94, 0.2);
-  color: #FB7185;
-  border-radius: 8px;
-  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 69, 58, 0.12);
+  border: 1px solid rgba(255, 69, 58, 0.25);
+  color: #ff453a;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease;
 }
 
 .pro-button-danger:hover {
-  background-color: rgba(244, 63, 94, 0.2);
-  border-color: rgba(244, 63, 94, 0.4);
-  color: #FFE4E6;
+  background-color: rgba(255, 69, 58, 0.2);
+  border-color: rgba(255, 69, 58, 0.4);
+  color: #ff6961;
 }
 
-/* Professional Input Fields */
+/* ─── Apple Inputs ─── */
 .pro-input {
-  background-color: #0A0E16;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #E8ECF0;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #f5f5f7;
+  border-radius: 12px;
   font-size: 13px;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  transition: all 0.15s ease;
 }
 
 .pro-input:focus {
   outline: none;
-  border-color: #10B981;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
-  background-color: #101520;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: #0071e3;
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.35);
 }
 
 .pro-input::placeholder {
-  color: #64748B;
+  color: #86868b;
 }
 
-/* Precision Badges & Keyboard Tags */
+/* ─── Apple Badges & Keyboard Tags ─── */
 .pro-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 7px;
+  padding: 2px 8px;
   font-size: 11px;
   font-weight: 500;
-  border-radius: 5px;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 113, 227, 0.25);
+  background-color: rgba(0, 113, 227, 0.12);
+  color: #0a84ff;
 }
 
 .pro-kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1px 5px;
+  padding: 1px 6px;
   font-size: 10px;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-weight: 600;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: rgba(255, 255, 255, 0.04);
-  color: #94A3B8;
+  font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #a1a1a6;
 }
 
-/* Clean Custom Scrollbars */
+/* ─── Apple Precision Minimal Scrollbars ─── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -215,17 +268,17 @@
   scrollbar-width: none;
 }
 
-/* Grid & Canvas Backgrounds */
+/* ─── Apple Subtle Background Grids ─── */
 .pro-dot-grid {
-  background-color: #060810;
-  background-image: radial-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
-  background-size: 18px 18px;
+  background-color: #000000;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .pro-line-grid {
-  background-color: #060810;
-  background-image: 
-    linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-color: #000000;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }

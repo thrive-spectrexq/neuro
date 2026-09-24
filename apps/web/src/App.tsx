@@ -13,14 +13,14 @@ import { useUIStore, ActiveTab } from './stores/uiStore';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from './services/apiClient';
 import {
-  Network, 
-  LayoutGrid, 
-  CheckSquare, 
-  ShieldCheck, 
-  Zap, 
-  Shield, 
-  Search, 
-  FolderPlus, 
+  Network,
+  LayoutGrid,
+  CheckSquare,
+  ShieldCheck,
+  Zap,
+  Shield,
+  Search,
+  FolderPlus,
   Globe,
   GraduationCap,
   HardDrive,
@@ -29,21 +29,35 @@ import {
   Sliders,
   LogOut,
   FolderGit2,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 
 // Code-split heavy studios for faster initial load
-const TaskKanbanBoard = lazy(() => import('./components/TaskKanbanBoard').then(m => ({ default: m.TaskKanbanBoard })));
-const VaultCanvasStudio = lazy(() => import('./components/VaultCanvasStudio').then(m => ({ default: m.VaultCanvasStudio })));
-const SpacedRepetitionStudio = lazy(() => import('./components/SpacedRepetitionStudio').then(m => ({ default: m.SpacedRepetitionStudio })));
-const VaultLintStudio = lazy(() => import('./components/VaultLintStudio').then(m => ({ default: m.VaultLintStudio })));
-const AutomationBuilder = lazy(() => import('./components/AutomationBuilder').then(m => ({ default: m.AutomationBuilder })));
-const AuditLogViewer = lazy(() => import('./components/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
+const TaskKanbanBoard = lazy(() =>
+  import('./components/TaskKanbanBoard').then((m) => ({ default: m.TaskKanbanBoard })),
+);
+const VaultCanvasStudio = lazy(() =>
+  import('./components/VaultCanvasStudio').then((m) => ({ default: m.VaultCanvasStudio })),
+);
+const SpacedRepetitionStudio = lazy(() =>
+  import('./components/SpacedRepetitionStudio').then((m) => ({
+    default: m.SpacedRepetitionStudio,
+  })),
+);
+const VaultLintStudio = lazy(() =>
+  import('./components/VaultLintStudio').then((m) => ({ default: m.VaultLintStudio })),
+);
+const AutomationBuilder = lazy(() =>
+  import('./components/AutomationBuilder').then((m) => ({ default: m.AutomationBuilder })),
+);
+const AuditLogViewer = lazy(() =>
+  import('./components/AuditLogViewer').then((m) => ({ default: m.AuditLogViewer })),
+);
 
 const StudioLoadingSkeleton: React.FC<{ title: string }> = ({ title }) => (
-  <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#090A0F] text-[#64748B]">
-    <Loader2 className="w-6 h-6 animate-spin text-teal-500 mb-2" />
+  <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#000000] text-[#86868B]">
+    <Loader2 className="w-6 h-6 animate-spin text-[#0A84FF] mb-2" />
     <span className="text-xs font-mono">Loading {title}...</span>
   </div>
 );
@@ -104,71 +118,77 @@ export default function App() {
   ];
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#090A0F] text-[#F1F5F9] font-sans select-none overflow-hidden">
-      {/* 1. Pro Workstation Header Bar */}
-      <header className="h-12 flex-shrink-0 bg-[#0F1117] border-b border-[#1F2433] flex items-center justify-between px-4 z-30">
+    <div className="h-screen w-screen flex flex-col bg-[#000000] text-[#F5F5F7] font-sans select-none overflow-hidden">
+      {/* 1. Apple macOS Sequoia Style Toolbar */}
+      <header className="h-12 flex-shrink-0 bg-[#0A0A0D]/80 backdrop-blur-2xl border-b border-white/[0.08] flex items-center justify-between px-5 z-30">
         {/* Left: Vault Identity & Breadcrumbs */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white shadow-sm">
-              <FolderGit2 className="w-4 h-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#0071E3] via-[#5E5CE6] to-[#BF5AF2] flex items-center justify-center text-white shadow-sm p-[1.5px]">
+              <div className="w-full h-full rounded-[10px] bg-black flex items-center justify-center">
+                <FolderGit2 className="w-3.5 h-3.5 text-[#0A84FF]" />
+              </div>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-semibold">
-              <span className="text-white font-mono tracking-tight">Neuro</span>
-              <span className="text-[#64748B]">/</span>
-              <span className="text-[#94A3B8] font-mono text-[11px] bg-[#161A24] px-2 py-0.5 rounded border border-[#242A3C]">
+              <span className="text-[#F5F5F7] font-medium tracking-tight">Neuro</span>
+              <span className="text-[#86868B]">/</span>
+              <span className="text-[#A1A1A6] font-mono text-[11px] bg-white/[0.06] px-2 py-0.5 rounded-full border border-white/[0.08]">
                 vault-main
               </span>
             </div>
           </div>
 
-          <div className="h-4 w-px bg-[#202636]" />
+          <div className="h-4 w-px bg-white/[0.08]" />
 
           {/* Sync Status Badge */}
-          <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 bg-[#121622] border border-[#202636] rounded-md text-[11px] font-mono text-[#94A3B8]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-emerald-400 font-medium">Synced</span>
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 bg-white/[0.05] border border-white/[0.08] rounded-full text-[11px] font-medium text-[#A1A1A6]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#30D158] shadow-[0_0_6px_#30D158]" />
+            <span className="text-[#30D158] font-medium">Synced</span>
           </div>
         </div>
 
-        {/* Center: Command Palette Trigger */}
+        {/* Center: Spotlight Command Palette Trigger */}
         <div className="flex-1 max-w-md mx-4">
           <button
             onClick={() => setCommandPaletteOpen(true)}
-            className="w-full h-8 px-3 bg-[#141722] hover:bg-[#1A1E2B] border border-[#242A3C] hover:border-[#38415C] rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center justify-between text-xs group"
+            className="w-full h-8 px-4 bg-white/[0.06] hover:bg-white/[0.09] border border-white/[0.09] hover:border-white/[0.16] rounded-full text-[#86868B] hover:text-[#F5F5F7] transition-all flex items-center justify-between text-xs group shadow-sm"
           >
             <div className="flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-[#64748B] group-hover:text-teal-400 transition-colors" />
-              <span>Search vault, commands, or jump to note...</span>
+              <Search className="w-3.5 h-3.5 text-[#86868B] group-hover:text-[#0A84FF] transition-colors" />
+              <span className="font-normal tracking-tight">
+                Search vault, commands, or jump to note...
+              </span>
             </div>
             <div className="flex items-center gap-1">
-              <kbd className="pro-kbd">⌘K</kbd>
+              <kbd className="text-[10px] font-mono text-[#86868B] bg-black/40 px-1.5 py-0.5 rounded border border-white/[0.08]">
+                ⌘K
+              </kbd>
             </div>
           </button>
         </div>
 
         {/* Right: Quick Tools, System Indicator & Account */}
         <div className="flex items-center gap-2">
-          {/* Quick Action Icon Buttons */}
+          {/* Quick Action Pill Buttons */}
           <button
             onClick={() => setShowImportHub(true)}
-            className="h-8 px-2.5 bg-[#141722] hover:bg-[#1D2230] border border-[#242A3C] rounded-lg text-[#94A3B8] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
+            className="h-7 px-3 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-full text-[#A1A1A6] hover:text-white transition-all flex items-center gap-1.5 text-xs font-medium"
             title="Import Markdown, Obsidian or Notion"
           >
-            <FolderPlus className="w-3.5 h-3.5 text-teal-400" />
+            <FolderPlus className="w-3.5 h-3.5 text-[#0A84FF]" />
             <span className="hidden sm:inline">Import</span>
           </button>
 
           <button
             onClick={() => setShowWebClipper(true)}
-            className="h-8 px-2.5 bg-[#141722] hover:bg-[#1D2230] border border-[#242A3C] rounded-lg text-[#94A3B8] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
+            className="h-7 px-3 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-full text-[#A1A1A6] hover:text-white transition-all flex items-center gap-1.5 text-xs font-medium"
             title="Web Clipper"
           >
-            <Globe className="w-3.5 h-3.5 text-sky-400" />
+            <Globe className="w-3.5 h-3.5 text-[#5E5CE6]" />
             <span className="hidden sm:inline">Clip</span>
           </button>
 
-          <div className="h-4 w-px bg-[#202636]" />
+          <div className="h-4 w-px bg-white/[0.08]" />
 
           {/* Contextual System & Assistant Indicator */}
           <SystemIndicator />
@@ -176,7 +196,7 @@ export default function App() {
           {/* Sign Out */}
           <button
             onClick={logout}
-            className="h-8 w-8 flex items-center justify-center bg-[#141722] hover:bg-[#2D141A] border border-[#242A3C] hover:border-[#4D1D28] text-[#94A3B8] hover:text-[#FB7185] rounded-lg transition-colors"
+            className="h-7 w-7 flex items-center justify-center bg-white/[0.06] hover:bg-[#FF453A]/15 border border-white/[0.08] hover:border-[#FF453A]/30 text-[#86868B] hover:text-[#FF453A] rounded-full transition-colors"
             title="Sign Out of Vault"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -184,9 +204,9 @@ export default function App() {
         </div>
       </header>
 
-      {/* 2. Workspace View Tabs Bar */}
-      <div className="h-10 flex-shrink-0 bg-[#0C0E14] border-b border-[#1A1F2C] px-4 flex items-center justify-between">
-        <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+      {/* 2. Apple Segmented Control Navigation Bar */}
+      <div className="h-11 flex-shrink-0 bg-[#000000] border-b border-white/[0.06] px-5 flex items-center justify-between">
+        <nav className="flex items-center bg-white/[0.04] p-0.5 rounded-full border border-white/[0.07] overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -194,25 +214,25 @@ export default function App() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`h-7 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all relative ${
+                className={`h-7 px-3.5 rounded-full text-xs font-medium tracking-tight flex items-center gap-2 transition-all duration-150 relative ${
                   isActive
-                    ? 'bg-[#181C28] text-white border border-[#2F374E]'
-                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#12151E]'
+                    ? 'bg-white/[0.14] text-white shadow-sm border border-white/[0.1]'
+                    : 'text-[#86868B] hover:text-[#F5F5F7]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-teal-400' : 'text-[#64748B]'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#0A84FF]' : 'text-[#86868B]'}`} />
                 <span>{item.label}</span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                  <span className="w-1 h-1 rounded-full bg-[#0A84FF] shadow-[0_0_4px_#0A84FF]" />
                 )}
               </button>
             );
           })}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono text-[#64748B]">
-          <span className="flex items-center gap-1">
-            <Radio className="w-3 h-3 text-emerald-400" />
+        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono text-[#86868B]">
+          <span className="flex items-center gap-1.5">
+            <Radio className="w-3 h-3 text-[#30D158]" />
             <span>Local Engine 0.8ms</span>
           </span>
           <span>•</span>
@@ -221,18 +241,18 @@ export default function App() {
       </div>
 
       {/* 3. Main Central Workspace Area */}
-      <div className="flex-1 flex overflow-hidden bg-[#090A0F]">
+      <div className="flex-1 flex overflow-hidden bg-[#000000]">
         {/* Active Module Panel */}
         <main className="flex-1 flex overflow-hidden">
           {activeTab === 'graph' && (
             <div className="flex-1 flex overflow-hidden">
               {/* Left Pane: Create & Edit Note Form */}
-              <div className="w-[440px] flex-shrink-0 border-r border-[#1C202C] bg-[#0E1017] p-3 overflow-hidden">
+              <div className="w-[440px] flex-shrink-0 border-r border-white/[0.08] bg-[#0A0A0D] p-3 overflow-hidden">
                 <CreateNoteForm />
               </div>
 
               {/* Right Pane: Graph Visualization Canvas */}
-              <div className="flex-1 relative bg-[#090A0F] overflow-hidden">
+              <div className="flex-1 relative bg-[#000000] overflow-hidden">
                 <GraphView />
               </div>
             </div>
@@ -240,7 +260,7 @@ export default function App() {
 
           {activeTab === 'canvas' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Canvas Studio" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <VaultCanvasStudio />
               </div>
             </Suspense>
@@ -248,7 +268,7 @@ export default function App() {
 
           {activeTab === 'tasks' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Task Board" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <TaskKanbanBoard />
               </div>
             </Suspense>
@@ -256,7 +276,7 @@ export default function App() {
 
           {activeTab === 'study' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Study & Recall" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <SpacedRepetitionStudio />
               </div>
             </Suspense>
@@ -264,7 +284,7 @@ export default function App() {
 
           {activeTab === 'diagnostics' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Diagnostics Studio" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <VaultLintStudio />
               </div>
             </Suspense>
@@ -272,7 +292,7 @@ export default function App() {
 
           {activeTab === 'automations' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Automation Builder" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <AutomationBuilder />
               </div>
             </Suspense>
@@ -280,7 +300,7 @@ export default function App() {
 
           {activeTab === 'audit' && (
             <Suspense fallback={<StudioLoadingSkeleton title="Audit Log Viewer" />}>
-              <div className="flex-1 h-full overflow-hidden bg-[#090A0F]">
+              <div className="flex-1 h-full overflow-hidden bg-[#000000]">
                 <AuditLogViewer />
               </div>
             </Suspense>
@@ -291,27 +311,31 @@ export default function App() {
         <AssistantDrawer />
       </div>
 
-      {/* 4. Professional Workstation Status Bar (Footer) */}
-      <footer className="h-6 flex-shrink-0 bg-[#0B0C12] border-t border-[#1C202C] px-3 flex items-center justify-between text-[11px] font-mono text-[#64748B] z-30">
+      {/* 4. Apple Minimalist Status Bar (Footer) */}
+      <footer className="h-6 flex-shrink-0 bg-[#070709] border-t border-white/[0.06] px-4 flex items-center justify-between text-[11px] font-mono text-[#86868B] z-30">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <HardDrive className="w-3 h-3 text-teal-400" />
+          <div className="flex items-center gap-1.5 text-[#A1A1A6]">
+            <HardDrive className="w-3 h-3 text-[#0A84FF]" />
             <span>neuro-vault: ~/notes</span>
           </div>
-          <span className="text-[#282E40]">|</span>
-          <div>Total Notes: <span className="text-slate-200">{notes.length}</span></div>
-          <span className="text-[#282E40]">|</span>
-          <div className="flex items-center gap-1">
-            <Cpu className="w-3 h-3 text-emerald-400" />
+          <span className="text-white/[0.1]">|</span>
+          <div>
+            Total Notes: <span className="text-[#F5F5F7]">{notes.length}</span>
+          </div>
+          <span className="text-white/[0.1]">|</span>
+          <div className="flex items-center gap-1.5">
+            <Cpu className="w-3 h-3 text-[#30D158]" />
             <span>Parser: Fast Markdown BM25</span>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div>Encoding: <span className="text-slate-300">UTF-8</span></div>
-          <span className="text-[#282E40]">|</span>
-          <div className="flex items-center gap-1 text-slate-300">
-            <Sliders className="w-3 h-3 text-sky-400" />
+          <div>
+            Encoding: <span className="text-[#A1A1A6]">UTF-8</span>
+          </div>
+          <span className="text-white/[0.1]">|</span>
+          <div className="flex items-center gap-1.5 text-[#A1A1A6]">
+            <Sliders className="w-3 h-3 text-[#0A84FF]" />
             <span>Zero-Cloud Mode</span>
           </div>
         </div>

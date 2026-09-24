@@ -1,29 +1,41 @@
 import React from 'react';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'flat' | 'bordered' | 'subtle';
+  variant?: 'flat' | 'bordered' | 'subtle' | 'glass';
   density?: 'compact' | 'normal' | 'relaxed';
   interactive?: boolean;
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className = '', variant = 'bordered', density = 'normal', interactive = false, children, ...props }, ref) => {
-    const baseStyles = 'rounded-lg transition-colors duration-150';
+  (
+    {
+      className = '',
+      variant = 'bordered',
+      density = 'normal',
+      interactive = false,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const baseStyles = 'rounded-2xl transition-all duration-200 ease-out';
 
     const variants = {
-      flat: 'bg-[#0F1117] border border-transparent',
-      bordered: 'bg-[#0F1117] border border-[#1F2433] text-[#F1F5F9]',
-      subtle: 'bg-[#151821] border border-[#242A3C] text-[#F1F5F9]',
+      flat: 'bg-white/[0.03] border border-transparent text-[#F5F5F7]',
+      bordered:
+        'bg-[#16161A]/80 backdrop-blur-xl border border-white/[0.08] text-[#F5F5F7] shadow-[0_2px_10px_-2px_rgba(0,0,0,0.5)]',
+      subtle: 'bg-white/[0.05] backdrop-blur-2xl border border-white/[0.1] text-[#F5F5F7]',
+      glass: 'bg-black/40 backdrop-blur-3xl border border-white/[0.12] text-[#F5F5F7] shadow-xl',
     };
 
     const densities = {
-      compact: 'p-2.5',
-      normal: 'p-4',
+      compact: 'p-3',
+      normal: 'p-4.5',
       relaxed: 'p-6',
     };
 
     const interactiveStyles = interactive
-      ? 'hover:bg-[#161A24] hover:border-[#2F374E] cursor-pointer'
+      ? 'hover:bg-white/[0.08] hover:border-white/[0.16] hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 cursor-pointer active:scale-[0.99]'
       : '';
 
     return (
@@ -35,7 +47,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         {children}
       </div>
     );
-  }
+  },
 );
 
 Card.displayName = 'Card';

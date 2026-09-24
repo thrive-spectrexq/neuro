@@ -39,451 +39,539 @@ export function useJarvisAgent() {
   const silenceStartRef = useRef<number | null>(null);
 
   // Synthesize Speech
-  const speakResponse = useCallback((text: string) => {
-    if (isMuted || !text) return;
-    try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.05;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.9;
+  const speakResponse = useCallback(
+    (text: string) => {
+      if (isMuted || !text) return;
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 1.05;
+          utterance.pitch = 1.0;
+          utterance.volume = 0.9;
 
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => 
-          (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('George')) && v.lang.startsWith('en')
-        );
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice = voices.find(
+            (v) =>
+              (v.name.includes('Natural') ||
+                v.name.includes('Google') ||
+                v.name.includes('David') ||
+                v.name.includes('George')) &&
+              v.lang.startsWith('en'),
+          );
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+
+          window.speechSynthesis.speak(utterance);
         }
-
-        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn('Speech synthesis error:', e);
       }
-    } catch (e) {
-      console.warn('Speech synthesis error:', e);
-    }
-  }, [isMuted]);
+    },
+    [isMuted],
+  );
 
   // Execute Agent Command
-  const executeCommand = useCallback(async (command: string) => {
-    if (!command.trim()) return null;
+  const executeCommand = useCallback(
+    async (command: string) => {
+      if (!command.trim()) return null;
 
-    setIsProcessing(true);
-    soundEngine.playProcessingHum();
+      setIsProcessing(true);
+      soundEngine.playProcessingHum();
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/agent/execute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input_text: command }),
-      });
-
-      if (res.ok) {
-        const data: AgentExecutionResponse = await res.json();
-        setLastResult(data);
-        setHistory(prev => [data, ...prev.slice(0, 19)]);
-        
-        if (data.voice_response && !isMuted) {
-          speakResponse(data.voice_response);
-        }
-        setIsProcessing(false);
-        return data;
-      }
-    } catch (apiError) {
-      // Offline fallback
-    }
-
-    // Client-Side Offline Deterministic Fallback
-    let fallbackResult: AgentExecutionResponse = {
-      success: true,
-      input_text: command,
-      voice_response: `Executing ${command}`,
-      display_text: `Processed: ${command}`,
-      is_offline_native: true,
-      confidence: 0.9,
-    };
-
-    const lower = command.toLowerCase().trim();
-
-    if (lower.includes('volume up') || lower.includes('increase volume') || lower.includes('louder')) {
-      await window.electronAPI?.controlMedia('volumeup');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'volume_up',
-        voice_response: 'Increasing volume.',
-        display_text: '🔊 Volume Increased',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('volume down') || lower.includes('decrease volume') || lower.includes('quieter')) {
-      await window.electronAPI?.controlMedia('volumedown');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'volume_down',
-        voice_response: 'Lowering volume.',
-        display_text: '🔉 Volume Decreased',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower === 'mute' || lower.includes('mute sound') || lower.includes('mute audio')) {
-      await window.electronAPI?.controlMedia('mute');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'mute',
-        voice_response: 'Toggled system mute.',
-        display_text: '🔇 System Mute Toggled',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('pause music') || lower.includes('pause') || lower.includes('resume music') || lower === 'play') {
-      await window.electronAPI?.controlMedia('playpause');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'media_playpause',
-        voice_response: 'Media playback toggled.',
-        display_text: '⏯️ Media Play/Pause Toggled',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('next song') || lower.includes('next track') || lower.includes('skip song')) {
-      await window.electronAPI?.controlMedia('next');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'media_next',
-        voice_response: 'Skipping to next track.',
-        display_text: '⏭️ Skipped to Next Track',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('system status') || lower.includes('memory') || lower.includes('telemetry') || lower.includes('specs')) {
-      const stats = await window.electronAPI?.getSystemTelemetry();
-      const info = stats
-        ? `RAM: ${stats.freeMemoryGb}GB free / ${stats.totalMemoryGb}GB total (${stats.memoryUsagePercent}% used). Uptime: ${stats.uptimeHours}h.`
-        : 'System is running smoothly.';
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'system_status',
-        voice_response: info,
-        display_text: `⚡ System Telemetry: ${info}`,
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('screenshot') || lower.includes('snip') || lower.includes('capture screen')) {
-      await window.electronAPI?.launchApp('snippingtool');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'screenshot',
-        voice_response: 'Launching screen snipping tool.',
-        display_text: '📸 Snipping Tool Launched',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('antigravity')) {
-      await window.electronAPI?.launchApp('antigravity');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'launch_antigravity',
-        voice_response: 'Launching Antigravity and resuming your pair programming session, sir.',
-        display_text: '⚡ Launched Antigravity Coding Assistant',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('claude') || lower.includes('claude code')) {
-      await window.electronAPI?.launchApp('claude');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'launch_claude',
-        voice_response: 'Starting Claude Code in your active project workspace.',
-        display_text: '🤖 Launched Claude Code CLI',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('codex')) {
-      await window.electronAPI?.launchApp('codex');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'launch_codex',
-        voice_response: 'Launching Codex CLI assistant.',
-        display_text: '🧠 Launched Codex Agent',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('aider')) {
-      await window.electronAPI?.launchApp('aider');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'launch_aider',
-        voice_response: 'Launching Aider AI coding assistant in terminal.',
-        display_text: '⚡ Launched Aider AI',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('coding') || lower.includes('coding session') || lower.includes('resume coding') || lower.includes('start coding')) {
-      await window.electronAPI?.launchApp('antigravity');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'resume_coding',
-        voice_response: 'Resuming your active coding session in the project workspace, sir.',
-        display_text: '🚀 Resumed AI Coding Session',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('cursor')) {
-      await window.electronAPI?.launchApp('cursor');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Cursor IDE in project workspace.',
-        display_text: '💻 Launched Cursor IDE',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('windsurf')) {
-      await window.electronAPI?.launchApp('windsurf');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Windsurf IDE.',
-        display_text: '🌊 Launched Windsurf IDE',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('zed')) {
-      await window.electronAPI?.launchApp('zed');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Zed Editor.',
-        display_text: '⚡ Launched Zed Editor',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('code') || lower.includes('vscode') || lower.includes('vs code')) {
-      await window.electronAPI?.launchApp('vscode');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Visual Studio Code.',
-        display_text: '💻 Launched Visual Studio Code',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('docker')) {
-      await window.electronAPI?.launchApp('docker');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Launching Docker Desktop.',
-        display_text: '🐳 Launched Docker Desktop',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('github')) {
-      await window.electronAPI?.launchApp('github');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening GitHub.',
-        display_text: '🐙 Opened GitHub',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('postman')) {
-      await window.electronAPI?.launchApp('postman');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Postman API client.',
-        display_text: '🚀 Opened Postman',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('obsidian')) {
-      await window.electronAPI?.launchApp('obsidian');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Obsidian Vault.',
-        display_text: '💎 Opened Obsidian',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('notion')) {
-      await window.electronAPI?.launchApp('notion');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Notion.',
-        display_text: '📝 Opened Notion',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('figma')) {
-      await window.electronAPI?.launchApp('figma');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Figma Design.',
-        display_text: '🎨 Opened Figma',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('note') && (lower.includes('add') || lower.includes('create') || lower.includes('take') || lower.includes('write') || lower.includes('capture'))) {
-      const rawText = command.replace(/^(add to note|create note|take a note|add note|take note|write note|new note|note)\s*[:\-]?\s*/i, '').trim();
-      const noteTitle = rawText ? rawText.slice(0, 40) : 'Voice Quick Note';
-      const noteContent = rawText ? `# ${noteTitle}\n\n${rawText}\n\n*Captured via Neuro Voice Agent*` : '# Quick Note\n\nCaptured thought...';
-
-      // Save note locally to backend or local mock
       try {
-        fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/notes`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: noteTitle, content: noteContent, tags: ['voice-capture'] }),
-        }).catch(() => {});
-      } catch {}
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/agent/execute`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input_text: command }),
+          },
+        );
 
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'create_note',
-        voice_response: `I've created and saved that note to your second brain.`,
-        display_text: `📝 Note Captured: "${noteTitle}"`,
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('browser') || lower.includes('chrome') || lower.includes('edge') || lower.includes('firefox')) {
-      const appTarget = lower.includes('edge') ? 'edge' : lower.includes('chrome') ? 'chrome' : lower.includes('firefox') ? 'firefox' : 'browser';
-      await window.electronAPI?.launchApp(appTarget);
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_browser',
-        voice_response: 'Opening web browser, sir.',
-        display_text: '🌐 Opened Web Browser',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('terminal') || lower.includes('powershell') || lower.includes('command line') || lower === 'cmd') {
-      await window.electronAPI?.launchApp('terminal');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_terminal',
-        voice_response: 'Opening terminal in project workspace.',
-        display_text: '⚡ Opened Terminal Console',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('calculator') || lower.includes('calc')) {
-      await window.electronAPI?.launchApp('calculator');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_calculator',
-        voice_response: 'Opening Calculator.',
-        display_text: '🔢 Opened Calculator',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('explorer') || lower.includes('files') || lower.includes('folder') || lower.includes('open directory')) {
-      await window.electronAPI?.launchApp('explorer');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_explorer',
-        voice_response: 'Opening project file folder in Explorer.',
-        display_text: '📂 Opened Project Folder',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('task manager') || lower.includes('taskmgr') || lower.includes('processes')) {
-      await window.electronAPI?.launchApp('taskmgr');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_taskmgr',
-        voice_response: 'Opening Windows Task Manager.',
-        display_text: '📊 Opened Task Manager',
-        is_offline_native: true,
-        confidence: 0.98,
-      };
-    } else if (lower.includes('brave')) {
-      await window.electronAPI?.launchApp('brave');
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'open_app',
-        voice_response: 'Opening Brave Browser, sir.',
-        display_text: '🚀 Opened Brave Browser',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('spotify')) {
-      const query = lower.replace(/play|on|spotify|in|song/g, '').trim();
-      await window.electronAPI?.launchApp('spotify', query);
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'play_spotify',
-        voice_response: query ? `Playing ${query} on Spotify.` : 'Opening Spotify.',
-        display_text: query ? `🎵 Playing on Spotify: ${query}` : '🎵 Opened Spotify',
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else if (lower.includes('google') || lower.includes('search')) {
-      const query = lower.replace(/search|on|google|for/g, '').trim();
-      const url = `https://www.google.com/search?q=${encodeURIComponent(query || command)}`;
-      await window.electronAPI?.openExternal(url);
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        tool_name: 'web_search',
-        voice_response: `Searching Google for ${query || command}.`,
-        display_text: `🔍 Searched Google: ${query || command}`,
-        is_offline_native: true,
-        confidence: 0.95,
-      };
-    } else {
-      fallbackResult = {
-        success: true,
-        input_text: command,
-        voice_response: `I heard: ${command}. You can say "Open Antigravity", "Open Browser", "Add to note", "Play music", or launch any developer tool.`,
-        display_text: `Recognized: "${command}"`,
-        is_offline_native: true,
-        confidence: 0.7,
-      };
-    }
+        if (res.ok) {
+          const data: AgentExecutionResponse = await res.json();
+          setLastResult(data);
+          setHistory((prev) => [data, ...prev.slice(0, 19)]);
 
-    setLastResult(fallbackResult);
-    setHistory(prev => [fallbackResult, ...prev.slice(0, 19)]);
-    if (fallbackResult.voice_response) {
-      speakResponse(fallbackResult.voice_response);
-    }
-    setIsProcessing(false);
-    return fallbackResult;
-  }, [speakResponse, isMuted]);
+          if (data.voice_response && !isMuted) {
+            speakResponse(data.voice_response);
+          }
+          setIsProcessing(false);
+          return data;
+        }
+      } catch (apiError) {
+        // Offline fallback
+      }
+
+      // Client-Side Offline Deterministic Fallback
+      let fallbackResult: AgentExecutionResponse = {
+        success: true,
+        input_text: command,
+        voice_response: `Executing ${command}`,
+        display_text: `Processed: ${command}`,
+        is_offline_native: true,
+        confidence: 0.9,
+      };
+
+      const lower = command.toLowerCase().trim();
+
+      if (
+        lower.includes('volume up') ||
+        lower.includes('increase volume') ||
+        lower.includes('louder')
+      ) {
+        await window.electronAPI?.controlMedia('volumeup');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'volume_up',
+          voice_response: 'Increasing volume.',
+          display_text: '🔊 Volume Increased',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('volume down') ||
+        lower.includes('decrease volume') ||
+        lower.includes('quieter')
+      ) {
+        await window.electronAPI?.controlMedia('volumedown');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'volume_down',
+          voice_response: 'Lowering volume.',
+          display_text: '🔉 Volume Decreased',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower === 'mute' || lower.includes('mute sound') || lower.includes('mute audio')) {
+        await window.electronAPI?.controlMedia('mute');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'mute',
+          voice_response: 'Toggled system mute.',
+          display_text: '🔇 System Mute Toggled',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('pause music') ||
+        lower.includes('pause') ||
+        lower.includes('resume music') ||
+        lower === 'play'
+      ) {
+        await window.electronAPI?.controlMedia('playpause');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'media_playpause',
+          voice_response: 'Media playback toggled.',
+          display_text: '⏯️ Media Play/Pause Toggled',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('next song') ||
+        lower.includes('next track') ||
+        lower.includes('skip song')
+      ) {
+        await window.electronAPI?.controlMedia('next');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'media_next',
+          voice_response: 'Skipping to next track.',
+          display_text: '⏭️ Skipped to Next Track',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('system status') ||
+        lower.includes('memory') ||
+        lower.includes('telemetry') ||
+        lower.includes('specs')
+      ) {
+        const stats = await window.electronAPI?.getSystemTelemetry();
+        const info = stats
+          ? `RAM: ${stats.freeMemoryGb}GB free / ${stats.totalMemoryGb}GB total (${stats.memoryUsagePercent}% used). Uptime: ${stats.uptimeHours}h.`
+          : 'System is running smoothly.';
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'system_status',
+          voice_response: info,
+          display_text: `⚡ System Telemetry: ${info}`,
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('screenshot') ||
+        lower.includes('snip') ||
+        lower.includes('capture screen')
+      ) {
+        await window.electronAPI?.launchApp('snippingtool');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'screenshot',
+          voice_response: 'Launching screen snipping tool.',
+          display_text: '📸 Snipping Tool Launched',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('antigravity')) {
+        await window.electronAPI?.launchApp('antigravity');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'launch_antigravity',
+          voice_response: 'Launching Antigravity and resuming your pair programming session, sir.',
+          display_text: '⚡ Launched Antigravity Coding Assistant',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('claude') || lower.includes('claude code')) {
+        await window.electronAPI?.launchApp('claude');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'launch_claude',
+          voice_response: 'Starting Claude Code in your active project workspace.',
+          display_text: '🤖 Launched Claude Code CLI',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('codex')) {
+        await window.electronAPI?.launchApp('codex');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'launch_codex',
+          voice_response: 'Launching Codex CLI assistant.',
+          display_text: '🧠 Launched Codex Agent',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('aider')) {
+        await window.electronAPI?.launchApp('aider');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'launch_aider',
+          voice_response: 'Launching Aider AI coding assistant in terminal.',
+          display_text: '⚡ Launched Aider AI',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('coding') ||
+        lower.includes('coding session') ||
+        lower.includes('resume coding') ||
+        lower.includes('start coding')
+      ) {
+        await window.electronAPI?.launchApp('antigravity');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'resume_coding',
+          voice_response: 'Resuming your active coding session in the project workspace, sir.',
+          display_text: '🚀 Resumed AI Coding Session',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('cursor')) {
+        await window.electronAPI?.launchApp('cursor');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Cursor IDE in project workspace.',
+          display_text: '💻 Launched Cursor IDE',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('windsurf')) {
+        await window.electronAPI?.launchApp('windsurf');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Windsurf IDE.',
+          display_text: '🌊 Launched Windsurf IDE',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('zed')) {
+        await window.electronAPI?.launchApp('zed');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Zed Editor.',
+          display_text: '⚡ Launched Zed Editor',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('code') || lower.includes('vscode') || lower.includes('vs code')) {
+        await window.electronAPI?.launchApp('vscode');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Visual Studio Code.',
+          display_text: '💻 Launched Visual Studio Code',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('docker')) {
+        await window.electronAPI?.launchApp('docker');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Launching Docker Desktop.',
+          display_text: '🐳 Launched Docker Desktop',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('github')) {
+        await window.electronAPI?.launchApp('github');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening GitHub.',
+          display_text: '🐙 Opened GitHub',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('postman')) {
+        await window.electronAPI?.launchApp('postman');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Postman API client.',
+          display_text: '🚀 Opened Postman',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('obsidian')) {
+        await window.electronAPI?.launchApp('obsidian');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Obsidian Vault.',
+          display_text: '💎 Opened Obsidian',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('notion')) {
+        await window.electronAPI?.launchApp('notion');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Notion.',
+          display_text: '📝 Opened Notion',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('figma')) {
+        await window.electronAPI?.launchApp('figma');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Figma Design.',
+          display_text: '🎨 Opened Figma',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (
+        lower.includes('note') &&
+        (lower.includes('add') ||
+          lower.includes('create') ||
+          lower.includes('take') ||
+          lower.includes('write') ||
+          lower.includes('capture'))
+      ) {
+        const rawText = command
+          .replace(
+            /^(add to note|create note|take a note|add note|take note|write note|new note|note)\s*[:\-]?\s*/i,
+            '',
+          )
+          .trim();
+        const noteTitle = rawText ? rawText.slice(0, 40) : 'Voice Quick Note';
+        const noteContent = rawText
+          ? `# ${noteTitle}\n\n${rawText}\n\n*Captured via Neuro Voice Agent*`
+          : '# Quick Note\n\nCaptured thought...';
+
+        // Save note locally to backend or local mock
+        try {
+          fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/notes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: noteTitle,
+              content: noteContent,
+              tags: ['voice-capture'],
+            }),
+          }).catch(() => {});
+        } catch {}
+
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'create_note',
+          voice_response: `I've created and saved that note to your second brain.`,
+          display_text: `📝 Note Captured: "${noteTitle}"`,
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('browser') ||
+        lower.includes('chrome') ||
+        lower.includes('edge') ||
+        lower.includes('firefox')
+      ) {
+        const appTarget = lower.includes('edge')
+          ? 'edge'
+          : lower.includes('chrome')
+            ? 'chrome'
+            : lower.includes('firefox')
+              ? 'firefox'
+              : 'browser';
+        await window.electronAPI?.launchApp(appTarget);
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_browser',
+          voice_response: 'Opening web browser, sir.',
+          display_text: '🌐 Opened Web Browser',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (
+        lower.includes('terminal') ||
+        lower.includes('powershell') ||
+        lower.includes('command line') ||
+        lower === 'cmd'
+      ) {
+        await window.electronAPI?.launchApp('terminal');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_terminal',
+          voice_response: 'Opening terminal in project workspace.',
+          display_text: '⚡ Opened Terminal Console',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('calculator') || lower.includes('calc')) {
+        await window.electronAPI?.launchApp('calculator');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_calculator',
+          voice_response: 'Opening Calculator.',
+          display_text: '🔢 Opened Calculator',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('explorer') ||
+        lower.includes('files') ||
+        lower.includes('folder') ||
+        lower.includes('open directory')
+      ) {
+        await window.electronAPI?.launchApp('explorer');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_explorer',
+          voice_response: 'Opening project file folder in Explorer.',
+          display_text: '📂 Opened Project Folder',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (
+        lower.includes('task manager') ||
+        lower.includes('taskmgr') ||
+        lower.includes('processes')
+      ) {
+        await window.electronAPI?.launchApp('taskmgr');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_taskmgr',
+          voice_response: 'Opening Windows Task Manager.',
+          display_text: '📊 Opened Task Manager',
+          is_offline_native: true,
+          confidence: 0.98,
+        };
+      } else if (lower.includes('brave')) {
+        await window.electronAPI?.launchApp('brave');
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'open_app',
+          voice_response: 'Opening Brave Browser, sir.',
+          display_text: '🚀 Opened Brave Browser',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('spotify')) {
+        const query = lower.replace(/play|on|spotify|in|song/g, '').trim();
+        await window.electronAPI?.launchApp('spotify', query);
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'play_spotify',
+          voice_response: query ? `Playing ${query} on Spotify.` : 'Opening Spotify.',
+          display_text: query ? `🎵 Playing on Spotify: ${query}` : '🎵 Opened Spotify',
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else if (lower.includes('google') || lower.includes('search')) {
+        const query = lower.replace(/search|on|google|for/g, '').trim();
+        const url = `https://www.google.com/search?q=${encodeURIComponent(query || command)}`;
+        await window.electronAPI?.openExternal(url);
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          tool_name: 'web_search',
+          voice_response: `Searching Google for ${query || command}.`,
+          display_text: `🔍 Searched Google: ${query || command}`,
+          is_offline_native: true,
+          confidence: 0.95,
+        };
+      } else {
+        fallbackResult = {
+          success: true,
+          input_text: command,
+          voice_response: `I heard: ${command}. You can say "Open Antigravity", "Open Browser", "Add to note", "Play music", or launch any developer tool.`,
+          display_text: `Recognized: "${command}"`,
+          is_offline_native: true,
+          confidence: 0.7,
+        };
+      }
+
+      setLastResult(fallbackResult);
+      setHistory((prev) => [fallbackResult, ...prev.slice(0, 19)]);
+      if (fallbackResult.voice_response) {
+        speakResponse(fallbackResult.voice_response);
+      }
+      setIsProcessing(false);
+      return fallbackResult;
+    },
+    [speakResponse, isMuted],
+  );
 
   // Transcribe recorded audio buffer via local FastAPI endpoint
   const sendAudioForTranscription = async (blob: Blob) => {
@@ -491,10 +579,13 @@ export function useJarvisAgent() {
     try {
       const fd = new FormData();
       fd.append('file', blob, 'speech.webm');
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/voice/transcribe`, {
-        method: 'POST',
-        body: fd,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/v1/voice/transcribe`,
+        {
+          method: 'POST',
+          body: fd,
+        },
+      );
       if (res.ok) {
         const data = await res.json();
         if (data.text && data.text.trim()) {
@@ -584,7 +675,9 @@ export function useJarvisAgent() {
             silenceStartRef.current = null;
             if (mediaRecorder && mediaRecorder.state === 'inactive') {
               audioChunksRef.current = [];
-              try { mediaRecorder.start(); } catch {}
+              try {
+                mediaRecorder.start();
+              } catch {}
             }
           }
         } else if (isSpeakingRef.current) {
@@ -597,14 +690,15 @@ export function useJarvisAgent() {
             setIsSpeaking(false);
             silenceStartRef.current = null;
             if (mediaRecorder && mediaRecorder.state === 'recording') {
-              try { mediaRecorder.stop(); } catch {}
+              try {
+                mediaRecorder.stop();
+              } catch {}
             }
           }
         } else {
           setIsSpeaking(false);
         }
       }, 70);
-
     } catch (err) {
       console.error('Error starting microphone stream:', err);
       isListeningRef.current = false;
@@ -627,7 +721,9 @@ export function useJarvisAgent() {
     }
 
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      try { mediaRecorderRef.current.stop(); } catch {}
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
       mediaRecorderRef.current = null;
     }
 
@@ -637,7 +733,9 @@ export function useJarvisAgent() {
     }
 
     if (audioContextRef.current) {
-      try { audioContextRef.current.close(); } catch {}
+      try {
+        audioContextRef.current.close();
+      } catch {}
       audioContextRef.current = null;
     }
   }, []);
@@ -654,7 +752,7 @@ export function useJarvisAgent() {
   useEffect(() => {
     if (window.electronAPI?.onToggleJarvisHUD) {
       const cleanup = window.electronAPI.onToggleJarvisHUD(() => {
-        setIsOpen(prev => {
+        setIsOpen((prev) => {
           const nextState = !prev;
           if (nextState) {
             startListening();

@@ -13,7 +13,7 @@ import {
   Plus,
   RefreshCw,
   BookOpen,
-  Volume2
+  Volume2,
 } from 'lucide-react';
 import { useNotes } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -37,7 +37,8 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
     {
       id: '1',
       question: 'What is the primary role of ChromaDB in Neuro?',
-      answer: 'ChromaDB serves as the local-first vector store for semantic embeddings and similarity retrieval across notes.',
+      answer:
+        'ChromaDB serves as the local-first vector store for semantic embeddings and similarity retrieval across notes.',
       sourceNoteTitle: 'Welcome to Neuro',
       sourceNoteId: '1',
       intervalDays: 1,
@@ -55,7 +56,8 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
     {
       id: '3',
       question: 'How do you create bi-directional links between concepts in Neuro?',
-      answer: 'Use the double bracket syntax: [[Note Title]] to automatically generate backlinks in the knowledge graph.',
+      answer:
+        'Use the double bracket syntax: [[Note Title]] to automatically generate backlinks in the knowledge graph.',
       sourceNoteTitle: 'Bi-directional Linking',
       sourceNoteId: '2',
       intervalDays: 7,
@@ -80,7 +82,7 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
 
     const newCards: Flashcard[] = [];
     notes.forEach((note) => {
-      const lines = note.content.split('\n').filter(l => l.trim().length > 10);
+      const lines = note.content.split('\n').filter((l) => l.trim().length > 10);
       lines.forEach((line, i) => {
         if (line.includes('::')) {
           const [q, a] = line.split('::');
@@ -133,10 +135,10 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
 
     if (currentIndex + 1 < cards.length) {
       setIsFlipped(false);
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       setSessionCompleted(true);
-      setStreak(prev => prev + 1);
+      setStreak((prev) => prev + 1);
     }
   };
 
@@ -197,7 +199,9 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
         <div className="flex-1 flex flex-col items-center justify-center my-4">
           {/* Card Progress Indicator */}
           <div className="w-full max-w-lg flex items-center justify-between text-xs text-zinc-500 font-mono mb-3">
-            <span>Card {currentIndex + 1} of {cards.length}</span>
+            <span>
+              Card {currentIndex + 1} of {cards.length}
+            </span>
             <span className="text-teal-400">SRS Interval: {currentCard.intervalDays}d</span>
           </div>
 
@@ -213,9 +217,13 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
           >
             {/* Top Card Badge */}
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className={`px-2.5 py-0.5 rounded-full uppercase tracking-wider text-[10px] font-bold ${
-                isFlipped ? 'bg-teal-950/80 text-teal-300 border border-teal-500/40' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
-              }`}>
+              <span
+                className={`px-2.5 py-0.5 rounded-full uppercase tracking-wider text-[10px] font-bold ${
+                  isFlipped
+                    ? 'bg-teal-950/80 text-teal-300 border border-teal-500/40'
+                    : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                }`}
+              >
                 {isFlipped ? 'Answer' : 'Question / Prompt'}
               </span>
 
@@ -304,7 +312,8 @@ export default function FlashcardsPage({ onNavigate }: { onNavigate?: (page: 'ed
             Knowledge Session Complete!
           </h2>
           <p className="text-xs text-zinc-400 max-w-md mb-6 font-sans">
-            You've reviewed all cards in this deck. Your spaced repetition intervals have been recorded locally.
+            You've reviewed all cards in this deck. Your spaced repetition intervals have been
+            recorded locally.
           </p>
 
           <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-6">

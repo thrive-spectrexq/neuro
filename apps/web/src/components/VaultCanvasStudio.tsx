@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { 
-  Network, 
-  Plus, 
-  Download, 
-  Sparkles, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCcw, 
-  Type, 
+import {
+  Network,
+  Plus,
+  Download,
+  Sparkles,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Type,
   Trash2,
   Edit3,
-  Check
+  Check,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
@@ -61,15 +61,11 @@ export function VaultCanvasStudio() {
 
   const handleSetNodeColor = (colorHex: string) => {
     if (!selectedNodeId) return;
-    setNodes((prev) =>
-      prev.map((n) => (n.id === selectedNodeId ? { ...n, color: colorHex } : n))
-    );
+    setNodes((prev) => prev.map((n) => (n.id === selectedNodeId ? { ...n, color: colorHex } : n)));
   };
 
   const handleUpdateNodeText = (id: string, newText: string) => {
-    setNodes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, text: newText } : n))
-    );
+    setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, text: newText } : n)));
   };
 
   const [nodes, setNodes] = useState<CanvasNode[]>([
@@ -147,7 +143,9 @@ export function VaultCanvasStudio() {
     let mounted = true;
     const fetchCanvas = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`,
+        );
         if (res.ok) {
           const data = await res.json();
           if (mounted && data.nodes && data.nodes.length > 0) {
@@ -160,18 +158,23 @@ export function VaultCanvasStudio() {
       }
     };
     fetchCanvas();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Debounced auto-save
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nodes, edges }),
-        });
+        await fetch(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/obsidian/canvas`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nodes, edges }),
+          },
+        );
       } catch (err) {
         console.error('Failed to auto-save canvas:', err);
       }
@@ -216,7 +219,9 @@ export function VaultCanvasStudio() {
   const handleDeleteSelected = () => {
     if (!selectedNodeId) return;
     setNodes((prev) => prev.filter((n) => n.id !== selectedNodeId));
-    setEdges((prev) => prev.filter((e) => e.fromNode !== selectedNodeId && e.toNode !== selectedNodeId));
+    setEdges((prev) =>
+      prev.filter((e) => e.fromNode !== selectedNodeId && e.toNode !== selectedNodeId),
+    );
     setSelectedNodeId(null);
   };
 
@@ -276,7 +281,7 @@ export function VaultCanvasStudio() {
           y: 100 + Math.floor(idx / 3) * 180,
           width: 280,
           height: 130,
-          color: idx === 0 ? '#14B8A6' : idx === (data.nodes.length - 1) ? '#10b981' : '#10B981',
+          color: idx === 0 ? '#14B8A6' : idx === data.nodes.length - 1 ? '#10b981' : '#10B981',
         }));
 
         const generatedEdges: CanvasEdge[] = (data.edges || []).map((edge: any, idx: number) => ({
@@ -324,7 +329,7 @@ export function VaultCanvasStudio() {
             };
           }
           return node;
-        })
+        }),
       );
     }
   };
@@ -354,12 +359,16 @@ export function VaultCanvasStudio() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold text-white tracking-wide font-mono">JSON Canvas Studio</h2>
+              <h2 className="text-xs font-bold text-white tracking-wide font-mono">
+                JSON Canvas Studio
+              </h2>
               <span className="px-1.5 py-0.5 text-[9px] font-mono bg-[#161A24] text-teal-300 border border-[#282E40] rounded">
                 JSON Canvas 1.0
               </span>
             </div>
-            <p className="text-[10px] text-[#64748B]">Visual spatial mind-mapping & native Obsidian .canvas interoperability</p>
+            <p className="text-[10px] text-[#64748B]">
+              Visual spatial mind-mapping & native Obsidian .canvas interoperability
+            </p>
           </div>
         </div>
 
@@ -418,7 +427,9 @@ export function VaultCanvasStudio() {
               ))}
               <div className="h-3 w-px bg-white/10 mx-1" />
               <button
-                onClick={() => setEditingNodeId(editingNodeId === selectedNodeId ? null : selectedNodeId)}
+                onClick={() =>
+                  setEditingNodeId(editingNodeId === selectedNodeId ? null : selectedNodeId)
+                }
                 className={`p-1 rounded-lg text-xs transition-all ${
                   editingNodeId === selectedNodeId
                     ? 'bg-teal-600 text-white'
@@ -566,7 +577,7 @@ export function VaultCanvasStudio() {
                 </div>
 
                 {/* Node Content Body */}
-                <div 
+                <div
                   className="p-3 text-xs text-[#CBD5E1] font-sans leading-relaxed flex-1 select-text"
                   onDoubleClick={(e) => {
                     e.stopPropagation();
@@ -595,9 +606,7 @@ export function VaultCanvasStudio() {
                       </button>
                     </div>
                   ) : (
-                    <div className="whitespace-pre-wrap font-mono text-[11px]">
-                      {node.text}
-                    </div>
+                    <div className="whitespace-pre-wrap font-mono text-[11px]">{node.text}</div>
                   )}
                 </div>
               </div>
@@ -625,7 +634,10 @@ export function VaultCanvasStudio() {
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
+            onClick={() => {
+              setZoom(1);
+              setPan({ x: 0, y: 0 });
+            }}
             className="p-1 text-[#94A3B8] hover:text-white hover:bg-[#181C26] rounded transition-colors"
             title="Reset Pan & Zoom"
           >

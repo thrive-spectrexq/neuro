@@ -31,8 +31,8 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
       let imported = 0;
       for (const file of files) {
         const text = await file.text();
-        const title = file.name.replace(/\.[^/.]+$/, "");
-        
+        const title = file.name.replace(/\.[^/.]+$/, '');
+
         // Auto extract tags starting with #
         const tagMatches = text.match(/#([a-zA-Z0-9_-]+)/g) || [];
         const tags = Array.from(new Set(tagMatches.map((t) => t.replace('#', '').toLowerCase())));
@@ -75,7 +75,9 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
             </div>
             <div>
               <h3 className="text-xs font-bold text-white font-mono">Knowledge Import Hub</h3>
-              <p className="text-[10px] text-[#64748B]">Batch ingest markdown archives into your local vault</p>
+              <p className="text-[10px] text-[#64748B]">
+                Batch ingest markdown archives into your local vault
+              </p>
             </div>
           </div>
           <button
@@ -88,7 +90,9 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
 
         {/* Source Provider Selector */}
         <div>
-          <label className="block text-[10px] font-mono text-[#94A3B8] mb-1.5">Select Ingestion Format</label>
+          <label className="block text-[10px] font-mono text-[#94A3B8] mb-1.5">
+            Select Ingestion Format
+          </label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: 'markdown', label: 'Markdown (.md)', icon: FileText },
@@ -125,7 +129,9 @@ export function ImportHubModal({ onClose, onSuccess }: ImportHubModalProps) {
           />
           <Upload className="w-6 h-6 text-teal-400 mx-auto mb-1.5 opacity-80" />
           <p className="text-xs font-bold text-white font-mono">Select or drag files to ingest</p>
-          <p className="text-[10px] text-[#64748B] font-mono mt-0.5">Supports .md and .txt markdown files</p>
+          <p className="text-[10px] text-[#64748B] font-mono mt-0.5">
+            Supports .md and .txt markdown files
+          </p>
           {files.length > 0 && (
             <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 bg-[#18162B] text-teal-300 border border-[#302856] rounded text-[10px] font-mono">
               <FileText className="w-3 h-3" />

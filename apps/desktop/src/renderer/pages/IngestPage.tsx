@@ -11,30 +11,58 @@ import {
   GitBranch,
   FolderOpen,
   Shield,
-  Code
+  Code,
 } from 'lucide-react';
 
 const mockRecentSources = [
-  { id: '1', name: 'attention-is-all-you-need.pdf', type: 'PDF', sha: 'a3f9e2b1c4', timestamp: '10 mins ago', status: 'complete' },
-  { id: '2', name: 'https://arxiv.org/abs/1706.03762', type: 'URL', sha: 'b7c8d9e0f1', timestamp: '1 hour ago', status: 'complete' },
-  { id: '3', name: 'project-notes.md', type: 'Markdown', sha: 'c4d5e6f7a8', timestamp: '2 hours ago', status: 'complete' },
-  { id: '4', name: 'data-pipeline-architecture.html', type: 'HTML', sha: 'd1e2f3a4b5', timestamp: '5 hours ago', status: 'error' },
+  {
+    id: '1',
+    name: 'attention-is-all-you-need.pdf',
+    type: 'PDF',
+    sha: 'a3f9e2b1c4',
+    timestamp: '10 mins ago',
+    status: 'complete',
+  },
+  {
+    id: '2',
+    name: 'https://arxiv.org/abs/1706.03762',
+    type: 'URL',
+    sha: 'b7c8d9e0f1',
+    timestamp: '1 hour ago',
+    status: 'complete',
+  },
+  {
+    id: '3',
+    name: 'project-notes.md',
+    type: 'Markdown',
+    sha: 'c4d5e6f7a8',
+    timestamp: '2 hours ago',
+    status: 'complete',
+  },
+  {
+    id: '4',
+    name: 'data-pipeline-architecture.html',
+    type: 'HTML',
+    sha: 'd1e2f3a4b5',
+    timestamp: '5 hours ago',
+    status: 'error',
+  },
 ];
 
 export default function IngestPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [urlInput, setUrlInput] = useState('');
-  
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
-  
+
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
-  
+
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
@@ -75,16 +103,19 @@ export default function IngestPage() {
       <div className="page-header">
         <h1 className="page-title">Source Ingestion</h1>
         <p className="page-subtitle">
-          Capture sources with provenance tracking. Every import is content-addressed and linked to your knowledge vault.
+          Capture sources with provenance tracking. Every import is content-addressed and linked to
+          your knowledge vault.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Input Zone */}
         <div className="flex flex-col gap-6">
-          <div 
+          <div
             className={`card-surface-static flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 min-h-[300px] transition-colors duration-200 ${
-              isDragging ? 'border-brand-emerald bg-brand-emerald/5' : 'border-[var(--surface-elevated)]'
+              isDragging
+                ? 'border-brand-emerald bg-brand-emerald/5'
+                : 'border-[var(--surface-elevated)]'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -99,12 +130,16 @@ export default function IngestPage() {
             </p>
             <label className="btn-primary cursor-pointer">
               Browse Files
-              <input type="file" className="hidden" onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  uploadFile(file);
-                }
-              }} />
+              <input
+                type="file"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    uploadFile(file);
+                  }
+                }}
+              />
             </label>
           </div>
 
@@ -114,10 +149,10 @@ export default function IngestPage() {
               Capture from URL
             </label>
             <div className="flex gap-2">
-              <input 
-                type="text" 
-                className="input-base flex-1" 
-                placeholder="Paste URL to capture..." 
+              <input
+                type="text"
+                className="input-base flex-1"
+                placeholder="Paste URL to capture..."
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
               />
@@ -173,7 +208,9 @@ export default function IngestPage() {
               <div className="flex-1 pt-2">
                 <div className="flex justify-between items-center mb-1">
                   <h3 className="font-medium text-[var(--text-primary)]">Extract</h3>
-                  <span className="text-xs text-brand-emerald font-medium animate-pulse">Processing...</span>
+                  <span className="text-xs text-brand-emerald font-medium animate-pulse">
+                    Processing...
+                  </span>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)]">Content extracted & parsed</p>
                 <div className="mt-3 w-full bg-[var(--surface-elevated)] h-1.5 rounded-full overflow-hidden">
@@ -222,8 +259,11 @@ export default function IngestPage() {
       <div className="flex flex-col gap-4 mt-4">
         <h2 className="section-label">Recent Sources</h2>
         <div className="flex flex-col gap-2">
-          {mockRecentSources.map(source => (
-            <div key={source.id} className="card-surface p-4 flex items-center justify-between group cursor-pointer">
+          {mockRecentSources.map((source) => (
+            <div
+              key={source.id}
+              className="card-surface p-4 flex items-center justify-between group cursor-pointer"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-[var(--surface-elevated)] flex items-center justify-center">
                   {source.type === 'PDF' && <FileText className="w-5 h-5 text-rose-400" />}
@@ -236,11 +276,17 @@ export default function IngestPage() {
                     {source.name}
                   </h4>
                   <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
-                    <span className={
-                      source.type === 'PDF' ? 'badge-rose' :
-                      source.type === 'URL' ? 'badge-emerald' :
-                      source.type === 'Markdown' ? 'badge-emerald' : 'badge-amber'
-                    }>
+                    <span
+                      className={
+                        source.type === 'PDF'
+                          ? 'badge-rose'
+                          : source.type === 'URL'
+                            ? 'badge-emerald'
+                            : source.type === 'Markdown'
+                              ? 'badge-emerald'
+                              : 'badge-amber'
+                      }
+                    >
                       {source.type}
                     </span>
                     <span className="flex items-center gap-1 font-mono">
@@ -276,7 +322,9 @@ export default function IngestPage() {
       <div className="mt-4 p-4 rounded-lg bg-[var(--surface-elevated)] border border-[var(--panel)] flex gap-4 items-start">
         <Shield className="w-5 h-5 text-brand-emerald shrink-0 mt-0.5" />
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-          <strong className="text-[var(--text-primary)] font-medium">Provenance Tracking:</strong> Every source is content-addressed with SHA-256, timestamped, and linked back to generated notes for full provenance tracking.
+          <strong className="text-[var(--text-primary)] font-medium">Provenance Tracking:</strong>{' '}
+          Every source is content-addressed with SHA-256, timestamped, and linked back to generated
+          notes for full provenance tracking.
         </p>
       </div>
     </div>

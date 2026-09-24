@@ -51,8 +51,12 @@ export function AuditLogViewer() {
             <Shield className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-white tracking-wide font-mono">Workspace Audit Trails & Compliance</h2>
-            <p className="text-[10px] text-[#64748B]">Deterministic ledger of data operations, security actions, and modifications</p>
+            <h2 className="text-xs font-bold text-white tracking-wide font-mono">
+              Workspace Audit Trails & Compliance
+            </h2>
+            <p className="text-[10px] text-[#64748B]">
+              Deterministic ledger of data operations, security actions, and modifications
+            </p>
           </div>
         </div>
 
@@ -110,7 +114,11 @@ export function AuditLogViewer() {
 
               <div className="flex items-center gap-1 text-[10px] font-mono text-[#64748B] flex-shrink-0">
                 <Clock className="w-3 h-3" />
-                {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {new Date(log.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                })}
               </div>
             </div>
           ))

@@ -28,7 +28,7 @@ export const useSyncStore = create<SyncState>((set, get) => ({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         user_id: userId,
@@ -52,8 +52,8 @@ export const useSyncStore = create<SyncState>((set, get) => ({
     const response = await fetch(`${API_BASE_URL}/api/v1/sync/latest`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -66,9 +66,8 @@ export const useSyncStore = create<SyncState>((set, get) => ({
 
     const decryptedData = await decryptPayload(
       { encrypted_data: blob.encrypted_data, iv: blob.iv, salt: blob.salt },
-      masterKey
+      masterKey,
     );
     return decryptedData;
-  }
+  },
 }));
-

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
-export type ActiveTab = 'graph' | 'canvas' | 'tasks' | 'study' | 'diagnostics' | 'automations' | 'audit';
+export type ActiveTab =
+  'graph' | 'canvas' | 'tasks' | 'study' | 'diagnostics' | 'automations' | 'audit';
 
 interface UIState {
   activeTab: ActiveTab;

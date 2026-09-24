@@ -7,7 +7,7 @@
 <p>Voice, Audio & Vision · Personal Agent Fabric · Model Registry · Governance Built-In · 100% Offline Capable</p>
 
 <p>
-  <img src="https://img.shields.io/badge/Release-v0.2.0-00f5d4?style=for-the-badge&logo=github&logoColor=black" />
+  <img src="https://img.shields.io/badge/Release-v0.2.1-0071E3?style=for-the-badge&logo=github&logoColor=white" />
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-0.141+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
@@ -23,7 +23,7 @@
 
 Neuro is an open-source, local-first AI workspace that unifies your personal agents, models, tools, and knowledge into a single platform. Voice, audio, and vision all work together — with permissions, privacy, and governance built in from the ground up.
 
-Say *"Hey Neuro"* or press <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the agent HUD. Your personal agents can open apps, play music, take notes, search your knowledge base, analyze images, and orchestrate complex multi-step workflows — all with full audit trails and consent-based governance.
+Say _"Hey Neuro"_ or press <kbd>Ctrl + Space</kbd> anywhere on your machine to summon the agent HUD. Your personal agents can open apps, play music, take notes, search your knowledge base, analyze images, and orchestrate complex multi-step workflows — all with full audit trails and consent-based governance.
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
@@ -65,7 +65,7 @@ Say *"Hey Neuro"* or press <kbd>Ctrl + Space</kbd> anywhere on your machine to s
 
 ### 3. Voice, Audio & Vision
 
-- **Voice Engine:** Wake-word detection (*"Hey Neuro"*), speech-to-text, text-to-speech — with swappable models from the registry.
+- **Voice Engine:** Wake-word detection (_"Hey Neuro"_), speech-to-text, text-to-speech — with swappable models from the registry.
 - **Local STT/TTS:** Offline voice via `faster-whisper` and local TTS engines. No API keys required.
 - **Vision Engine:** Screen capture analysis, document OCR, image understanding via multimodal models, and visual similarity search.
 - **Consent-Gated:** Voice recording and vision capture require explicit user consent through the governance system.
@@ -89,13 +89,13 @@ Say *"Hey Neuro"* or press <kbd>Ctrl + Space</kbd> anywhere on your machine to s
 
 ### 6. OS-Native Agent Tools
 
-- **App Launcher:** *"Open Brave"*, *"Launch VS Code"*, *"Open Terminal"*
-- **Spotify Controller:** *"Play Bohemian Rhapsody on Spotify"*
-- **Quick Notes:** *"Add this to note: Project roadmap specs"*
-- **Reminders:** *"Set a reminder in 15 minutes to drink water"*
-- **Web Research:** *"Search quantum computing on Google"*
-- **Screen Capture:** *"Take a screenshot"*, *"Analyze my screen"*
-- **System Control:** *"Mute volume"*, *"Lock screen"*, *"Empty recycle bin"*
+- **App Launcher:** _"Open Brave"_, _"Launch VS Code"_, _"Open Terminal"_
+- **Spotify Controller:** _"Play Bohemian Rhapsody on Spotify"_
+- **Quick Notes:** _"Add this to note: Project roadmap specs"_
+- **Reminders:** _"Set a reminder in 15 minutes to drink water"_
+- **Web Research:** _"Search quantum computing on Google"_
+- **Screen Capture:** _"Take a screenshot"_, _"Analyze my screen"_
+- **System Control:** _"Mute volume"_, _"Lock screen"_, _"Empty recycle bin"_
 
 ### 7. Extensibility
 
@@ -145,11 +145,13 @@ pnpm start
 ## Running Neuro
 
 ### Desktop Application (Electron + Vite + Silent FastAPI)
+
 ```bash
 pnpm start
 ```
 
 ### CLI Commands
+
 ```bash
 # Start MCP server for AI clients
 neuro mcp

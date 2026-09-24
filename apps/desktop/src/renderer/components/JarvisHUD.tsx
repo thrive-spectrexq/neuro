@@ -6,20 +6,16 @@ import {
   VolumeX,
   X,
   Sparkles,
-  Command,
   CornerDownLeft,
   ExternalLink,
   Play,
   FileText,
-  Clock,
   Search,
   Terminal,
   Cpu,
   CheckCircle2,
   AlertCircle,
-  Zap,
   Trash2,
-  Layers,
   ArrowRight,
   Radio,
   Copy,
@@ -45,15 +41,78 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { id: 'antigravity', label: '🚀 Antigravity Pair Programmer', cmd: 'open antigravity', category: 'AI Coding', icon: Sparkles, hotkey: '1' },
-  { id: 'claude', label: '🤖 Claude Code CLI', cmd: 'open claude code', category: 'AI Coding', icon: Terminal, hotkey: '2' },
-  { id: 'codex', label: '🧠 Codex Agent', cmd: 'open codex', category: 'AI Coding', icon: Zap, hotkey: '3' },
-  { id: 'coding_session', label: '⚡ Resume Coding Session', cmd: 'continue my coding session', category: 'Dev', icon: Code, hotkey: '4' },
-  { id: 'cursor', label: '💻 Open Cursor IDE', cmd: 'open cursor', category: 'Dev', icon: Terminal, hotkey: '5' },
-  { id: 'vscode', label: '📝 Open VS Code', cmd: 'open vscode', category: 'Dev', icon: Terminal, hotkey: '6' },
-  { id: 'github', label: '🐙 Open GitHub', cmd: 'open github', category: 'Dev', icon: ExternalLink, hotkey: '7' },
-  { id: 'docker', label: '🐳 Launch Docker', cmd: 'open docker', category: 'Dev', icon: ExternalLink, hotkey: '8' },
-  { id: 'spotify', label: '🎵 Play on Spotify', cmd: 'play synthwave on spotify', category: 'Media', icon: Play, hotkey: '9' },
+  {
+    id: 'antigravity',
+    label: '🚀 Antigravity Pair Programmer',
+    cmd: 'open antigravity',
+    category: 'AI Coding',
+    icon: Sparkles,
+    hotkey: '1',
+  },
+  {
+    id: 'claude',
+    label: '🤖 Claude Code CLI',
+    cmd: 'open claude code',
+    category: 'AI Coding',
+    icon: Terminal,
+    hotkey: '2',
+  },
+  {
+    id: 'codex',
+    label: '🧠 Codex Agent',
+    cmd: 'open codex',
+    category: 'AI Coding',
+    icon: Sparkles,
+    hotkey: '3',
+  },
+  {
+    id: 'coding_session',
+    label: '⚡ Resume Coding Session',
+    cmd: 'continue my coding session',
+    category: 'Dev',
+    icon: Code,
+    hotkey: '4',
+  },
+  {
+    id: 'cursor',
+    label: '💻 Open Cursor IDE',
+    cmd: 'open cursor',
+    category: 'Dev',
+    icon: Terminal,
+    hotkey: '5',
+  },
+  {
+    id: 'vscode',
+    label: '📝 Open VS Code',
+    cmd: 'open vscode',
+    category: 'Dev',
+    icon: Terminal,
+    hotkey: '6',
+  },
+  {
+    id: 'github',
+    label: '🐙 Open GitHub',
+    cmd: 'open github',
+    category: 'Dev',
+    icon: ExternalLink,
+    hotkey: '7',
+  },
+  {
+    id: 'docker',
+    label: '🐳 Launch Docker',
+    cmd: 'open docker',
+    category: 'Dev',
+    icon: ExternalLink,
+    hotkey: '8',
+  },
+  {
+    id: 'spotify',
+    label: '🎵 Play on Spotify',
+    cmd: 'play synthwave on spotify',
+    category: 'Media',
+    icon: Play,
+    hotkey: '9',
+  },
 ];
 
 export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
@@ -71,7 +130,6 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     executeCommand,
     isSpeechSupported,
     audioVolume,
-    isSpeaking,
     voiceLevel,
     activationThreshold,
   } = useJarvisAgent();
@@ -79,7 +137,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
   const [inputVal, setInputVal] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [localHistory, setLocalHistory] = useState<AgentExecutionResponse[]>([]);
-  const [activeTab, setActiveTab] = useState<'console' | 'actions' | 'telemetry'>('console');
+  const [activeTab, setActiveTab] = useState<'console' | 'actions'>('console');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -139,7 +197,7 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Live Fluid Harmonic Spectrum Canvas Visualizer
+  // Live Fluid Siri-Style Harmonic Spectrum Canvas Visualizer
   const startAudioVisualizer = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
@@ -177,45 +235,38 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
         const height = canvas.height;
         const centerY = height / 2;
 
-        // Calculate average audio level
-        let sum = 0;
-        for (let i = 0; i < bufferLength; i++) {
-          sum += dataArray[i] ?? 0;
-        }
-        const avg = sum / bufferLength;
         phase += 0.04;
 
-        // Draw smooth symmetric wave bars
-        const barCount = 36;
+        // Draw smooth symmetric Apple Siri wave bars
+        const barCount = 32;
         const barWidth = 3;
         const gap = (width - barCount * barWidth) / (barCount + 1);
 
         for (let i = 0; i < barCount; i++) {
           const freqIndex = Math.floor((i / barCount) * (bufferLength / 2));
           const freqVal = dataArray[freqIndex] || 0;
-          
-          // Combine frequency data with subtle harmonic breathing
-          const wave = isListening 
-            ? Math.max(4, (freqVal / 255) * (height * 0.75) + Math.sin(phase + i * 0.2) * 4)
-            : Math.max(3, Math.sin(phase + i * 0.2) * 6 + 4);
+
+          const wave = isListening
+            ? Math.max(4, (freqVal / 255) * (height * 0.8) + Math.sin(phase + i * 0.25) * 4)
+            : Math.max(3, Math.sin(phase + i * 0.25) * 5 + 3);
 
           const x = gap + i * (barWidth + gap);
           const y = centerY - wave / 2;
 
-          // Gradient color from emerald to Neural Violet
+          // Apple Intelligence gradient: Blue -> Indigo -> Violet -> Mint
           const gradient = canvasCtx.createLinearGradient(0, y, 0, y + wave);
           if (isListening) {
-            gradient.addColorStop(0, '#34D399');
-            gradient.addColorStop(0.5, '#14B8A6');
-            gradient.addColorStop(1, '#2DD4BF');
+            gradient.addColorStop(0, '#0A84FF');
+            gradient.addColorStop(0.5, '#5E5CE6');
+            gradient.addColorStop(1, '#BF5AF2');
           } else {
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
           }
 
           canvasCtx.fillStyle = gradient;
           canvasCtx.beginPath();
-          canvasCtx.roundRect(x, y, barWidth, wave, 2);
+          canvasCtx.roundRect(x, y, barWidth, wave, 1.5);
           canvasCtx.fill();
         }
       };
@@ -264,44 +315,48 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xl animate-in fade-in duration-150 select-none"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-2xl animate-in fade-in duration-200 select-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Precision Obsidian Command Surface */}
-      <div 
-        className="w-full max-w-2xl bg-[#0b0e17] border border-white/[0.09] rounded-2xl shadow-elevated overflow-hidden flex flex-col max-h-[86vh] relative animate-in scale-in duration-200"
+      {/* Apple Intelligence Frosted Glass Sheet Surface */}
+      <div
+        className="w-full max-w-2xl bg-[#14141A]/92 backdrop-blur-3xl border border-white/[0.12] rounded-3xl shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[86vh] relative animate-in scale-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        
         {/* Top Control & Status Bar */}
-        <div className="px-5 py-3.5 border-b border-white/[0.07] flex items-center justify-between bg-[#0e121e]">
-          
+        <div className="px-6 py-4 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.02]">
           {/* Agent Identity & Live State Pill */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-brand-primary/20 border border-brand-primary/40 flex items-center justify-center text-brand-primary-light">
-                <Zap size={14} className={isListening ? 'animate-pulse' : ''} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0071E3] via-[#5E5CE6] to-[#BF5AF2] p-[1.5px] shadow-sm">
+                <div className="w-full h-full rounded-full bg-[#14141A] flex items-center justify-center text-[#0A84FF]">
+                  <Sparkles size={15} className={isListening ? 'animate-pulse' : ''} />
+                </div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold tracking-tight text-white uppercase font-sans">
-                    Neuro Agent
+                  <span className="text-xs font-semibold tracking-tight text-[#F5F5F7] font-sans">
+                    Neuro Intelligence
                   </span>
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06]">
-                    <span 
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08]">
+                    <span
                       className={`w-1.5 h-1.5 rounded-full ${
-                        isProcessing 
-                          ? 'bg-brand-amber animate-ping' 
-                          : isListening 
-                          ? 'bg-brand-emerald animate-pulse shadow-glow-emerald' 
-                          : 'bg-zinc-500'
-                      }`} 
+                        isProcessing
+                          ? 'bg-[#FF9F0A] animate-ping'
+                          : isListening
+                            ? 'bg-[#30D158] animate-pulse shadow-[0_0_6px_#30D158]'
+                            : 'bg-[#86868B]'
+                      }`}
                     />
-                    <span className="text-[10px] font-medium tracking-wide text-zinc-400">
-                      {isProcessing ? 'Executing' : isListening ? 'Listening ("Hey Neuro")' : 'Standby'}
+                    <span className="text-[10px] font-medium tracking-tight text-[#A1A1A6]">
+                      {isProcessing
+                        ? 'Processing'
+                        : isListening
+                          ? 'Listening ("Hey Neuro")'
+                          : 'Standby'}
                     </span>
                   </div>
                 </div>
@@ -310,25 +365,25 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
           </div>
 
           {/* Controls & Dismiss */}
-          <div className="flex items-center gap-1.5">
-            {/* View Mode Tabs */}
-            <div className="flex items-center bg-black/40 p-0.5 rounded-lg border border-white/[0.05] mr-2">
+          <div className="flex items-center gap-2">
+            {/* Apple Segmented View Mode Tabs */}
+            <div className="flex items-center bg-black/40 p-0.5 rounded-full border border-white/[0.08]">
               <button
                 onClick={() => setActiveTab('console')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
-                  activeTab === 'console' 
-                    ? 'bg-white/[0.08] text-white shadow-sm' 
-                    : 'text-zinc-400 hover:text-zinc-200'
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-150 ${
+                  activeTab === 'console'
+                    ? 'bg-white/[0.14] text-white shadow-sm'
+                    : 'text-[#86868B] hover:text-[#F5F5F7]'
                 }`}
               >
-                Console
+                Activity
               </button>
               <button
                 onClick={() => setActiveTab('actions')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
-                  activeTab === 'actions' 
-                    ? 'bg-white/[0.08] text-white shadow-sm' 
-                    : 'text-zinc-400 hover:text-zinc-200'
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-150 ${
+                  activeTab === 'actions'
+                    ? 'bg-white/[0.14] text-white shadow-sm'
+                    : 'text-[#86868B] hover:text-[#F5F5F7]'
                 }`}
               >
                 Actions
@@ -339,22 +394,22 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
             {localHistory.length > 0 && (
               <button
                 onClick={() => setLocalHistory([])}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors"
+                className="w-7 h-7 rounded-full text-[#86868B] hover:text-[#F5F5F7] hover:bg-white/[0.08] transition-colors flex items-center justify-center"
                 title="Clear activity log"
               >
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </button>
             )}
 
             {/* Voice Mute Toggle */}
             <button
               onClick={() => setIsMuted(!isMuted)}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                 isMuted
-                  ? 'text-brand-rose bg-brand-rose/10'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]'
+                  ? 'text-[#FF453A] bg-[#FF453A]/15'
+                  : 'text-[#86868B] hover:text-[#F5F5F7] hover:bg-white/[0.08]'
               }`}
-              title={isMuted ? 'Unmute voice responses' : 'Mute voice responses'}
+              title={isMuted ? 'Unmute voice' : 'Mute voice'}
             >
               {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
             </button>
@@ -365,17 +420,17 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 soundEngine.playClick();
                 toggleListening();
               }}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                 isListening
-                  ? 'text-brand-emerald bg-brand-emerald/10 ring-1 ring-brand-emerald/30'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]'
+                  ? 'text-[#30D158] bg-[#30D158]/15 ring-1 ring-[#30D158]/40'
+                  : 'text-[#86868B] hover:text-[#F5F5F7] hover:bg-white/[0.08]'
               }`}
-              title={isListening ? 'Stop listening' : 'Start microphone listening'}
+              title={isListening ? 'Stop microphone' : 'Start microphone'}
             >
               {isListening ? <Mic size={14} /> : <MicOff size={14} />}
             </button>
 
-            <div className="w-[1px] h-4 bg-white/[0.08] mx-1" />
+            <div className="w-px h-4 bg-white/[0.1] mx-0.5" />
 
             {/* Close Button */}
             <button
@@ -383,76 +438,102 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                 soundEngine.playClick();
                 onClose();
               }}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+              className="w-7 h-7 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-[#A1A1A6] hover:text-white flex items-center justify-center text-xs transition-colors"
               title="Close (Esc)"
             >
-              <X size={14} />
+              ✕
             </button>
           </div>
         </div>
 
         {/* Dynamic Voice Waveform & Streaming Transcript Section */}
-        <div className="px-6 py-4 bg-[#090b12] border-b border-white/[0.05] flex items-center justify-between gap-6">
-          
+        <div className="px-6 py-4 bg-black/30 border-b border-white/[0.06] flex items-center justify-between gap-6">
           {/* Transcript / State Display */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Radio size={12} className={isListening ? 'text-brand-emerald animate-pulse' : 'text-zinc-500'} />
-              <span className="text-[11px] font-mono tracking-wider uppercase text-zinc-500">
-                {isProcessing ? 'Agent Active' : isListening ? 'Voice Stream' : 'Ready'}
+              <Radio
+                size={12}
+                className={isListening ? 'text-[#0A84FF] animate-pulse' : 'text-[#86868B]'}
+              />
+              <span className="text-[10px] font-mono tracking-wider uppercase text-[#86868B]">
+                {isProcessing
+                  ? 'Executing OS Command'
+                  : isListening
+                    ? 'Voice Stream'
+                    : 'Ready for input'}
               </span>
             </div>
 
             {transcript ? (
-              <p className="text-sm font-medium text-brand-emerald-light tracking-tight truncate font-sans">
+              <p className="text-sm font-medium text-white tracking-tight truncate font-sans">
                 "{transcript}"
               </p>
             ) : isListening ? (
-              <p className="text-xs text-zinc-400 font-sans tracking-tight">
-                Listening for wake-word <span className="text-white font-medium">"Hey Neuro"</span> or direct commands...
+              <p className="text-xs text-[#A1A1A6] font-sans tracking-tight">
+                Listening for <span className="text-white font-medium">"Hey Neuro"</span> or direct
+                instructions...
               </p>
             ) : (
-              <p className="text-xs text-zinc-500 font-sans">
-                Type or speak an OS instruction: <span className="text-zinc-400">"Open Brave"</span>, <span className="text-zinc-400">"Play Spotify"</span>, <span className="text-zinc-400">"Add to note"</span>
+              <p className="text-xs text-[#86868B] font-sans">
+                Type or speak an instruction: <span className="text-[#A1A1A6]">"Open Brave"</span>,{' '}
+                <span className="text-[#A1A1A6]">"Play Spotify"</span>,{' '}
+                <span className="text-[#A1A1A6]">"Add to note"</span>
               </p>
             )}
           </div>
 
           {/* Fluid Multi-Band Audio Spectrum Canvas & Decibel Meter */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            {/* Live Volume Sensitivity VU Meter */}
+            {/* Live Volume Sensitivity Indicator */}
             {isListening && (
               <div className="flex flex-col items-end gap-1 font-mono">
-                <div className="flex items-center gap-1 text-[10px]">
-                  <span className={`w-1.5 h-1.5 rounded-full ${
-                    voiceLevel === 'optimal' ? 'bg-emerald-400 animate-pulse' :
-                    voiceLevel === 'quiet' ? 'bg-amber-400' :
-                    voiceLevel === 'loud' ? 'bg-rose-400' : 'bg-zinc-600'
-                  }`} />
-                  <span className={`text-[10px] font-medium ${
-                    voiceLevel === 'optimal' ? 'text-emerald-300' :
-                    voiceLevel === 'quiet' ? 'text-amber-300' :
-                    voiceLevel === 'loud' ? 'text-rose-300' : 'text-zinc-500'
-                  }`}>
-                    {voiceLevel === 'optimal' ? 'Optimal Audio' :
-                     voiceLevel === 'quiet' ? 'Speak Louder ⏶' :
-                     voiceLevel === 'loud' ? 'Loud Audio ⏷' : 'Listening...'}
+                <div className="flex items-center gap-1.5 text-[10px]">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      voiceLevel === 'optimal'
+                        ? 'bg-[#30D158] animate-pulse'
+                        : voiceLevel === 'quiet'
+                          ? 'bg-[#FF9F0A]'
+                          : voiceLevel === 'loud'
+                            ? 'bg-[#FF453A]'
+                            : 'bg-zinc-600'
+                    }`}
+                  />
+                  <span
+                    className={`text-[10px] font-medium tracking-tight ${
+                      voiceLevel === 'optimal'
+                        ? 'text-[#30D158]'
+                        : voiceLevel === 'quiet'
+                          ? 'text-[#FF9F0A]'
+                          : voiceLevel === 'loud'
+                            ? 'text-[#FF453A]'
+                            : 'text-[#86868B]'
+                    }`}
+                  >
+                    {voiceLevel === 'optimal'
+                      ? 'Optimal Audio'
+                      : voiceLevel === 'quiet'
+                        ? 'Speak Closer'
+                        : voiceLevel === 'loud'
+                          ? 'Loud Audio'
+                          : 'Listening...'}
                   </span>
-                  <span className="text-emerald-400 font-bold ml-1">{audioVolume}%</span>
+                  <span className="text-[#0A84FF] font-semibold ml-1">{audioVolume}%</span>
                 </div>
 
-                <div className="relative w-28 h-1.5 bg-zinc-900 rounded-full overflow-hidden flex items-center border border-white/[0.06]">
-                  {/* Activation threshold indicator line */}
+                <div className="relative w-28 h-1 bg-white/[0.08] rounded-full overflow-hidden flex items-center">
                   <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-emerald-400 z-10 opacity-75"
+                    className="absolute top-0 bottom-0 w-0.5 bg-[#0A84FF] z-10 opacity-75"
                     style={{ left: `${activationThreshold}%` }}
-                    title={`Activation Threshold (${activationThreshold}%)`}
+                    title={`Threshold (${activationThreshold}%)`}
                   />
                   <div
                     className={`h-full transition-all duration-75 rounded-full ${
-                      audioVolume >= 75 ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-rose-500' :
-                      audioVolume >= activationThreshold ? 'bg-gradient-to-r from-emerald-400 to-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
-                      'bg-amber-500/60'
+                      audioVolume >= 75
+                        ? 'bg-gradient-to-r from-[#0071E3] to-[#FF453A]'
+                        : audioVolume >= activationThreshold
+                          ? 'bg-[#0A84FF]'
+                          : 'bg-white/30'
                     }`}
                     style={{ width: `${Math.max(3, audioVolume)}%` }}
                   />
@@ -460,87 +541,98 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
               </div>
             )}
 
-            {/* Audio Waveform Canvas */}
-            <div className="w-32 h-10 flex items-center justify-center flex-shrink-0 bg-black/40 rounded-xl px-2 border border-white/[0.04]">
-              <canvas
-                ref={canvasRef}
-                width={128}
-                height={36}
-                className="w-full h-full"
-              />
+            {/* Apple Siri Harmonic Waveform Canvas */}
+            <div className="w-32 h-10 flex items-center justify-center flex-shrink-0 bg-black/40 rounded-2xl px-2 border border-white/[0.06]">
+              <canvas ref={canvasRef} width={128} height={36} className="w-full h-full" />
             </div>
           </div>
         </div>
 
         {/* Main Content Area: Console / History or Quick Actions */}
         {activeTab === 'console' ? (
-          <div ref={scrollRef} className="flex-1 p-5 overflow-y-auto space-y-2.5 min-h-[220px] max-h-[300px] bg-[#07080e]">
+          <div
+            ref={scrollRef}
+            className="flex-1 p-5 overflow-y-auto space-y-2.5 min-h-[220px] max-h-[300px] bg-black/20"
+          >
             {localHistory.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-8 text-zinc-500">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-3">
-                  <Cpu size={18} className="text-zinc-400" />
+              <div className="h-full flex flex-col items-center justify-center text-center py-8 text-[#86868B]">
+                <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-3 text-[#A1A1A6]">
+                  <Cpu size={18} />
                 </div>
-                <p className="text-xs font-medium text-zinc-300">Deterministic OS Execution Engine</p>
-                <p className="text-[11px] text-zinc-500 mt-1 max-w-sm">
-                  Commands execute locally with zero external API latency. Try saying <span className="text-zinc-400">"Hey Neuro"</span> or choose a quick action.
+                <p className="text-xs font-semibold text-[#F5F5F7] tracking-tight">
+                  Autonomous Local Agent Engine
+                </p>
+                <p className="text-xs text-[#86868B] mt-1 max-w-sm leading-relaxed">
+                  Commands execute natively on your device with zero external cloud dependencies.
+                  Say <span className="text-[#F5F5F7]">"Hey Neuro"</span> or pick an action.
                 </p>
               </div>
             ) : (
               localHistory.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-xl border border-white/[0.06] bg-[#0e121d] hover:border-white/[0.12] transition-all flex items-start justify-between gap-3 group"
+                  className="p-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.14] transition-all flex items-start justify-between gap-3 group"
                 >
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {item.success ? (
-                        <CheckCircle2 size={13} className="text-brand-emerald flex-shrink-0" />
+                        <CheckCircle2 size={13} className="text-[#30D158] flex-shrink-0" />
                       ) : (
-                        <AlertCircle size={13} className="text-brand-amber flex-shrink-0" />
+                        <AlertCircle size={13} className="text-[#FF9F0A] flex-shrink-0" />
                       )}
-                      
-                      <span className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider">
+
+                      <span className="text-[10px] font-mono font-medium text-[#86868B] uppercase tracking-wider">
                         {item.tool_name || 'System Command'}
                       </span>
 
                       {item.is_offline_native && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20">
+                        <span className="text-[9px] font-mono px-2 py-0.2 rounded-full bg-[#30D158]/10 text-[#30D158] border border-[#30D158]/20">
                           Native
                         </span>
                       )}
 
-                      <span className="text-[10px] text-zinc-600 ml-auto font-mono">
-                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      <span className="text-[10px] text-[#6E6E73] ml-auto font-mono">
+                        {new Date().toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                        })}
                       </span>
                     </div>
 
-                    <p className="text-xs font-medium text-zinc-200 leading-relaxed font-sans">
+                    <p className="text-xs font-medium text-[#F5F5F7] leading-relaxed font-sans">
                       {item.display_text || item.voice_response}
                     </p>
 
-                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-mono">
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#86868B] font-mono">
                       <span>Input:</span>
-                      <span className="text-zinc-400">"{item.input_text}"</span>
+                      <span className="text-[#A1A1A6]">"{item.input_text}"</span>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => copyToClipboard(item.display_text || item.voice_response || '', `hist-${idx}`)}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-white/[0.08] text-zinc-400 hover:text-white transition-opacity"
+                    onClick={() =>
+                      copyToClipboard(item.display_text || item.voice_response || '', `hist-${idx}`)
+                    }
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/[0.08] text-[#86868B] hover:text-white transition-opacity"
                     title="Copy output"
                   >
-                    {copiedId === `hist-${idx}` ? <Check size={12} className="text-brand-emerald" /> : <Copy size={12} />}
+                    {copiedId === `hist-${idx}` ? (
+                      <Check size={12} className="text-[#30D158]" />
+                    ) : (
+                      <Copy size={12} />
+                    )}
                   </button>
                 </div>
               ))
             )}
           </div>
         ) : (
-          <div className="flex-1 p-5 overflow-y-auto min-h-[220px] max-h-[300px] bg-[#07080e]">
-            <div className="text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider font-mono">
-              Available Native Commands
+          <div className="flex-1 p-5 overflow-y-auto min-h-[220px] max-h-[300px] bg-black/20">
+            <div className="text-[11px] font-semibold text-[#86868B] mb-3 uppercase tracking-wider font-mono">
+              Quick Shortcuts & Launchers
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {QUICK_ACTIONS.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -548,22 +640,25 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
                     key={item.id}
                     onClick={() => handleQuickCommand(item.cmd)}
                     disabled={isProcessing}
-                    className="p-3 rounded-xl bg-[#0e121d] border border-white/[0.06] hover:border-brand-primary/40 hover:bg-[#121626] transition-all flex items-center justify-between text-left group"
+                    className="p-3 rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:border-[#0071E3]/50 hover:bg-white/[0.06] transition-all flex items-center justify-between text-left group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-400 group-hover:text-brand-emerald transition-colors">
+                      <div className="w-7 h-7 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-[#86868B] group-hover:text-[#0A84FF] transition-colors">
                         <Icon size={14} />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs font-medium text-zinc-200 group-hover:text-white truncate">
+                        <div className="text-xs font-medium text-[#F5F5F7] group-hover:text-white truncate">
                           {item.label}
                         </div>
-                        <div className="text-[10px] text-zinc-500 font-mono truncate">
+                        <div className="text-[10px] text-[#86868B] font-mono truncate">
                           {item.cmd}
                         </div>
                       </div>
                     </div>
-                    <ArrowRight size={12} className="text-zinc-600 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ArrowRight
+                      size={12}
+                      className="text-[#86868B] group-hover:text-[#0A84FF] group-hover:translate-x-0.5 transition-all flex-shrink-0"
+                    />
                   </button>
                 );
               })}
@@ -571,29 +666,31 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
           </div>
         )}
 
-        {/* Command Input Bar */}
-        <div className="p-3.5 border-t border-white/[0.07] bg-[#0d101a]">
-          <form onSubmit={handleSubmit} className="flex items-center gap-2">
+        {/* Spotlight Command Input Bar */}
+        <div className="p-4 border-t border-white/[0.08] bg-white/[0.02]">
+          <form onSubmit={handleSubmit} className="flex items-center gap-2.5">
             <div className="relative flex-1">
               <input
                 ref={inputRef}
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="Ask Neuro... (e.g. 'open brave', 'play jazz on spotify', 'add to note')"
+                placeholder="Ask Neuro Intelligence... (e.g. 'open brave', 'play jazz on spotify', 'create note')"
                 disabled={isProcessing}
-                className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/30 transition-all font-sans"
+                className="w-full bg-white/[0.06] hover:bg-white/[0.08] focus:bg-white/[0.1] border border-white/[0.1] rounded-2xl px-4 py-2.5 text-xs text-[#F5F5F7] placeholder-[#86868B] outline-none focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/30 transition-all font-sans"
               />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-zinc-500 font-mono pointer-events-none">
-                <kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-zinc-400">↵ Enter</kbd>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-[#86868B] font-mono pointer-events-none">
+                <kbd className="px-1.5 py-0.5 bg-black/40 border border-white/[0.08] rounded-md text-[#86868B]">
+                  ↵ Return
+                </kbd>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={!inputVal.trim() || isProcessing}
-              className="px-3 py-2.5 bg-brand-primary hover:bg-brand-primary-dark text-white text-xs font-medium rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-glow-primary flex items-center gap-1.5 flex-shrink-0"
-              title="Execute command"
+              className="px-4 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_1px_2px_rgba(0,0,0,0.2)] flex items-center gap-1.5 flex-shrink-0"
+              title="Execute"
             >
               <span>Run</span>
               <CornerDownLeft size={12} />
@@ -601,18 +698,22 @@ export default function JarvisHUD({ isOpen, onClose }: JarvisHUDProps) {
           </form>
 
           {/* Quick Footer Hints */}
-          <div className="mt-2.5 flex items-center justify-between text-[10px] text-zinc-500 px-1 font-mono">
+          <div className="mt-2.5 flex items-center justify-between text-[10px] text-[#86868B] px-1 font-mono">
             <div className="flex items-center gap-3">
-              <span>Wake: <strong className="text-zinc-300 font-normal">"Hey Neuro"</strong></span>
+              <span>
+                Wake: <strong className="text-[#F5F5F7] font-normal">"Hey Neuro"</strong>
+              </span>
               <span>•</span>
-              <span>Shortcut: <kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded text-zinc-400">Ctrl + Space</kbd></span>
+              <span>
+                Shortcut:{' '}
+                <kbd className="px-1.5 py-0.2 bg-white/[0.06] border border-white/[0.08] rounded-md text-[#A1A1A6]">
+                  Ctrl + Space
+                </kbd>
+              </span>
             </div>
-            <div className="text-zinc-500">
-              Zero API Key Offline Execution
-            </div>
+            <div className="text-[#86868B]">On-Device Private Intelligence</div>
           </div>
         </div>
-
       </div>
     </div>
   );

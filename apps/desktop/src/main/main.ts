@@ -1,4 +1,14 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, screen, session, Tray, Menu, nativeImage } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  ipcMain,
+  screen,
+  session,
+  Tray,
+  Menu,
+  nativeImage,
+} from 'electron';
 import * as path from 'path';
 import { backendProcessManager } from './backend-process';
 import {
@@ -41,7 +51,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: 'Neuro — AI Workspace',
-    backgroundColor: '#060810',
+    backgroundColor: '#000000',
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       nodeIntegration: false,
@@ -246,7 +256,7 @@ app.whenReady().then(async () => {
     const icon = createTrayIcon();
     tray = new Tray(icon);
     tray.setToolTip('Neuro — AI Workspace');
-    
+
     const contextMenu = Menu.buildFromTemplate([
       {
         label: '🚀 Open Neuro Workstation',
@@ -380,12 +390,13 @@ ipcMain.handle('orb:resize', (_, { width, height }: { width: number; height: num
   if (orbWindow && !orbWindow.isDestroyed()) {
     const [currentX, currentY] = orbWindow.getPosition() as [number, number];
     const [currentW, currentH] = orbWindow.getSize() as [number, number];
-    
+
     // Smoothly shift to keep bottom-right alignment anchored
     const deltaW = width - currentW;
     const deltaH = height - currentH;
 
-    const primaryDisplay = screen.getDisplayNearestPoint({ x: currentX, y: currentY }) || screen.getPrimaryDisplay();
+    const primaryDisplay =
+      screen.getDisplayNearestPoint({ x: currentX, y: currentY }) || screen.getPrimaryDisplay();
     const { x: workX, y: workY, width: workW, height: workH } = primaryDisplay.workArea;
 
     let targetX = currentX - deltaW;
@@ -411,9 +422,12 @@ ipcMain.handle('system:telemetry', () => {
   return getSystemTelemetry();
 });
 
-ipcMain.handle('media:control', async (_, action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => {
-  return controlMedia(action);
-});
+ipcMain.handle(
+  'media:control',
+  async (_, action: 'playpause' | 'next' | 'prev' | 'volumeup' | 'volumedown' | 'mute') => {
+    return controlMedia(action);
+  },
+);
 
 ipcMain.handle('window:focus-main', () => {
   if (mainWindow && !mainWindow.isDestroyed()) {

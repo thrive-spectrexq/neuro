@@ -19,7 +19,7 @@ import {
   HardDrive,
   Activity,
   Check,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 
@@ -110,13 +110,17 @@ export default function SettingsPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setBenchmarkResult(`✅ Response in ${elapsedMs}ms: "${data.response || data.text || 'Success'}"`);
+        setBenchmarkResult(
+          `✅ Response in ${elapsedMs}ms: "${data.response || data.text || 'Success'}"`,
+        );
         soundEngine.playSuccessTone();
       } else {
         setBenchmarkResult(`⚠️ Local AI endpoint responded in ${elapsedMs}ms with offline mode.`);
       }
     } catch (e: any) {
-      setBenchmarkResult(`⚠️ Benchmark notice: Local fallback active (${Math.round(performance.now() - start)}ms)`);
+      setBenchmarkResult(
+        `⚠️ Benchmark notice: Local fallback active (${Math.round(performance.now() - start)}ms)`,
+      );
     } finally {
       setBenchmarking(false);
     }
@@ -143,7 +147,8 @@ export default function SettingsPage() {
             </span>
           </div>
           <p className="text-xs text-zinc-400 font-sans">
-            Configure local AI models (DeepSeek/Llama), desktop voice agent, and hardware diagnostics.
+            Configure local AI models (DeepSeek/Llama), desktop voice agent, and hardware
+            diagnostics.
           </p>
         </div>
 
@@ -225,7 +230,9 @@ export default function SettingsPage() {
 
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1 text-[11px] font-mono">
-              <span className={`w-1.5 h-1.5 rounded-full ${ollamaOnline ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${ollamaOnline ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}
+              />
               <span className={ollamaOnline ? 'text-emerald-400' : 'text-zinc-400'}>
                 {ollamaOnline ? 'Ollama Detected' : 'Ollama Standby'}
               </span>
@@ -235,7 +242,10 @@ export default function SettingsPage() {
               disabled={isScanningOllama}
               className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-[10px] text-zinc-300 font-mono transition-all"
             >
-              <RefreshCw size={10} className={isScanningOllama ? 'animate-spin text-emerald-400' : ''} />
+              <RefreshCw
+                size={10}
+                className={isScanningOllama ? 'animate-spin text-emerald-400' : ''}
+              />
               <span>Scan Models</span>
             </button>
           </div>
@@ -252,7 +262,9 @@ export default function SettingsPage() {
                 onChange={(e) => setAiProvider(e.target.value)}
                 className="w-full bg-[#070910] border border-white/[0.08] rounded-xl px-3.5 py-2 text-xs text-zinc-200 outline-none focus:border-emerald-500/50 cursor-pointer"
               >
-                <option value="Local Ollama (Offline)">Local Ollama (100% Offline & Private)</option>
+                <option value="Local Ollama (Offline)">
+                  Local Ollama (100% Offline & Private)
+                </option>
                 <option value="OpenAI">OpenAI (GPT-4o)</option>
                 <option value="Anthropic">Anthropic (Claude 3.5 Sonnet)</option>
                 <option value="Deterministic Only">Zero-Key Deterministic (No LLM)</option>
@@ -322,20 +334,26 @@ export default function SettingsPage() {
               {systemTelemetry ? `${systemTelemetry.freeMemoryGb} GB Free` : '16 GB Total'}
             </p>
             <p className="text-[10px] text-zinc-500 font-mono">
-              {systemTelemetry ? `${systemTelemetry.memoryUsagePercent}% RAM Allocated` : 'Optimized'}
+              {systemTelemetry
+                ? `${systemTelemetry.memoryUsagePercent}% RAM Allocated`
+                : 'Optimized'}
             </p>
           </div>
 
           <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] space-y-1">
             <span className="text-[10px] font-mono text-zinc-400 uppercase">CPU Architecture</span>
             <p className="text-lg font-bold text-white font-mono">
-              {systemTelemetry ? `${systemTelemetry.cpus} Cores (${systemTelemetry.arch})` : 'Multi-Core Active'}
+              {systemTelemetry
+                ? `${systemTelemetry.cpus} Cores (${systemTelemetry.arch})`
+                : 'Multi-Core Active'}
             </p>
             <p className="text-[10px] text-zinc-500 font-mono">Hardware Acceleration ON</p>
           </div>
 
           <div className="p-4 rounded-2xl border border-white/[0.06] bg-[#0c0f18] space-y-1">
-            <span className="text-[10px] font-mono text-zinc-400 uppercase">FastAPI Agent Core</span>
+            <span className="text-[10px] font-mono text-zinc-400 uppercase">
+              FastAPI Agent Core
+            </span>
             <p className="text-lg font-bold text-emerald-400 font-mono flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               {backendHealthy ? 'Port 8000 Online' : 'Online'}

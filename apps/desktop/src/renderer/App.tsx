@@ -13,13 +13,15 @@ import DesktopNeonOrb from './components/DesktopNeonOrb';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 
-type Page = 'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings' | 'vault-health' | 'ingest';
+type Page =
+  'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings' | 'vault-health' | 'ingest';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('notes');
   const [isJarvisOpen, setIsJarvisOpen] = useState(false);
 
-  const isOrbOnlyMode = typeof window !== 'undefined' && window.location.search.includes('mode=orb');
+  const isOrbOnlyMode =
+    typeof window !== 'undefined' && window.location.search.includes('mode=orb');
 
   useEffect(() => {
     if (isOrbOnlyMode) {
@@ -64,15 +66,24 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'notes': return <NotesPage onNavigate={setCurrentPage as any} />;
-      case 'editor': return <EditorPage />;
-      case 'graph': return <GraphPage />;
-      case 'flashcards': return <FlashcardsPage onNavigate={setCurrentPage as any} />;
-      case 'search': return <SearchPage onNavigate={setCurrentPage as any} />;
-      case 'settings': return <SettingsPage />;
-      case 'vault-health': return <VaultHealthPage />;
-      case 'ingest': return <IngestPage />;
-      default: return <NotesPage onNavigate={setCurrentPage as any} />;
+      case 'notes':
+        return <NotesPage onNavigate={setCurrentPage as any} />;
+      case 'editor':
+        return <EditorPage />;
+      case 'graph':
+        return <GraphPage />;
+      case 'flashcards':
+        return <FlashcardsPage onNavigate={setCurrentPage as any} />;
+      case 'search':
+        return <SearchPage onNavigate={setCurrentPage as any} />;
+      case 'settings':
+        return <SettingsPage />;
+      case 'vault-health':
+        return <VaultHealthPage />;
+      case 'ingest':
+        return <IngestPage />;
+      default:
+        return <NotesPage onNavigate={setCurrentPage as any} />;
     }
   };
 
@@ -83,16 +94,11 @@ export default function App() {
         onNavigate={setCurrentPage}
         onOpenJarvis={() => setIsJarvisOpen(true)}
       >
-        <ErrorBoundary onReset={() => setCurrentPage('notes')}>
-          {renderPage()}
-        </ErrorBoundary>
+        <ErrorBoundary onReset={() => setCurrentPage('notes')}>{renderPage()}</ErrorBoundary>
       </Layout>
 
       {/* Futuristic JARVIS HUD Overlay */}
-      <JarvisHUD
-        isOpen={isJarvisOpen}
-        onClose={() => setIsJarvisOpen(false)}
-      />
+      <JarvisHUD isOpen={isJarvisOpen} onClose={() => setIsJarvisOpen(false)} />
       <Toaster position="bottom-right" />
     </ErrorBoundary>
   );

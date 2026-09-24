@@ -41,9 +41,15 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
   const typeLabels: Record<string, { label: string; color: string }> = {
     completion: { label: 'Completion', color: 'text-sky-400 bg-sky-950/40 border-sky-800/50' },
     lint_fix: { label: 'Lint Fix', color: 'text-amber-400 bg-amber-950/40 border-amber-800/50' },
-    flashcard: { label: 'Recall Card', color: 'text-emerald-400 bg-emerald-950/40 border-emerald-800/50' },
+    flashcard: {
+      label: 'Recall Card',
+      color: 'text-emerald-400 bg-emerald-950/40 border-emerald-800/50',
+    },
     task: { label: 'Task Item', color: 'text-teal-400 bg-teal-950/40 border-teal-800/50' },
-    search_synthesis: { label: 'Synthesis', color: 'text-teal-400 bg-teal-950/40 border-teal-800/50' },
+    search_synthesis: {
+      label: 'Synthesis',
+      color: 'text-teal-400 bg-teal-950/40 border-teal-800/50',
+    },
     refactor: { label: 'Refactor', color: 'text-rose-400 bg-rose-950/40 border-rose-800/50' },
     explanation: { label: 'Insight', color: 'text-slate-300 bg-slate-800/40 border-slate-700/50' },
   };

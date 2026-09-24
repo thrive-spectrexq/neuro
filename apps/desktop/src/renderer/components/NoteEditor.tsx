@@ -18,7 +18,7 @@ import {
   FileCheck,
   Eye,
   Columns,
-  Code
+  Code,
 } from 'lucide-react';
 import { useNoteStore } from '../store/noteStore';
 import { useNotes, useUpdateNote } from '../hooks/useNotes';
@@ -70,11 +70,11 @@ export default function NoteEditor() {
               onSettled: () => {
                 setTimeout(() => setIsSaving(false), 500);
               },
-            }
+            },
           );
         }
       }, 800),
-    [notes, updateNoteMutation]
+    [notes, updateNoteMutation],
   );
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function NoteEditor() {
         debouncedSave(activeNoteId, title, value);
       }
     },
-    [activeNoteId, title, debouncedSave]
+    [activeNoteId, title, debouncedSave],
   );
 
   // Toggle Markdown checkbox directly in Preview
@@ -162,8 +162,11 @@ export default function NoteEditor() {
       } else {
         // Fallback local transformation if backend AI offline
         if (actionType === 'action_items') {
-          const lines = content.split('\n').filter(l => l.trim().length > 5);
-          const tasks = lines.slice(0, 5).map(l => `- [ ] ${l.replace(/^[-*#\d.]+\s*/, '')}`).join('\n');
+          const lines = content.split('\n').filter((l) => l.trim().length > 5);
+          const tasks = lines
+            .slice(0, 5)
+            .map((l) => `- [ ] ${l.replace(/^[-*#\d.]+\s*/, '')}`)
+            .join('\n');
           const newContent = `${content}\n\n### ⚡ Action Items\n${tasks}`;
           setContent(newContent);
           if (activeNoteId) debouncedSave(activeNoteId, title, newContent);
@@ -184,7 +187,8 @@ export default function NoteEditor() {
 
   // Live Voice Dictation directly into Note
   const toggleDictation = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert('Speech recognition is not supported in this browser/runtime.');
       return;
@@ -256,13 +260,28 @@ export default function NoteEditor() {
       <div className="p-8 font-sans text-sm leading-relaxed text-zinc-200 space-y-3 overflow-y-auto h-full">
         {lines.map((line, idx) => {
           if (line.startsWith('# ')) {
-            return <h1 key={idx} className="text-2xl font-bold text-white border-b border-white/[0.08] pb-2 pt-2">{line.slice(2)}</h1>;
+            return (
+              <h1
+                key={idx}
+                className="text-2xl font-bold text-white border-b border-white/[0.08] pb-2 pt-2"
+              >
+                {line.slice(2)}
+              </h1>
+            );
           }
           if (line.startsWith('## ')) {
-            return <h2 key={idx} className="text-xl font-bold text-emerald-300 pt-2">{line.slice(3)}</h2>;
+            return (
+              <h2 key={idx} className="text-xl font-bold text-emerald-300 pt-2">
+                {line.slice(3)}
+              </h2>
+            );
           }
           if (line.startsWith('### ')) {
-            return <h3 key={idx} className="text-base font-semibold text-teal-300 pt-1">{line.slice(4)}</h3>;
+            return (
+              <h3 key={idx} className="text-base font-semibold text-teal-300 pt-1">
+                {line.slice(4)}
+              </h3>
+            );
           }
           if (line.startsWith('- [ ] ') || line.startsWith('- [x] ')) {
             const isChecked = line.startsWith('- [x] ');
@@ -286,11 +305,18 @@ export default function NoteEditor() {
             );
           }
           if (line.startsWith('- ') || line.startsWith('* ')) {
-            return <li key={idx} className="ml-4 list-disc text-zinc-300">{line.slice(2)}</li>;
+            return (
+              <li key={idx} className="ml-4 list-disc text-zinc-300">
+                {line.slice(2)}
+              </li>
+            );
           }
           if (line.startsWith('> ')) {
             return (
-              <blockquote key={idx} className="border-l-2 border-emerald-500 pl-3 py-1 bg-emerald-950/20 text-emerald-200 italic rounded-r-md">
+              <blockquote
+                key={idx}
+                className="border-l-2 border-emerald-500 pl-3 py-1 bg-emerald-950/20 text-emerald-200 italic rounded-r-md"
+              >
                 {line.slice(2)}
               </blockquote>
             );
@@ -298,7 +324,11 @@ export default function NoteEditor() {
           if (!line.trim()) {
             return <div key={idx} className="h-2" />;
           }
-          return <p key={idx} className="text-zinc-300">{line}</p>;
+          return (
+            <p key={idx} className="text-zinc-300">
+              {line}
+            </p>
+          );
         })}
       </div>
     );
@@ -311,7 +341,9 @@ export default function NoteEditor() {
           <FileText size={20} className="text-zinc-500" />
         </div>
         <p className="text-sm font-medium text-zinc-300">No Note Selected</p>
-        <p className="text-xs text-zinc-500 mt-1">Select a note from the Notes tab or create a new one.</p>
+        <p className="text-xs text-zinc-500 mt-1">
+          Select a note from the Notes tab or create a new one.
+        </p>
       </div>
     );
   }
@@ -377,10 +409,11 @@ export default function NoteEditor() {
           <div className="w-[1px] h-3 bg-white/[0.08]" />
 
           <div className="flex items-center gap-1">
-            <CheckCircle2 size={12} className={isSaving ? 'text-amber-400 animate-spin' : 'text-emerald-400'} />
-            <span className="text-[11px] text-zinc-400">
-              {isSaving ? 'Saving...' : 'Saved'}
-            </span>
+            <CheckCircle2
+              size={12}
+              className={isSaving ? 'text-amber-400 animate-spin' : 'text-emerald-400'}
+            />
+            <span className="text-[11px] text-zinc-400">{isSaving ? 'Saving...' : 'Saved'}</span>
           </div>
         </div>
       </div>
@@ -458,14 +491,14 @@ export default function NoteEditor() {
       <div className="flex-1 overflow-hidden relative flex">
         {/* CodeMirror Source Editor */}
         {(viewMode === 'edit' || viewMode === 'split') && (
-          <div className={`${viewMode === 'split' ? 'w-1/2 border-r border-white/[0.06]' : 'w-full'} h-full overflow-hidden`}>
+          <div
+            className={`${viewMode === 'split' ? 'w-1/2 border-r border-white/[0.06]' : 'w-full'} h-full overflow-hidden`}
+          >
             <CodeMirror
               value={content}
               height="100%"
               theme={oneDark}
-              extensions={[
-                markdown({ base: markdownLanguage, codeLanguages: languages }),
-              ]}
+              extensions={[markdown({ base: markdownLanguage, codeLanguages: languages })]}
               onChange={handleContentChange}
               className="h-full text-[13px] leading-relaxed [&_.cm-editor]:h-full [&_.cm-editor]:bg-transparent [&_.cm-scroller]:p-8 [&_.cm-content]:font-mono [&_.cm-line]:py-0.5"
             />
@@ -474,7 +507,9 @@ export default function NoteEditor() {
 
         {/* Rich Live Markdown Preview */}
         {(viewMode === 'preview' || viewMode === 'split') && (
-          <div className={`${viewMode === 'split' ? 'w-1/2' : 'w-full'} h-full overflow-y-auto bg-[#07080c]`}>
+          <div
+            className={`${viewMode === 'split' ? 'w-1/2' : 'w-full'} h-full overflow-y-auto bg-[#07080c]`}
+          >
             {renderMarkdownPreview()}
           </div>
         )}

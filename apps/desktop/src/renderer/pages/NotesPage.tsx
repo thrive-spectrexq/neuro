@@ -6,17 +6,12 @@ import {
   Tag,
   Clock,
   Trash2,
-  ExternalLink,
-  Sparkles,
-  Layers,
-  ArrowUpDown,
   BookOpen,
   Download,
   Upload,
   FileUp,
-  Check,
   CheckCircle2,
-  Link
+  Link,
 } from 'lucide-react';
 import { useNotes, useCreateNote, useDeleteNote } from '../hooks/useNotes';
 import { useNoteStore } from '../store/noteStore';
@@ -71,7 +66,10 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
     }
   };
 
-  const handleCreateNote = (templateTitle = 'Untitled Note', templateContent = '# Untitled Note\n\nStart capturing knowledge or ideas here...') => {
+  const handleCreateNote = (
+    templateTitle = 'Untitled Note',
+    templateContent = '# Untitled Note\n\nStart capturing knowledge or ideas here...',
+  ) => {
     soundEngine.playClick();
     createNoteMutation.mutate(
       {
@@ -83,7 +81,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
         onSuccess: (newNote) => {
           handleNoteClick(newNote.id);
         },
-      }
+      },
     );
   };
 
@@ -99,15 +97,19 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
     let imported = 0;
 
     Array.from(files).forEach((file) => {
-      if (file.name.endsWith('.md') || file.name.endsWith('.txt') || file.name.endsWith('.markdown')) {
+      if (
+        file.name.endsWith('.md') ||
+        file.name.endsWith('.txt') ||
+        file.name.endsWith('.markdown')
+      ) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const rawText = (e.target?.result as string) || '';
           const cleanFileName = file.name.replace(/\.(md|txt|markdown)$/, '');
-          
+
           // Extract first heading as title if present
           const headingMatch = rawText.match(/^#\s+(.+)$/m);
-          const title = (headingMatch && headingMatch[1]) ? headingMatch[1].trim() : cleanFileName;
+          const title = headingMatch && headingMatch[1] ? headingMatch[1].trim() : cleanFileName;
 
           // Extract tags `#tag`
           const tagMatches = rawText.match(/#[a-zA-Z0-9_-]+/g) || [];
@@ -146,10 +148,14 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
   // Export all vault notes as JSON
   const handleExportVault = () => {
     if (!notes || notes.length === 0) return;
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(notes, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(notes, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `neuro_vault_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute(
+      'download',
+      `neuro_vault_backup_${new Date().toISOString().slice(0, 10)}.json`,
+    );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -179,57 +185,63 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`page-container ${
-        isDraggingFile ? 'bg-emerald-950/20 ring-2 ring-emerald-400 ring-inset' : ''
+        isDraggingFile ? 'bg-[#0071E3]/10 ring-2 ring-[#0071E3] ring-inset' : ''
       }`}
     >
       {/* Drag & Drop Overlay Feedback */}
       {isDraggingFile && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center text-brand-emerald pointer-events-none animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xl flex flex-col items-center justify-center text-[#0A84FF] pointer-events-none animate-in fade-in duration-150">
           <FileUp size={48} className="animate-bounce mb-3" />
-          <p className="text-lg font-bold">Drop Markdown (.md) files to import into Neuro</p>
-          <p className="text-xs text-text-muted mt-1">Files will be indexed and linked to your knowledge vault</p>
+          <p className="text-lg font-bold tracking-tight text-white">
+            Drop Markdown (.md) files to import into Neuro
+          </p>
+          <p className="text-xs text-[#86868B] mt-1">
+            Files will be indexed and linked to your knowledge vault
+          </p>
         </div>
       )}
 
-      {/* Workspace Header */}
-      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7 animate-fade-in">
+      {/* Apple Notes Workspace Header */}
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7 animate-in fade-in duration-200">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="page-title">
-              Notes & Knowledge Vault
-            </h1>
+          <div className="flex items-center gap-3 mb-1.5">
+            <h1 className="page-title">Notes & Knowledge</h1>
             <div className="flex items-center gap-2">
-              <span className="badge-neutral flex items-center gap-1">
-                <FileText size={12} />
+              <span className="badge-neutral flex items-center gap-1.5">
+                <FileText size={11} />
                 {notes?.length || 0} notes
               </span>
-              <span className="badge-neutral flex items-center gap-1">
-                <Tag size={12} />
+              <span className="badge-neutral flex items-center gap-1.5">
+                <Tag size={11} />
                 {allTags.length} tags
               </span>
               {importStatus && (
-                <span className="badge-emerald flex items-center gap-1 animate-fade-in">
-                  <CheckCircle2 size={12} /> {importStatus}
+                <span className="badge-emerald flex items-center gap-1.5 animate-in fade-in duration-150">
+                  <CheckCircle2 size={11} /> {importStatus}
                 </span>
               )}
             </div>
           </div>
           <p className="page-subtitle">
-            Personal second brain notes with bi-directional wiki linking, semantic search, and Markdown import.
+            Personal knowledge vault with bi-directional wiki linking, semantic search, and Markdown
+            import.
           </p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Quick Search */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Quick Spotlight Filter */}
           <div className="relative w-56">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+            <Search
+              size={13}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#86868B] pointer-events-none"
+            />
             <input
               type="text"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              placeholder="Filter notes..."
-              className="input-base pl-9 w-full"
+              placeholder="Search notes..."
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs rounded-full bg-white/[0.05] hover:bg-white/[0.08] focus:bg-white/[0.1] border border-white/[0.09] focus:border-[#0071E3] focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30 text-[#F5F5F7] placeholder-[#86868B] transition-all"
             />
           </div>
 
@@ -247,7 +259,7 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             className="btn-secondary"
             title="Import Markdown Files or Obsidian Notes"
           >
-            <Upload size={14} className="text-brand-emerald" />
+            <Upload size={13} className="text-[#0A84FF]" />
             <span>Import</span>
           </button>
 
@@ -257,16 +269,13 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             className="btn-secondary"
             title="Export all vault notes as JSON backup"
           >
-            <Download size={14} className="text-brand-primary" />
+            <Download size={13} className="text-[#A1A1A6]" />
             <span>Export</span>
           </button>
 
           {/* New Note Button */}
-          <button
-            onClick={() => handleCreateNote()}
-            className="btn-primary"
-          >
-            <Plus size={16} />
+          <button onClick={() => handleCreateNote()} className="btn-primary">
+            <Plus size={14} />
             <span>New Note</span>
           </button>
         </div>
@@ -274,13 +283,13 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
 
       {/* Tag Filter Bar */}
       {allTags.length > 0 && (
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <div className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-2 animate-in fade-in duration-200">
           <button
             onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1 rounded-full text-xs font-medium tracking-tight transition-all duration-150 ${
               selectedTag === null
-                ? 'bg-surface-elevated text-text-primary border border-surface-elevated'
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface border border-transparent'
+                ? 'bg-white/[0.14] text-white shadow-sm border border-white/[0.1]'
+                : 'text-[#86868B] hover:text-[#F5F5F7] hover:bg-white/[0.06] border border-transparent'
             }`}
           >
             All Notes
@@ -289,14 +298,14 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-full text-xs font-mono transition-all duration-150 flex items-center gap-1.5 ${
                 selectedTag === tag
-                  ? 'badge-emerald'
-                  : 'bg-surface text-text-secondary hover:text-text-primary border border-surface hover:border-surface-elevated'
+                  ? 'bg-[#0071E3]/20 text-[#0A84FF] border border-[#0071E3]/40 shadow-sm'
+                  : 'bg-white/[0.04] text-[#86868B] hover:text-[#F5F5F7] border border-white/[0.06] hover:border-white/[0.1]'
               }`}
             >
-              <Tag size={12} className={selectedTag === tag ? 'opacity-70' : 'opacity-50'} />
-              <span>{tag}</span>
+              <Tag size={11} className={selectedTag === tag ? 'opacity-90' : 'opacity-50'} />
+              <span>#{tag}</span>
             </button>
           ))}
         </div>
@@ -304,75 +313,81 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
 
       {/* Notes Grid */}
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center text-text-muted text-sm font-mono animate-pulse">
+        <div className="flex-1 flex items-center justify-center text-[#86868B] text-xs font-mono animate-pulse">
           Loading knowledge repository...
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-12 rounded-2xl border border-dashed border-surface-elevated card-surface-static animate-scale-in">
-          <div className="w-14 h-14 rounded-2xl bg-surface flex items-center justify-center mb-4">
-            <BookOpen size={24} className="text-text-muted" />
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-12 rounded-3xl border border-dashed border-white/[0.1] bg-white/[0.02] animate-in scale-in duration-200">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4 text-[#86868B]">
+            <BookOpen size={24} />
           </div>
-          <h3 className="text-base font-semibold text-text-primary mb-2">
+          <h3 className="text-base font-semibold text-[#F5F5F7] mb-2 tracking-tight">
             {searchFilter || selectedTag ? 'No matching notes found' : 'Your Second Brain is Empty'}
           </h3>
-          <p className="text-sm text-text-secondary max-w-md mb-6">
+          <p className="text-xs text-[#86868B] max-w-md mb-6 leading-relaxed">
             {searchFilter || selectedTag
               ? 'Try changing your search keywords or clearing active tag filters.'
               : 'Create your first note or drag-and-drop your existing Markdown vault.'}
           </p>
-          <button
-            onClick={() => handleCreateNote()}
-            className="btn-primary"
-          >
-            <Plus size={16} />
+          <button onClick={() => handleCreateNote()} className="btn-primary">
+            <Plus size={14} />
             <span>Create First Note</span>
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-12">
-          {filteredNotes.map((note, index) => (
+          {filteredNotes.map((note) => (
             <div
               key={note.id}
               onClick={() => handleNoteClick(note.id)}
-              className="card-surface group flex flex-col justify-between animate-scale-in"
-              style={{ animationDelay: `${index * 30}ms` }}
+              className="card-surface p-4.5 group flex flex-col justify-between cursor-pointer"
             >
               <div>
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-emerald transition-colors line-clamp-1">
+                <div className="flex items-start justify-between gap-3 mb-2.5">
+                  <h3 className="text-sm font-semibold tracking-tight text-[#F5F5F7] group-hover:text-[#0A84FF] transition-colors line-clamp-1">
                     {note.title || 'Untitled Note'}
                   </h3>
                   <button
                     onClick={(e) => handleDeleteNote(e, note.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 text-text-muted hover:text-rose-400 transition-all rounded-md hover:bg-rose-500/10"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 text-[#86868B] hover:text-[#FF453A] transition-all rounded-lg hover:bg-[#FF453A]/10"
                     title="Delete Note"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                   </button>
                 </div>
 
-                <p className="text-xs text-text-secondary line-clamp-4 leading-relaxed mb-4">
-                  {getCleanSnippet(note.content) || <span className="italic text-text-tertiary">Empty note...</span>}
+                <p className="text-xs text-[#A1A1A6] line-clamp-3 leading-relaxed mb-4">
+                  {getCleanSnippet(note.content) || (
+                    <span className="italic text-[#6E6E73]">Empty note...</span>
+                  )}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-surface-elevated flex items-center justify-between text-xs text-text-muted font-mono">
+              <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-[#86868B] font-mono">
                 <div className="flex items-center gap-1.5">
-                  <Clock size={12} className="opacity-70" />
-                  <span>{new Date(note.updatedAt || note.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <Clock size={11} className="opacity-70" />
+                  <span>
+                    {new Date(note.updatedAt || note.createdAt || Date.now()).toLocaleDateString(
+                      undefined,
+                      { month: 'short', day: 'numeric', year: 'numeric' },
+                    )}
+                  </span>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   {getWikilinkCount(note.content) > 0 && (
-                    <div className="flex items-center gap-1 text-text-tertiary" title={`${getWikilinkCount(note.content)} linked references`}>
-                      <Link size={12} />
+                    <div
+                      className="flex items-center gap-1 text-[#86868B]"
+                      title={`${getWikilinkCount(note.content)} linked references`}
+                    >
+                      <Link size={11} />
                       <span>{getWikilinkCount(note.content)}</span>
                     </div>
                   )}
 
                   {note.tags && note.tags.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Tag size={12} className="opacity-70" />
+                    <div className="flex items-center gap-1 text-[#86868B]">
+                      <Tag size={11} className="opacity-70" />
                       <span>{note.tags.length}</span>
                     </div>
                   )}
@@ -386,9 +401,9 @@ export default function NotesPage({ onNavigate }: NotesPageProps) {
       {/* Floating Action Button for Mobile */}
       <button
         onClick={() => handleCreateNote()}
-        className="md:hidden fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 bg-brand-emerald hover:bg-emerald-500 text-background rounded-full shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-transform hover:scale-105 active:scale-95 z-40 font-semibold text-sm"
+        className="md:hidden fixed bottom-6 right-6 flex items-center gap-2 px-5 py-3 bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-full shadow-[0_4px_20px_rgba(0,113,227,0.4)] transition-transform hover:scale-105 active:scale-95 z-40 font-medium text-xs tracking-tight"
       >
-        <Plus size={18} />
+        <Plus size={16} />
         <span>Quick Note</span>
       </button>
     </div>
