@@ -8,17 +8,36 @@ import SearchPage from './pages/SearchPage';
 import SettingsPage from './pages/SettingsPage';
 import VaultHealthPage from './pages/VaultHealthPage';
 import IngestPage from './pages/IngestPage';
+import CanvasPage from './pages/CanvasPage';
 import JarvisHUD from './components/JarvisHUD';
+import CommandPalette from './components/CommandPalette';
 import DesktopNeonOrb from './components/DesktopNeonOrb';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 
 type Page =
-  'notes' | 'editor' | 'graph' | 'flashcards' | 'search' | 'settings' | 'vault-health' | 'ingest';
+  | 'notes'
+  | 'editor'
+  | 'canvas'
+  | 'graph'
+  | 'flashcards'
+  | 'search'
+  | 'settings'
+  | 'vault-health'
+  | 'ingest';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('notes');
   const [isJarvisOpen, setIsJarvisOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Global handle for opening command palette
+  useEffect(() => {
+    (window as any).__openCommandPalette = () => setIsCommandPaletteOpen(true);
+    return () => {
+      delete (window as any).__openCommandPalette;
+    };
+  }, []);
 
   const isOrbOnlyMode =
     typeof window !== 'undefined' && window.location.search.includes('mode=orb');
@@ -70,6 +89,8 @@ export default function App() {
         return <NotesPage onNavigate={setCurrentPage as any} />;
       case 'editor':
         return <EditorPage />;
+      case 'canvas':
+        return <CanvasPage onNavigate={setCurrentPage as any} />;
       case 'graph':
         return <GraphPage />;
       case 'flashcards':
@@ -93,9 +114,18 @@ export default function App() {
         currentPage={currentPage}
         onNavigate={setCurrentPage}
         onOpenJarvis={() => setIsJarvisOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       >
         <ErrorBoundary onReset={() => setCurrentPage('notes')}>{renderPage()}</ErrorBoundary>
       </Layout>
+
+      {/* Universal Command Palette (Cmd/Ctrl + K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onNavigate={setCurrentPage}
+        onOpenJarvis={() => setIsJarvisOpen(true)}
+      />
 
       {/* Futuristic JARVIS HUD Overlay */}
       <JarvisHUD isOpen={isJarvisOpen} onClose={() => setIsJarvisOpen(false)} />

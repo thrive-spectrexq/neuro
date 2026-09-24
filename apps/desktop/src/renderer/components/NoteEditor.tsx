@@ -19,6 +19,8 @@ import {
   Eye,
   Columns,
   Code,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { useNoteStore } from '../store/noteStore';
 import { useNotes, useUpdateNote } from '../hooks/useNotes';
@@ -26,7 +28,12 @@ import { soundEngine } from '../utils/soundEngine';
 
 type EditorViewMode = 'edit' | 'split' | 'preview';
 
-export default function NoteEditor() {
+interface NoteEditorProps {
+  isZenMode?: boolean;
+  onToggleZenMode?: () => void;
+}
+
+export default function NoteEditor({ isZenMode = false, onToggleZenMode }: NoteEditorProps) {
   const { activeNoteId } = useNoteStore();
   const { data: notes } = useNotes();
   const updateNoteMutation = useUpdateNote();
@@ -253,6 +260,12 @@ export default function NoteEditor() {
     return content.trim() ? content.trim().split(/\s+/).length : 0;
   }, [content]);
 
+  const charCount = useMemo(() => content.length, [content]);
+
+  const readingTimeMinutes = useMemo(() => {
+    return Math.max(1, Math.ceil(wordCount / 200));
+  }, [wordCount]);
+
   // Simple, elegant Markdown preview renderer
   const renderMarkdownPreview = () => {
     const lines = content.split('\n');
@@ -392,6 +405,22 @@ export default function NoteEditor() {
             </button>
           </div>
 
+          {/* Zen Focus Mode Button */}
+          {onToggleZenMode && (
+            <button
+              onClick={onToggleZenMode}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono transition-all ${
+                isZenMode
+                  ? 'bg-[#0071E3] border-[#0071E3] text-white shadow-sm'
+                  : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.06] text-zinc-400 hover:text-white'
+              }`}
+              title={isZenMode ? 'Exit Zen Focus Mode (Esc)' : 'Enter Zen Focus Mode'}
+            >
+              {isZenMode ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+              <span className="text-[11px]">{isZenMode ? 'Zen Mode' : 'Zen'}</span>
+            </button>
+          )}
+
           <button
             onClick={handleCopyContent}
             className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-400 hover:text-white transition-all"
@@ -401,9 +430,13 @@ export default function NoteEditor() {
             <span className="text-[11px]">{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
             <span>{wordCount} words</span>
+            <span className="text-zinc-600">·</span>
+            <span>{charCount} chars</span>
+            <span className="text-zinc-600">·</span>
+            <span>{readingTimeMinutes}m read</span>
           </div>
 
           <div className="w-[1px] h-3 bg-white/[0.08]" />

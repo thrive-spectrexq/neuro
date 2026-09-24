@@ -2,6 +2,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import {
   FileText,
   Edit3,
+  LayoutGrid,
   Network,
   Search,
   Settings,
@@ -18,17 +19,19 @@ interface LayoutProps {
   currentPage: string;
   onNavigate: (page: any) => void;
   onOpenJarvis?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 const navItems = [
   { id: 'notes', icon: FileText, label: 'Notes', shortcut: '1' },
   { id: 'editor', icon: Edit3, label: 'Editor', shortcut: '2' },
-  { id: 'graph', icon: Network, label: 'Graph', shortcut: '3' },
-  { id: 'flashcards', icon: Brain, label: 'Recall', shortcut: '4' },
-  { id: 'search', icon: Search, label: 'Search', shortcut: '5' },
+  { id: 'canvas', icon: LayoutGrid, label: 'Canvas', shortcut: '3' },
+  { id: 'graph', icon: Network, label: 'Graph', shortcut: '4' },
+  { id: 'flashcards', icon: Brain, label: 'Recall', shortcut: '5' },
+  { id: 'search', icon: Search, label: 'Search', shortcut: '6' },
   { id: 'vault-health', icon: Activity, label: 'Vault Health', shortcut: '7' },
   { id: 'ingest', icon: Upload, label: 'Ingest', shortcut: '8' },
-  { id: 'settings', icon: Settings, label: 'Settings', shortcut: '6' },
+  { id: 'settings', icon: Settings, label: 'Settings', shortcut: '9' },
 ];
 
 function NavButton({
@@ -118,7 +121,13 @@ function AgentSummonButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-export default function Layout({ children, currentPage, onNavigate, onOpenJarvis }: LayoutProps) {
+export default function Layout({
+  children,
+  currentPage,
+  onNavigate,
+  onOpenJarvis,
+  onOpenCommandPalette,
+}: LayoutProps) {
   // Keyboard shortcut handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -144,7 +153,7 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#000000] text-[#F5F5F7] font-sans">
-      {/* ═══ Apple macOS Translucent Sidebar ═══ */}
+      {/* ═══ Translucent Sidebar ═══ */}
       <aside className="w-sidebar flex flex-col items-center bg-[#0B0B0E]/85 backdrop-blur-2xl border-r border-white/[0.08] z-30 flex-shrink-0 select-none titlebar-drag">
         {/* Brand Mark */}
         <div className="h-header flex items-center justify-center flex-shrink-0 border-b border-white/[0.06]">
@@ -187,7 +196,7 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
 
       {/* ═══ Main Content Area ═══ */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-[#000000]">
-        {/* Apple macOS Unified Header Bar */}
+        {/* Unified Header Bar */}
         <header className="h-header w-full titlebar-drag flex items-center justify-between px-5 border-b border-white/[0.08] bg-[#0A0A0D]/75 backdrop-blur-2xl select-none z-20 flex-shrink-0">
           {/* Breadcrumb */}
           <div className="no-drag flex items-center gap-2 text-xs">
@@ -212,18 +221,17 @@ export default function Layout({ children, currentPage, onNavigate, onOpenJarvis
           {/* Center Spotlight Command Pill */}
           <div className="no-drag">
             <button
-              onClick={onOpenJarvis}
+              onClick={onOpenCommandPalette || onOpenJarvis}
               className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.09] hover:border-white/[0.16] text-[#A1A1A6] hover:text-[#F5F5F7] text-xs transition-all duration-150 group shadow-sm"
+              title="Command Palette (Ctrl+K / ⌘K)"
             >
               <Search
                 size={13}
                 className="text-[#86868B] group-hover:text-[#0A84FF] transition-colors"
               />
-              <span className="text-xs font-normal tracking-tight">
-                Spotlight & Intelligence...
-              </span>
+              <span className="text-xs font-normal tracking-tight">Search or run command...</span>
               <kbd className="text-[10px] px-1.5 py-0.5 bg-black/40 rounded-md border border-white/[0.08] text-[#86868B] font-mono">
-                Ctrl+Space
+                ⌘K
               </kbd>
             </button>
           </div>
