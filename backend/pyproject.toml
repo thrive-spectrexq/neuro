@@ -6,8 +6,8 @@ license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.141.1",
-    "uvicorn[standard]==0.53.0",
-    "sqlmodel==0.0.42",
+    "uvicorn[standard]==0.54.0",
+    "sqlmodel==0.0.47",
     "alembic==1.20.0",
     "pydantic[email]==2.13.5",
     "pydantic-settings==2.15.0",
@@ -24,7 +24,7 @@ dependencies = [
     "pyyaml==6.0.3",
     "typer==0.27.2",
     "aiosqlite==0.22.1",
-    "networkx==3.6.1",
+    "networkx==3.7",
 ]
 
 [project.scripts]
