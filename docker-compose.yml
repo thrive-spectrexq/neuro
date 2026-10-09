@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
     container_name: neuro-backend
     ports:
-      - "8000:8000"
+      - "${NEURO_BIND_ADDRESS:-127.0.0.1}:8000:8000"
     volumes:
       - ./backend:/app
       - backend-data:/app/data
@@ -63,16 +63,18 @@ services:
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
-  # Redis — Task queue & cache
+  # Redis — Celery broker and result backend
   # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     container_name: neuro-redis
     ports:
-      - "6379:6379"
+      - "${NEURO_BIND_ADDRESS:-127.0.0.1}:6379:6379"
     volumes:
       - redis-data:/data
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    # Do not evict broker/backend keys under memory pressure. Monitor memory and
+    # size this limit for the workload; noeviction makes capacity problems visible.
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy noeviction
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -87,7 +89,7 @@ services:
     image: chromadb/chroma:latest
     container_name: neuro-chromadb
     ports:
-      - "8001:8000"
+      - "${NEURO_BIND_ADDRESS:-127.0.0.1}:8001:8000"
     volumes:
       - chroma-data:/chroma/chroma
     environment:
@@ -110,7 +112,7 @@ services:
     profiles:
       - ai
     ports:
-      - "11434:11434"
+      - "${NEURO_BIND_ADDRESS:-127.0.0.1}:11434:11434"
     volumes:
       - ollama-data:/root/.ollama
     restart: unless-stopped
